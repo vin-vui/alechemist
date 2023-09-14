@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: Shangrila;
+    src: url("fonts/SHANLN__.TTF");
+}
+
+@font-face {
+    font-family: ShangrilaC;
+    src: url("fonts/SHANLNC_.TTF");
+}
+
+[x-cloak] {
+    display: none;
+}
