@@ -26,3 +26,6 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
+Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
