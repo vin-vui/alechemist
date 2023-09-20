@@ -19,7 +19,7 @@ export default {
                 "shangrila-caps": ['ShangrilaC'],
             },
             colors: {
-                "rich-black": "#0D0D19",
+                "rich-black": "#12121A",
                 "xanthous": "#F3AE1A",
                 "tawny": "#CA6018",
                 "old-gold": "#E2C05D",
