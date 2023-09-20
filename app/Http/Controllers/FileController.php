@@ -12,7 +12,7 @@ class FileController extends Controller
 {
     public function index()
     {
-        return view ('brewing.uploadFile');
+        return view ('recipes.uploadFile');
     }
 
     public function store(Request $request)
