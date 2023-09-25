@@ -18,8 +18,9 @@ class FileController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:xml|max:2048',
+            'file' => 'required|file|mimes:xml|max:2048'
         ]);
+
 
         $uploadFile = $request->file('file');
         $fileContent = file_get_contents($uploadFile->path());
@@ -29,9 +30,9 @@ class FileController extends Controller
         $recipe = ($arrayFile['RECIPE']);
         $mash = ($arrayFile['RECIPE']['MASH']);
 
-        // Informations recettes
+        // Informations recipes
 
-        Recipe::firstOrCreate ([
+        $imported_recipe = Recipe::create ([
             'name' => $recipe['NAME'],
             'type' => $recipe['STYLE']['NAME'],
             'method' => $recipe['TYPE'],
@@ -46,13 +47,12 @@ class FileController extends Controller
             'carbonation' => $recipe['CARBONATION']
         ]);
 
-       $recipeId = Recipe::where('name', $recipe['NAME'])->value('id');
 
         // Céréales et sucres - Fermentables
         if (!empty($recipe['FERMENTABLES'])) {
             foreach ($arrayFile['RECIPE']['FERMENTABLES']['FERMENTABLE'] as $fermentable) {
 
-                $this->createStep($fermentable['AMOUNT']*1000, 'g', $fermentable['NAME'], null, 'Mash', $recipeId);
+                $this->createStep($fermentable['AMOUNT']*1000, 'g', $fermentable['NAME'], null, 'Preparation', $imported_recipe->id);
             }
         }
 
@@ -65,7 +65,7 @@ class FileController extends Controller
             }
             foreach ($array_hop as $hop) {
 
-                $this->createStep($hop['AMOUNT']*1000, 'g', $hop['NAME'], $hop['TIME'], $hop['USE'], $recipeId);
+                $this->createStep($hop['AMOUNT']*1000, 'g', $hop['NAME'], $hop['TIME'], $hop['USE'], $imported_recipe->id);
             }
         }
 
@@ -79,7 +79,7 @@ class FileController extends Controller
             }
         foreach ($array_misc as $misc) {
 
-            $this->createStep($misc['AMOUNT']*1000, 'g', $misc['NAME'], $misc['TIME'], $misc['USE'], $recipeId);
+            $this->createStep($misc['AMOUNT']*1000, 'g', $misc['NAME'], $misc['TIME'], $misc['USE'], $imported_recipe->id);
 
         }
         }
@@ -94,7 +94,7 @@ class FileController extends Controller
 
             foreach ($array_yeast as $yeast) {
 
-                 $this->createStep($yeast['AMOUNT']*1000, 'g', $yeast['NAME'], null, 'Yeast' , $recipeId);
+                 $this->createStep($yeast['AMOUNT']*1000, 'g', $yeast['NAME'], null, 'Yeast' , $imported_recipe->id);
 
             }
         }
@@ -103,25 +103,28 @@ class FileController extends Controller
         $mash = $recipe['MASH']['MASH_STEPS']['MASH_STEP'];
 
         if (array_key_exists('INFUSE_AMOUNT', $mash)) {
-            $this->createStep($mash['INFUSE_AMOUNT'], 'l', $mash['TYPE'], $mash['INFUSE_TEMP'], 'Mash', $recipeId);
+            $this->createStep($mash['INFUSE_AMOUNT'], 'l', $mash['INFUSE_TEMP'].' °C', null, 'Preparation', $imported_recipe->id);
         }
         if (array_key_exists('STEP_TEMP', $mash)) {
-            $this->createStep($mash['STEP_TEMP'], '°C', $mash['NAME'], $mash['STEP_TIME'], 'Mash', $recipeId);
+            $this->createStep($mash['STEP_TEMP'], '°C', $mash['NAME'], $mash['STEP_TIME'], 'Mash', $imported_recipe->id);
+        }
+        if (array_key_exists('SPARGE_TEMP', $recipe['MASH'])) {
+            $this->createStep($recipe['MASH']['SPARGE_TEMP'], '°C', 'Filtrer et rincer les drêches jusqu\'à'.' '.$recipe['BOIL_SIZE'].' l', null, 'Mash', $imported_recipe->id);
         }
 
 
         //Fermentation
         if (array_key_exists('PRIMARY_AGE', $recipe)) {
-            $this->createStep($recipe['PRIMARY_TEMP'], '°C', 'Primaire', $recipe['PRIMARY_AGE']*1440, 'Primary', $recipeId);
+            $this->createStep($recipe['PRIMARY_TEMP'], '°C', 'Primaire', $recipe['PRIMARY_AGE']*1440, 'Primary', $imported_recipe->id);
         }
         if (array_key_exists('SECONDARY_AGE', $recipe)) {
-            $this->createStep($recipe['SECONDARY_TEMP'], '°C', 'Secondaire', $recipe['SECONDARY_AGE']*1440, 'Secondary', $recipeId);
+            $this->createStep($recipe['SECONDARY_TEMP'], '°C', 'Secondaire', $recipe['SECONDARY_AGE']*1440, 'Secondary', $imported_recipe->id);
         }
         if (array_key_exists('TERTIARY_AGE', $recipe)) {
-            $this->createStep($recipe['TERTIARY_TEMP'], '°C', 'Tertiaire', $recipe['TERTIARY_AGE']*1440, 'Tertiary', $recipeId);
+            $this->createStep($recipe['TERTIARY_TEMP'], '°C', 'Tertiaire', $recipe['TERTIARY_AGE']*1440, 'Tertiary', $imported_recipe->id);
         }
         if (array_key_exists('AGE', $recipe)) {
-            $this->createStep($recipe['AGE_TEMP'], '°C', 'Garde en bouteille', $recipe['AGE']*1440, 'Bottle', $recipeId);
+            $this->createStep($recipe['AGE_TEMP'], '°C', 'Garde en bouteille', $recipe['AGE']*1440, 'Bottle', $imported_recipe->id);
         }
 
         return redirect('uploadFile');

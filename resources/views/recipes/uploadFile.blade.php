@@ -1,18 +1,22 @@
 <x-app-layout>
-    <div class="max-w-xl mx-auto py-4 px-4">
-        <form class="flex flex-col text-sm  bg-gray-50 rounded shadow-lg py-4"
+    <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center">
+        <h2 class="text-xl font-semibold tracking-widest">Import File</h2>
+    </div>
+    <div class="max-w-xl mx-auto p-4">
+        <form class="flex flex-col text-sm  bg-white rounded shadow-lg py-4"
         action="{{ route('upload.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             @error('file')<span class="flex justify-center text-xs text-tawny">{{ $message }} </span> @enderror
-            <div class="py-4 flex flex-col justify-center items-center">
-                <label class="text-lg font-semibold  @error('file') is-invalid @enderror" for="inputFile">File BeerXML:</label>
-                <input type="file" class="flex items-center h-8 px-4 w-62 bg-gray-50  mt-2 rounded focus:outline-none focus:ring-2" id="inputfile" name="file">
+            <div class="flex flex-col justify-center items-center py-4 mx-4 gap-y-4">
+                <label class="mb-2 text-lg font-medium text-gray-900" for="file">File BeerXML</label>
+                <input class="w-full text-sm text-gray-900 border rounded cursor-pointer transition-all duration-300 file:bg-old-gold file:rounded file:border-0 file:p-2 hover:file:bg-tawny focus:outline-none" name="file" id="file" type="file">
+
             </div>
 
             <div class="flex justify-center">
                 <button
-                    type="submit" class="bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-3 flex items-center gap-2">Submit
+                    type="submit" class="mt-4 bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-2 px-3 flex items-center gap-2">Submit
                 </button>
             </div>
 

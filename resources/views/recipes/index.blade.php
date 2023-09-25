@@ -10,6 +10,7 @@
     </div>
     <div class="flex flex-col gap-4 px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         @foreach ($recipes as $recipe)
+            <a href="{{ route('recipe.show', $recipe) }}">
             <div class="bg-gray-50 shadow-lg dark:bg-gray-700 dark:text-gray-400">
                 <div class="flex gap-4 items-center">
                     <div class="shrink-0">
@@ -21,7 +22,12 @@
                         <span class="text-xs bg-xanthous py-0.5 px-1.5 rounded text-gray-900 uppercase">{{ $recipe->alcohol }} %</span>
                     </div>
                 </div>
+                <div class="flex justify-between">
+                <div class="text-xs bg-old-gold">Create at {{ $recipe->created_at->format('Y-m-d') }}</div>
+                <div class="text-xs bg-old-gold">Modify at {{ $recipe->updated_at->format('Y-m-d') }}</div>
+                </div>
             </div>
+            </a>
         @endforeach
     </div>
 </div>

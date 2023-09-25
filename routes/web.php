@@ -1,6 +1,9 @@
 <?php
 
+
 use App\Livewire\RecipesController;
+use App\Livewire\RecipeDetailsController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileController;
 
@@ -31,4 +34,5 @@ Route::middleware([
 
 Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
 Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
-Route::get('recipes', RecipesController::class)->name('index');
+Route::get('/recipes', RecipesController::class)->name('index');
+Route::get('/recipes/{recipeId}', RecipeDetailsController::class)->name('recipe.show');
