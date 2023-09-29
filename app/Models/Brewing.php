@@ -2,24 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Recipe extends Model
+class Brewing extends Model
 {
     use HasFactory;
-
     protected $fillable = ['name', 'type', 'method', 'ferment', 'volume', 'efficiency', 'color', 'bitterness', 'alcohol',
     'initial_density', 'final_density', 'density_b_boil', 'carbonation'];
 
-    public function steps(): HasMany
+    public function Brewing_steps(): HasMany
     {
-        return $this->hasMany(Step::class);
+        return $this->hasMany(Brewing_Step::class);
     }
 
-    public function brewing(): BelongsTo
+    public function recipe(): HasMany
     {
-        return $this->belongsTo(brewing::class);
+        return $this->hasMany(Recipe::class);
     }
 }

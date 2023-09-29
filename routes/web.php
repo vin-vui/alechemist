@@ -1,11 +1,12 @@
 <?php
 
 
+use App\Livewire\BrewingController;
 use App\Livewire\RecipesController;
-use App\Livewire\RecipeDetailsController;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileController;
+use App\Livewire\RecipeDetailsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,5 +35,6 @@ Route::middleware([
 
 Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
 Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
-Route::get('/recipes', RecipesController::class)->name('index');
-Route::get('/recipes/{recipeId}', RecipeDetailsController::class)->name('recipe.show');
+Route::get('/recipes', RecipesController::class)->name('recipes.index');
+Route::get('/recipes/{recipeId}', RecipeDetailsController::class)->name('recipes.show');
+Route::get('/recipes/{recipe}/brewing', BrewingController::class)->name('recipe.brewing');

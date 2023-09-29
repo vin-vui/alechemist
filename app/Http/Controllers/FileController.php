@@ -109,7 +109,7 @@ class FileController extends Controller
             $this->createStep($mash['STEP_TEMP'], '°C', $mash['NAME'], $mash['STEP_TIME'], 'Mash', $imported_recipe->id);
         }
         if (array_key_exists('SPARGE_TEMP', $recipe['MASH'])) {
-            $this->createStep($recipe['MASH']['SPARGE_TEMP'], '°C', 'Filtrer et rincer les drêches jusqu\'à'.' '.$recipe['BOIL_SIZE'].' l', null, 'Mash', $imported_recipe->id);
+            $this->createStep($recipe['MASH']['SPARGE_TEMP'], '°C', 'Rincer les drêches jusqu\'à'.' '.$recipe['BOIL_SIZE'].' l', null, 'Mash', $imported_recipe->id);
         }
 
 
@@ -127,7 +127,7 @@ class FileController extends Controller
             $this->createStep($recipe['AGE_TEMP'], '°C', 'Garde en bouteille', $recipe['AGE']*1440, 'Bottle', $imported_recipe->id);
         }
 
-        return redirect('uploadFile');
+        return redirect()->route('recipe.show',['recipeId'=> $imported_recipe->id]);
     }
 
     // createStep($quantity, $unit, $field, $time, $type, $recipe_id)

@@ -7,16 +7,16 @@
             <li>
                 <ul role="list" class="-ml-2 space-y-1">
                     <li>
-                        <a href="#" class="bg-anti-flash-white text-rich-black group flex gap-x-3 p-2 text-sm leading-6 font-semibold" x-state:on="Current" x-state:off="Default" x-state-description="Current: &quot;bg-gray-50 text-rich-black&quot;, Default: &quot;text-white hover:text-rich-black hover:bg-anti-flash-white&quot;">
-                            <svg class="h-6 w-6 shrink-0 text-xanthous" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <a href="{{ route('dashboard' )}}" class="{{ request()->routeIs('dashboard') ? 'text-rich-black bg-anti-flash-white' : 'text-white hover:text-rich-black hover:bg-anti-flash-white' }} group flex gap-x-3 p-2 text-sm leading-6 font-semibold" x-state:on="Current" x-state:off="Default" x-state-description="Current: &quot;bg-gray-50 text-rich-black&quot;, Default: &quot;text-white hover:text-rich-black hover:bg-anti-flash-white&quot;">
+                            <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('dashboard') ? 'text-xanthous' : 'text-tawny group-hover:text-xanthous' }}" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
                             </svg>
                             {{ __('Dashboard') }}
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('index') }}" class="text-white hover:text-rich-black hover:bg-anti-flash-white group flex gap-x-3 p-2 text-sm leading-6 font-semibold" x-state-description="undefined: &quot;bg-gray-50 text-rich-black&quot;, undefined: &quot;text-white hover:text-rich-black hover:bg-anti-flash-white&quot;">
-                            <svg class="h-6 w-6 shrink-0 text-tawny group-hover:text-xanthous" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
+                        <a href="{{ route('recipes.index') }}" class="{{ request()->routeIs('recipes.*') ? 'text-rich-black bg-anti-flash-white' : 'text-white hover:text-rich-black hover:bg-anti-flash-white' }} group flex gap-x-3 p-2 text-sm leading-6 font-semibold" x-state-description="undefined: &quot;bg-gray-50 text-rich-black&quot;, undefined: &quot;text-white hover:text-rich-black hover:bg-anti-flash-white&quot;">
+                            <svg class="h-6 w-6 shrink-0 {{ request()->routeIs('recipes.*') ? 'text-xanthous' : 'text-tawny group-hover:text-xanthous' }}" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 256 256">
                                 <path fill="currentColor" d="M104 104v80a8 8 0 0 1-16 0v-80a8 8 0 0 1 16 0Zm40-8a8 8 0 0 0-8 8v80a8 8 0 0 0 16 0v-80a8 8 0 0 0-8-8Zm96 16v64a24 24 0 0 1-24 24h-16v8a16 16 0 0 1-16 16H56a16 16 0 0 1-16-16V72c0-30.88 28.71-56 64-56c16.77 0 32.91 5.8 44.82 16H160a40 40 0 0 1 40 40v16h16a24 24 0 0 1 24 24ZM57 64h125.62A24 24 0 0 0 160 48h-14.26a8 8 0 0 1-5.53-2.22C131.06 37 117.87 32 104 32c-23.18 0-42.57 13.76-47 32Zm127 144V80H56v128h128Zm40-96a8 8 0 0 0-8-8h-16v80h16a8 8 0 0 0 8-8Z" />
                             </svg>
                             {{ __('Recipes') }}
