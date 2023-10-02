@@ -12,7 +12,7 @@
                         </h3>
                         <a href="{{ route('recipe.brewing', $recipe) }} ">
                             <button
-                                class="text-sm bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-2 flex items-center gap-1">
+                                class="text-sm bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-1.5 flex items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24">
                                     <path fill="currentColor" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2v-6Z" />
                                 </svg>
@@ -41,30 +41,30 @@
             </svg>
             <div class="flex flex-col w-1/2">
                 <div class="flex">
-                    <div class="font-semibold mb-1">Method</div>
-                    <div class="ml-2 text-gray-500">{{ $recipe->method }}</div>
+                    <div class="text-sm font-semibold mb-1">Method</div>
+                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->method }}</div>
                 </div>
                 <div class="flex">
-                    <div class="font-semibold mb-1">Volume</div>
-                    <div class="ml-2 text-gray-500">{{ $recipe->volume }} l</div>
+                    <div class="text-sm font-semibold mb-1">Volume</div>
+                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->volume }} l</div>
                 </div>
                 <div class="flex">
-                    <div class="font-semibold mb-1">Ferment</div>
-                    <div class="ml-2 text-gray-500">{{ $recipe->ferment }}</div>
+                    <div class="text-sm font-semibold mb-1">Ferment</div>
+                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->ferment }}</div>
                 </div>
             </div>
             <div class="flex flex-col w-1/2 ml-2">
                 <div class="flex">
-                    <div class="font-semibold mb-1"> Initial density</div>
-                    <div class="ml-2 text-gray-500">{{ $recipe->initial_density }}</div>
+                    <div class="text-sm font-semibold mb-1"> Initial density</div>
+                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->initial_density }}</div>
                 </div>
                 <div class="flex">
-                    <div class="font-semibold mb-1"> Final density</div>
-                    <div class="ml-2 text-gray-500">{{ $recipe->final_density }}</div>
+                    <div class="text-sm font-semibold mb-1"> Final density</div>
+                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->final_density }}</div>
                 </div>
                 <div class="flex">
-                    <div class="font-semibold mb-1"> Carbonation</div>
-                    <div class="ml-2 text-gray-500">{{ $recipe->carbonation }}</div>
+                    <div class="text-sm font-semibold mb-1"> Carbonation</div>
+                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->carbonation }}</div>
                 </div>
             </div>
         </div>
@@ -111,8 +111,9 @@
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
-                            class="flex justify-center sm:justify-start md:justify-start lg:justify-start xl:justify-start 2xl:justify-start px-2 py-3">
-                            Quantity</th>
+                            class="flex justify-center items-center sm:justify-start md:justify-start lg:justify-start xl:justify-start 2xl:justify-start px-2 py-3">
+                            Quantity
+                        </th>
                         <th scope="col" class="px-2 py-3">Unit</th>
                         <th scope="col" class="px-2 py-3">Name</th>
                         <th scope="col" class="px-2 py-3">Add</th>
@@ -126,13 +127,13 @@
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Mash')
                                 <td
-                                    class="flex justify-center sm:justify-start md:justify-start lg:justify-start xl:justify-start 2xl:justify-start  px-2 py-3">
+                                    class="sm:justify-start md:justify-start lg:justify-start xl:justify-start 2xl:justify-start  px-2 py-3">
                                     {{ $step->quantity }} </td>
                                 <td class="px-2 py-3">{{ $step->unit }} </td>
                                 <td class="px-2 py-3">{{ $step->field }} </td>
                                 <td class="px-2 py-3">{{ $step->type }} </td>
                                 <td
-                                    class="flex justify-center sm:justify-start md:justify-start lg:justify-start xl:justify-start 2xl:justify-start  px-2 py-3">
+                                    class="sm:justify-start md:justify-start lg:justify-start xl:justify-start 2xl:justify-start  px-2 py-3">
                                     {{ $step->time }} </td>
                             @endif
                         </tr>

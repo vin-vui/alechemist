@@ -127,7 +127,7 @@ class FileController extends Controller
             $this->createStep($recipe['AGE_TEMP'], '°C', 'Garde en bouteille', $recipe['AGE']*1440, 'Bottle', $imported_recipe->id);
         }
 
-        return redirect()->route('recipe.show',['recipeId'=> $imported_recipe->id]);
+        return redirect()->route('recipes.show',['recipeId'=> $imported_recipe->id]);
     }
 
     // createStep($quantity, $unit, $field, $time, $type, $recipe_id)

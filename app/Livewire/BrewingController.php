@@ -45,6 +45,12 @@ class BrewingController extends Component
                     $this->currentStepType = 'Yeast';
                     break;
                 case 'Yeast':
+                    $this->currentStepType = 'Primary';
+                    break;
+                case 'Primary':
+                    $this->currentStepType = 'Secondary';
+                    break;
+                case 'Secondary':
                     $this->currentStepType = 'Bottle';
                     break;
                 default:
