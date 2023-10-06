@@ -1,4 +1,4 @@
-<div class="">
+<div>
     <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center">
         <h2 class="text-xl font-semibold tracking-widest">Recipes</h2>
         <a href="{{ route('fileUpload') }}">

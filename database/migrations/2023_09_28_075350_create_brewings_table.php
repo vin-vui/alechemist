@@ -15,17 +15,15 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('type');
-            $table->string('method');
-            $table->string('ferment');
-            $table->float('volume');
-            $table->string('efficiency');
-            $table->string('color');
-            $table->string('bitterness');
-            $table->string('alcohol');
-            $table->float('initial_density', 4, 3);
-            $table->float('final_density', 4, 3);
+            $table->float('volume')->nullable();
+            $table->string('alcohol')->nullable();
+            $table->float('initial_density', 4, 3)->nullable();
+            $table->float('final_density', 4, 3)->nullable();
             $table->float('density_b_boil')->nullable();
-            $table->Float('carbonation');
+            $table->float('carbonation')->nullable();
+            $table->date('date_start');
+            $table->text('note');
+            $table->foreignId('recipe_id');
             $table->timestamps();
         });
     }

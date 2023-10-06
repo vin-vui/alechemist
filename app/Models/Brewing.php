@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Brewing extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'type', 'method', 'ferment', 'volume', 'efficiency', 'color', 'bitterness', 'alcohol',
-    'initial_density', 'final_density', 'density_b_boil', 'carbonation'];
+    protected $fillable = ['name', 'type', 'volume', 'alcohol', 'initial_density', 'final_density', 'density_b_boil',
+    'carbonation', 'date_start', 'note', 'recipe_id'];
 
     public function Brewing_steps(): HasMany
     {
