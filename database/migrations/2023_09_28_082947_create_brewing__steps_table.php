@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('date')->nullable();
             $table->integer('time')->nullable();
             $table->enum('type', ['Preparation', 'Mash', 'Rinse', 'Boil', 'Yeast', 'Primary', 'Secondary', 'Tertiary', 'Bottle', 'Dry Hop', 'Aroma']);
-            $table->boolean('status');
+            $table->boolean('status')->default(0);
             $table->foreignId('brewing_id');
             $table->timestamps();
         });

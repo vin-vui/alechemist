@@ -2,9 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Models\Step;
-use App\Models\Recipe;
 use App\Models\Brewing;
+use App\Models\Brewing_Step;
 use Livewire\Component;
 
 class PreparationController extends Component
@@ -13,9 +12,11 @@ class PreparationController extends Component
 
     public function mount(Brewing $brewing)
     {
-        $this->brewing = Brewing::find($brewing->id);
-        $this->recipe = $brewing->recipe_id;
-        $this->steps = Step::where('type', 'Preparation')->where('recipe_id', $this->recipe)->get();
+        $this->brewing = $brewing;
+        $this->steps = Brewing_Step::where('type', 'Preparation')
+        ->where('brewing_id', $this->brewing->id)
+        ->orderBy('unit', 'DESC')
+        ->get();
     }
 
 

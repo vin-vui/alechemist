@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Recipe;
+use App\Models\Brewing_Step;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Brewing extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'type', 'volume', 'alcohol', 'initial_density', 'final_density', 'density_b_boil',
+    protected $fillable = ['name', 'type', 'volume', 'alcohol', 'initial_density', 'final_density', 'before_boil_density',
     'carbonation', 'date_start', 'note', 'recipe_id'];
 
     public function Brewing_steps(): HasMany

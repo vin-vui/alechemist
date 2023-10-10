@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('alcohol');
             $table->float('initial_density', 4, 3);
             $table->float('final_density', 4, 3);
-            $table->float('density_b_boil')->nullable();
+            $table->float('before_boil_density')->nullable();
             $table->Float('carbonation');
             $table->timestamps();
         });

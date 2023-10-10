@@ -2,19 +2,18 @@
 
 namespace App\Livewire;
 
-use App\Models\Step;
+use App\Models\Brewing_Step;
 use App\Models\Brewing;
 use Livewire\Component;
 
 class YeastController extends Component
 {
-    public $recipe, $steps;
+    public $recipe, $steps, $brewing;
 
     public function mount(Brewing $brewing)
     {
-        $this->brewing = Brewing::find($brewing->id);
-        $this->recipe = $brewing;
-        $this->steps = Step::where('type', 'Yeast')->where('recipe_id', $this->recipe->id)->get();
+        $this->brewing = $brewing;
+        $this->steps = Brewing_Step::where('type', 'Yeast')->where('brewing_id', $this->brewing->id)->get();
     }
 
     public function render()

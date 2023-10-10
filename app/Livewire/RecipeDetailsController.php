@@ -9,10 +9,10 @@ class RecipeDetailsController extends Component
 {
     public $recipe;
 
-    public function mount($recipeId)
+    public function mount(Recipe $recipe)
     {
 
-    $this->recipe = Recipe::find($recipeId);
+        $this->recipe = $recipe;
     }
 
     public function render()

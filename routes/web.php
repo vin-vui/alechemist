@@ -46,15 +46,15 @@ Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
 Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
 
 Route::get('/recipes', RecipesController::class)->name('recipes.index');
-Route::get('/recipes/{recipeId}', RecipeDetailsController::class)->name('recipes.show');
+Route::get('/recipes/{recipe}', RecipeDetailsController::class)->name('recipes.show');
 
-Route::get('brewing/', BrewingController::class)->name('brewing.index');
+Route::get('/recipes/{recipe}/brewings', BrewingController::class)->name('brewing.index');
 
-Route::get('brewing/new', CreateBrewingController::class)->name('brewing.create');
-Route::post('brewing/new', [CreateBrewingController::class, 'store'])->name('brewing.store');
+Route::get('/recipes/{recipe}/brewings/new', CreateBrewingController::class)->name('brewing.create');
 
-Route::get('brewing/{brewing}/preparation', PreparationController::class)->name('preparation');
-Route::get('brewing/{brewing}/mash', MashController::class)->name('mash');
-Route::get('brewing/{brewing}/boil', BoilController::class)->name('boil');
-Route::get('brewing/{brewing}/yeast', YeastController::class)->name('yeast');
-Route::get('brewing/{brewing}/ferment', FermentController::class)->name('ferment');
+
+Route::get('/recipes/{recipe}/brewings/{brewing}/preparation', PreparationController::class)->name('preparation');
+Route::get('/recipes/{recipe}/brewings/{brewing}/mash', MashController::class)->name('mash');
+Route::get('/recipes/{recipe}/brewings/{brewing}/boil', BoilController::class)->name('boil');
+Route::get('/recipes/{recipe}/brewings/{brewing}/yeast', YeastController::class)->name('yeast');
+Route::get('/recipes/{recipe}/brewings/{brewing}/ferment', FermentController::class)->name('ferment');
