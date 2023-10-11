@@ -3,16 +3,16 @@
         <div class="bg-gray-50 shadow-lg">
             <div class="flex gap-4 items-center">
                 <div class="shrink-0">
-                    <img class="h-28 object-cover"
+                    <img class="h-32 object-cover"
                         src="https://images.unsplash.com/photo-1613478223984-2926776f434a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80">
                 </div>
                 <div class="w-full pr-4">
                     <div class="flex justify-between items-center">
                         <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}
                         </h3>
-                        <a href="{{ route('brewing.index', $recipe) }} ">
+                        <a href="{{ route('brewing.index', $recipe) }}">
                             <button
-                                class="text-sm bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-1.5 flex items-center gap-1">
+                                class="text-sm bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-1.5 flex">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M20 4H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1ZM4 2a3 3 0 0 0-3 3v14a3 3 0 0 0 3 3h16a3 3 0 0 0 3-3V5a3 3 0 0 0-3-3H4Zm2 5h2v2H6V7Zm5 0a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-6Zm-3 4H6v2h2v-2Zm2 1a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2h-6a1 1 0 0 1-1-1Zm-2 3H6v2h2v-2Zm2 1a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2h-6a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
                                 </svg>
                                 Brewings list

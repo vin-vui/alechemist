@@ -44,6 +44,7 @@ class FileController extends Controller
             'alcohol' => $recipe['EST_ABV'],
             'initial_density' => $recipe['EST_OG'],
             'final_density' => $recipe['EST_FG'],
+            'boil_time' => $recipe['BOIL_TIME'],
             'carbonation' => $recipe['CARBONATION']
         ]);
 

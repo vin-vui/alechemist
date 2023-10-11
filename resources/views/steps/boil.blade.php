@@ -7,38 +7,75 @@
             </svg>
             <span class="border-b-old-gold border-0 border-b-2 w-1/5">Boil</span>
         </div>
-        <div class="flex flex-col w-full">
+        <div class="text-sm bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-1.5">
+            <div class="flex">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+                    <path fill="currentColor"
+                        d="M9 3V1h6v2H9Zm2 11h2V8h-2v6Zm1 8q-1.85 0-3.488-.713T5.65 19.35q-1.225-1.225-1.938-2.863T3 13q0-1.85.713-3.488T5.65 6.65q1.225-1.225 2.863-1.938T12 4q1.55 0 2.975.5t2.675 1.45l1.4-1.4l1.4 1.4l-1.4 1.4Q20 8.6 20.5 10.025T21 13q0 1.85-.713 3.488T18.35 19.35q-1.225 1.225-2.863 1.938T12 22Zm0-2q2.9 0 4.95-2.05T19 13q0-2.9-2.05-4.95T12 6Q9.1 6 7.05 8.05T5 13q0 2.9 2.05 4.95T12 20Zm0-7Z" />
+                </svg>
+                <span>Chrono</span>
+            </div>
+            @if ($this->brewing->boil_start != null)
+                <span wire:poll.1m>
+                    il reste
+                    {{ now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)) }}
+                    minutes
+                </span>
+            @else
+                <button class="border border-black p-1" wire:click="startChrono">
+                    Start
+                </button>
+            @endif
+        </div>
+        <div class="flex flex-col w-full gap-2">
             @foreach ($steps as $step)
-                <fieldset>
-                    <div class="rounded-md bg-white">
-                        <label
-                            class="rounded-tl-md rounded-tr-md relative flex cursor-pointer border p-4 focus:outline-none">
-                            <input type="checkbox" name="privacy-setting" value="Public access"
-                                class="mt-0.5 h-4 w-4 shrink-0 cursor-pointer text-indigo-600 border-gray-300 focus:ring-indigo-600 active:ring-2 active:ring-offset-2 active:ring-indigo-600">
-                            <div class="ml-3 flex gap-x-1 justify-between">
-                                <div id="privacy-setting-0-description" class="block text-sm">
+                @php
+                    $time_left = now()->diffInMinutes(
+                        Carbon\Carbon::create($this->brewing->boil_start)
+                            ->addMinutes($this->brewing->boil_time)
+                            ->subMinutes($step->time),
+                        false,
+                    );
+                @endphp
+                <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : 'border-transparent' }} {{ $time_left <= 0 ? 'border-red-600' : '' }}"
+                    wire:click="statusChange({{ $step }})">
+                    <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
+                        <div class="ml-3 w-full flex gap-x-1 justify-between">
+                            <div class="flex gap-x-1">
+                                <div class="block text-sm font-medium">
                                     {{ $step->quantity }}
                                 </div>
-                                <div id="privacy-setting-0-label" class="block text-sm font-medium">
+                                <div class="block text-sm">
                                     {{ $step->unit }}
                                 </div>
-                                <div id="privacy-setting-0-description" class="block text-sm">
+                                <div class="block text-sm">
                                     {{ $step->field }}
                                 </div>
-                                <div id="privacy-setting-0-description" class="block text-sm">
-                                    {{ $step->time }}
-                                </div>
                             </div>
-                        </label>
+                            <div class="block text-sm">
+                                {{ $time_left <= 0 ? 'en retard batard' : 'dans ' . $time_left . ' minutes' }}
+                            </div>
+                        </div>
                     </div>
-                </fieldset>
+                </div>
             @endforeach
         </div>
-        <a href={{ route('yeast', [$recipe, $brewing]) }}>
-            <button
-                class="bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-3 flex items-center gap-2">
+        @if ($this->allChecked)
+            <button type="button" wire:click="next"
+                class="bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-4 flex items-center shrink-0 w-full justify-between font-semibold uppercase">
+                <div></div>
+                <div class="ml-16">Next step</div>
+                <svg class="mr-16"xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                    viewBox="0 0 100 100">
+                    <path fill="currentColor"
+                        d="m50.868 78.016l36.418-26.055a2.516 2.516 0 0 0 1.051-2.043v-.006a2.52 2.52 0 0 0-1.059-2.048L50.86 21.977a2.513 2.513 0 0 0-2.612-.183a2.509 2.509 0 0 0-1.361 2.236v12.183l-32.709-.001a2.514 2.514 0 0 0-2.515 2.516l.001 22.541a2.515 2.515 0 0 0 2.516 2.516h32.706v12.187c0 .94.53 1.803 1.366 2.237a2.512 2.512 0 0 0 2.616-.193z" />
+                </svg>
+            </button>
+        @else
+            <button type="button"
+                class="bg-gray-100 rounded py-4 flex items-center w-full justify-center font-semibold uppercase">
                 Next step
             </button>
-        </a>
+        @endif
     </div>
 </div>

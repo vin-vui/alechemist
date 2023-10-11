@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('brewings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->float('volume')->nullable();
-            $table->string('alcohol')->nullable();
-            $table->float('initial_density', 4, 3)->nullable();
-            $table->float('final_density', 4, 3)->nullable();
+            $table->float('volume');
+            $table->string('alcohol');
+            $table->float('initial_density', 4, 3);
+            $table->float('final_density', 4, 3);
+            $table->integer('boil_time');
+            $table->dateTime('boil_start')->nullable();
             $table->float('before_boil_density')->nullable();
-            $table->float('carbonation')->nullable();
+            $table->float('carbonation');
             $table->date('date_start');
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->foreignId('recipe_id');
             $table->timestamps();
         });

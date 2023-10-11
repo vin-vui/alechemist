@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Recipe;
 use App\Models\Brewing;
-use App\Models\Brewing_Step;
+use App\Models\BrewingStep;
 use Livewire\Component;
 
 class BrewingController extends Component
@@ -19,7 +19,7 @@ class BrewingController extends Component
 
     public function delete(Brewing $brewing)
     {
-        $this->brewingSteps = Brewing_Step::where('brewing_id', $brewing->id)->delete();
+        $this->brewingSteps = BrewingStep::where('brewing_id', $brewing->id)->delete();
         $brewing->delete();
 
     }

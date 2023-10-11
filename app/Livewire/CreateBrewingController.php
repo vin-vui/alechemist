@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
-use App\Models\Brewing_step;
+use App\Models\BrewingStep;
 
 class CreateBrewingController extends Component
 {
@@ -32,7 +32,7 @@ class CreateBrewingController extends Component
         $brewing = $this->newBrewing($validated);
         // J'utilise ma fontion bewingSteps pour insérer mes differentes étapes dans mon nouveau brassin depuis ma recette
         $this->brewingSteps($brewing);
-        
+
         return redirect()->route('brewing.index', $this->recipe);
     }
 
@@ -46,6 +46,7 @@ class CreateBrewingController extends Component
         $brewing->alcohol = $this->recipe->alcohol;
         $brewing->initial_density = $this->recipe->initial_density;
         $brewing->final_density = $this->recipe->final_density;
+        $brewing->boil_time = $this->recipe->boil_time;
         $brewing->before_boil_density = $this->recipe->before_boil_density;
         $brewing->carbonation = $this->recipe->carbonation;
         $brewing->recipe_id = $this->recipe->id;
@@ -57,7 +58,7 @@ class CreateBrewingController extends Component
     private function brewingSteps($brewing)
     {
         foreach ($this->steps as $step) {
-            $brewingStep = new Brewing_Step;
+            $brewingStep = new BrewingStep;
             $brewingStep->quantity = $step->quantity;
             $brewingStep->unit = $step->unit;
             $brewingStep->field = $step->field;

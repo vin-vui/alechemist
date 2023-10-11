@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('color');
             $table->string('bitterness');
             $table->string('alcohol');
+            $table->integer('boil_time');
             $table->float('initial_density', 4, 3);
             $table->float('final_density', 4, 3);
             $table->float('before_boil_density')->nullable();
