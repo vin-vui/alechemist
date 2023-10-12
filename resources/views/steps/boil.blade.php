@@ -7,24 +7,33 @@
             </svg>
             <span class="border-b-old-gold border-0 border-b-2 w-1/5">Boil</span>
         </div>
-        <div class="text-sm bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-1.5">
-            <div class="flex">
+        <div class="flex  flex-col justify-between gap-y-2 text-sm bg-xanthous p-2">
+            <div class="flex justify-between">
                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
                     <path fill="currentColor"
                         d="M9 3V1h6v2H9Zm2 11h2V8h-2v6Zm1 8q-1.85 0-3.488-.713T5.65 19.35q-1.225-1.225-1.938-2.863T3 13q0-1.85.713-3.488T5.65 6.65q1.225-1.225 2.863-1.938T12 4q1.55 0 2.975.5t2.675 1.45l1.4-1.4l1.4 1.4l-1.4 1.4Q20 8.6 20.5 10.025T21 13q0 1.85-.713 3.488T18.35 19.35q-1.225 1.225-2.863 1.938T12 22Zm0-2q2.9 0 4.95-2.05T19 13q0-2.9-2.05-4.95T12 6Q9.1 6 7.05 8.05T5 13q0 2.9 2.05 4.95T12 20Zm0-7Z" />
                 </svg>
-                <span>Chrono</span>
+                <span class="font-semibold text-lg">Chrono</span>
             </div>
             @if ($this->brewing->boil_start != null)
-                <span wire:poll.1m>
-                    il reste
-                    {{ now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)) }}
-                    minutes
-                </span>
+                @if (!$this->endTime())
+                    <span wire:poll.1m>
+                        il reste
+                        {{ now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)) }}
+                        minutes
+                    </span>
+                @else
+                    <span class="font-semibold animate-pulse">Temps écoulé</span>
+                @endif
             @else
-                <button class="border border-black p-1" wire:click="startChrono">
-                    Start
-                </button>
+                <div>
+                    <button class="border border-black p-1 active:bg-tawny" wire:click="startChrono">
+                        Start
+                    </button>
+                    <button class="border border-black p-1 active:bg-tawny" wire:click="modifyChrono">
+                     Modifier
+                    </button>
+                </div>
             @endif
         </div>
         <div class="flex flex-col w-full gap-2">
@@ -37,7 +46,7 @@
                         false,
                     );
                 @endphp
-                <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : 'border-transparent' }} {{ $time_left <= 0 ? 'border-red-600' : '' }}"
+                <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->boil_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}"
                     wire:click="statusChange({{ $step }})">
                     <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
                         <div class="ml-3 w-full flex gap-x-1 justify-between">
@@ -53,13 +62,25 @@
                                 </div>
                             </div>
                             <div class="block text-sm">
-                                {{ $time_left <= 0 ? 'en retard batard' : 'dans ' . $time_left . ' minutes' }}
+                                @if ($this->brewing->boil_start != null && $time_left <= 0 && !$step->status)
+                                en retard batard
+                                @elseif ($this->brewing->boil_start != null && $time_left > 0)
+                                dans {{ $time_left }} minutes
+                                {{-- {{ $time_left <= 0 ? 'en retard batard' : 'dans ' . $time_left . ' minutes' }} --}}
+                                @endif
                             </div>
                         </div>
+                        @if ($time_left <= 0 && !$step->status)
+                        <span class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                          </span>
+                          @endif
                     </div>
                 </div>
             @endforeach
         </div>
+        {{-- Si tout est check alors on acive le bouton next, sinon il reste grise --}}
         @if ($this->allChecked)
             <button type="button" wire:click="next"
                 class="bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-4 flex items-center shrink-0 w-full justify-between font-semibold uppercase">

@@ -11,11 +11,11 @@
             </button>
         </a>
     </div>
-    <div class="flex flex-col gap-4 px-4 sm:px-6 lg:px-8 pt-8 pb-12">
+    <div class="flex flex-col gap-y-4 px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         @foreach ($recipes as $recipe)
             <a href="{{ route('recipes.show', $recipe) }}">
                 <div class="bg-gray-50 shadow-lg dark:bg-gray-700 dark:text-gray-400">
-                    <div class="flex gap-4 items-center">
+                    <div class="flex gap-4 justify-start items-center">
                         <div class="shrink-0">
                             <img class="h-28 object-cover"
                                 src="https://images.unsplash.com/photo-1613478223984-2926776f434a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80">

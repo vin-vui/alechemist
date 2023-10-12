@@ -9,7 +9,7 @@ use App\Models\BrewingStep;
 
 class BoilController extends Component
 {
-    public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $boilTime;
+    public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $boilTime, $boilStart, $boilEnd;
 
     public function mount(Brewing $brewing)
     {
@@ -51,6 +51,13 @@ class BoilController extends Component
     {
         $this->brewing->boil_start = now();
         $this->brewing->save();
+    }
+
+    public function endTime()
+    {
+        $boilStart = Carbon::create($this->brewing->boil_start);
+        $boilEnd = $boilStart->addMinutes($this->brewing->boil_time);
+        return now() > $boilEnd;
     }
 
     public function render()
