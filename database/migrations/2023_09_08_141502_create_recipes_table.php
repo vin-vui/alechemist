@@ -27,6 +27,7 @@ return new class extends Migration
             $table->float('final_density', 4, 3);
             $table->float('before_boil_density')->nullable();
             $table->Float('carbonation');
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }

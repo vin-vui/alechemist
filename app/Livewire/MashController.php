@@ -30,6 +30,8 @@ class MashController extends Component
 
     public function next()
     {
+        $this->brewing->current_step = 'boil';
+        $this->brewing->save();
         return redirect()->route('boil', [$this->recipe, $this->brewing]);
     }
 

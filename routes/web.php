@@ -15,7 +15,7 @@ use App\Livewire\RecipesController;
 use App\Livewire\RecipeDetailsController;
 
 use App\Livewire\CreateBrewingController;
-use App\Livewire\BrewingDetailsController;
+
 
 /*
 |--------------------------------------------------------------------------

@@ -8,23 +8,28 @@ use Livewire\Component;
 
 class FermentController extends Component
 {
-    public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount;
+    public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $fermentTime;
+
 
     public function mount(Brewing $brewing)
     {
         $this->brewing = $brewing;
-        $this->stepsCount = BrewingStep::where('type', 'Primary')
-        ->orWhere('type', 'Secondary')
-        ->orWhere('type', 'Tertiary')
-        ->orWhere('type', 'Bottle')
+
+
+
+
+        $this->stepsCount = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
         ->where('brewing_id', $this->brewing->id)->count();
 
-        $this->checkStep = BrewingStep::where('type', 'Primary')
-        ->orWhere('type', 'Secondary')
-        ->orWhere('type', 'Tertiary')
-        ->orWhere('type', 'Bottle')
+        $this->checkStep = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
         ->where('brewing_id', $this->brewing->id)
         ->where('status', true)->count();
+
+        $this->fermentTime = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
+        ->where('brewing_id', $this->brewing->id)
+        ->sum('time');
+
+
         $this->allChecked();
     }
 
@@ -54,14 +59,25 @@ class FermentController extends Component
         }
 
         $this->allChecked();
+
     }
+
+    public function startChrono()
+    {
+        $this->brewing->ferment_start = now();
+        $this->brewing->save();
+    }
+
+
     public function render()
     {
-        $this->steps = BrewingStep::where('type', 'Primary')
-        ->orWhere('type', 'Secondary')
-        ->orWhere('type', 'Tertiary')
-        ->orWhere('type', 'Bottle')
+        $this->steps = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
         ->where('brewing_id', $this->brewing->id)->get();
+        // $this->steps = BrewingStep::where('type', 'Primary')
+        // ->orWhere('type', 'Secondary')
+        // ->orWhere('type', 'Tertiary')
+        // ->orWhere('type', 'Bottle')
+        // ->where('brewing_id', $this->brewing->id)->get();
 
         return view('steps.ferment')->layout('layouts.app');
     }

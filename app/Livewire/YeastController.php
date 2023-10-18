@@ -29,6 +29,8 @@ class YeastController extends Component
 
     public function next()
     {
+        $this->brewing->current_step = 'ferment';
+        $this->brewing->save();
         return redirect()->route('ferment', [$this->recipe, $this->brewing]);
     }
 

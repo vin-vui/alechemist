@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use File;
-use App\Models\Recipe;
 use App\Models\Step;
+use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class FileController extends Controller
 {
@@ -45,7 +46,8 @@ class FileController extends Controller
             'initial_density' => $recipe['EST_OG'],
             'final_density' => $recipe['EST_FG'],
             'boil_time' => $recipe['BOIL_TIME'],
-            'carbonation' => $recipe['CARBONATION']
+            'carbonation' => $recipe['CARBONATION'],
+            'user_id' => Auth::user()->id
         ]);
 
 
@@ -115,6 +117,7 @@ class FileController extends Controller
 
 
         //Fermentation
+
         if (array_key_exists('PRIMARY_AGE', $recipe)) {
             $this->createStep($recipe['PRIMARY_TEMP'], '°C', 'Primaire', $recipe['PRIMARY_AGE']*1440, 'Primary', $imported_recipe->id);
         }

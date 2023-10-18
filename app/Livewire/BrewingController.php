@@ -16,7 +16,6 @@ class BrewingController extends Component
         $this->recipe = $recipe;
     }
 
-
     public function delete(Brewing $brewing)
     {
         $this->brewingSteps = BrewingStep::where('brewing_id', $brewing->id)->delete();

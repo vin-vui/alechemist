@@ -20,9 +20,11 @@ return new class extends Migration
             $table->float('final_density', 4, 3);
             $table->integer('boil_time');
             $table->dateTime('boil_start')->nullable();
+            $table->dateTime('ferment_start')->nullable();
             $table->float('before_boil_density')->nullable();
             $table->float('carbonation');
             $table->date('date_start');
+            $table->enum('current_step',['preparation', 'mash', 'boil', 'yeast', 'ferment'])->nullable();
             $table->text('note')->nullable();
             $table->foreignId('recipe_id');
             $table->timestamps();

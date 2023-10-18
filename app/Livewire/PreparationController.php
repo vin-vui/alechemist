@@ -30,6 +30,9 @@ class PreparationController extends Component
 
     public function next()
     {
+        $this->brewing->current_step = 'mash';
+        $this->brewing->save();
+
         return redirect()->route('mash', [$this->recipe, $this->brewing]);
     }
 

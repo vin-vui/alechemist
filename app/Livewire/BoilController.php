@@ -9,7 +9,8 @@ use App\Models\BrewingStep;
 
 class BoilController extends Component
 {
-    public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $boilTime, $boilStart, $boilEnd;
+    public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $boilTime, $boilStart, $boilEnd, $newBoilTime;
+    public $isOpen = false;
 
     public function mount(Brewing $brewing)
     {
@@ -30,6 +31,8 @@ class BoilController extends Component
 
     public function next()
     {
+        $this->brewing->current_step = 'yeast';
+        $this->brewing->save();
         return redirect()->route('yeast', [$this->recipe, $this->brewing]);
     }
 
@@ -58,6 +61,24 @@ class BoilController extends Component
         $boilStart = Carbon::create($this->brewing->boil_start);
         $boilEnd = $boilStart->addMinutes($this->brewing->boil_time);
         return now() > $boilEnd;
+    }
+
+    public function modifyBoilTime(Brewing $brewing)
+    {
+        $brewing->boil_time = $this->newBoilTime;
+        $brewing->save();
+
+        $this->closeModal();
+    }
+
+    public function openModal()
+    {
+        $this->newBoilTime = $this->brewing->boil_time;
+        $this->isOpen = true;
+    }
+    public function closeModal()
+    {
+        $this->isOpen = false;
     }
 
     public function render()

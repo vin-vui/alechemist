@@ -14,25 +14,33 @@
     <div class="flex flex-col gap-y-4 p-4">
         @foreach ($brewings as $brewing)
             <div class="flex bg-gray-50 shadow-lg">
-                <a href="{{ route('preparation', [$recipe, $brewing]) }}" class="flex flex-col w-full">
-                    <div class="flex justify-start items-center">
-                        <div class="shrink-0 w-1/3">
-                            <img class="h-28 object-cover"
-                                src="https://images.pexels.com/photos/1267359/pexels-photo-1267359.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1">
-                        </div>
+                @if ($brewing->current_step != null)
+                    <a href="{{ route($brewing->current_step, [$recipe, $brewing]) }}" class="flex flex-col w-full">
+                    @else
+                        <a href="{{ route('preparation', [$recipe, $brewing]) }}" class="flex flex-col w-full">
+                @endif
+                {{-- <a href="{{ route('preparation', [$recipe, $brewing]) }}" class="flex flex-col w-full"> --}}
+                <div class="flex justify-start items-center">
+                    <div class="shrink-0 w-1/3">
+                        <img class="h-28 object-cover"
+                            src="https://images.pexels.com/photos/1267359/pexels-photo-1267359.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1">
+                    </div>
+                    <div class="flex flex-col gap-y-8">
                         <div class="flex flex-col px-4 gap-y-4">
                             <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">
-                                {{ $brewing->name }}</h3>
-                            <div class="flex justify-start gap-x-6 items-center">
-                            <span
-                                class="text-xs bg-old-gold py-0.5 px-1.5 rounded text-gray-900 uppercase">{{ $brewing->alcohol }}
-                                %</span>
-                                <div class="text-sm min-w-fit bg-old-gold py-1 px-1.5 rounded text-gray-900 uppercase">
-                                    {{ $brewing->date_start }}
-                                </div>
+                                {{ $brewing->name }}
+                            </h3>
+                        </div>
+                        <div class="flex justify-start gap-x-6 items-center ml-4">
+                            <div class="text-xs bg-old-gold py-0.5 px-1.5 rounded text-gray-900 uppercase">
+                                {{ $brewing->alcohol }} %
+                            </div>
+                            <div class="text-sm min-w-fit bg-old-gold py-1 px-1.5 rounded text-gray-900 uppercase">
+                                {{ $brewing->date_start }}
                             </div>
                         </div>
                     </div>
+                </div>
                 </a>
                 <div class="self-end p-2">
                     <button wire:click="delete({{ $brewing }})"

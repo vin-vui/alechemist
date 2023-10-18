@@ -12,7 +12,7 @@ class Brewing extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'type', 'volume', 'alcohol', 'boil_time', 'boil_start', 'initial_density', 'final_density', 'before_boil_density',
-    'carbonation', 'date_start', 'note', 'recipe_id'];
+    'carbonation', 'date_start', 'current_step', 'note', 'recipe_id'];
 
     public function BrewingSteps(): HasMany
     {

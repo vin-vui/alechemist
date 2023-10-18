@@ -13,7 +13,7 @@ class Recipe extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'type', 'method', 'ferment', 'volume', 'efficiency', 'color', 'bitterness', 'alcohol',
-    'boil_time', 'initial_density', 'final_density', 'before_boil_density', 'carbonation'];
+    'boil_time', 'initial_density', 'final_density', 'before_boil_density', 'user_id','carbonation'];
 
     public function steps(): HasMany
     {
@@ -24,4 +24,10 @@ class Recipe extends Model
     {
         return $this->belongsTo(brewing::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }
