@@ -49,6 +49,11 @@ class MashController extends Component
         $this->allChecked();
     }
 
+    public function note()
+    {
+        return redirect()->route('note', [$this->recipe, $this->brewing]);
+    }
+
     public function render()
     {
         $this->steps = BrewingStep::where('type', 'Mash')->where('brewing_id', $this->brewing->id)->get();

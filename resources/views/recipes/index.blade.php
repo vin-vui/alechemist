@@ -27,11 +27,11 @@
                             <span
                                 class="text-xs bg-xanthous py-0.5 px-1.5 rounded text-gray-900 uppercase">{{ $recipe->alcohol }}
                                 %</span>
+                            <div class="flex justify-between pt-1 pr-4">
+                                <div class="text-xs">Created at {{ $recipe->created_at->format('Y-m-d') }}</div>
+                                <div class="text-xs">Modify at {{ $recipe->updated_at->format('Y-m-d') }}</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex justify-between pl-24 pr-4 pb-2">
-                        <div class="text-xs">Create at {{ $recipe->created_at->format('Y-m-d') }}</div>
-                        <div class="text-xs">Modify at {{ $recipe->updated_at->format('Y-m-d') }}</div>
                     </div>
                 </div>
             </a>

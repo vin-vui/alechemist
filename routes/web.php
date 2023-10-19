@@ -1,20 +1,22 @@
 <?php
 
+use App\Livewire\BoilController;
+
+use App\Livewire\HomeController;
+
+use App\Livewire\MashController;
+use App\Livewire\NoteController;
+use App\Livewire\YeastController;
+use App\Livewire\BrewingController;
+use App\Livewire\FermentController;
+use App\Livewire\RecipesController;
+
 use Illuminate\Support\Facades\Route;
+use App\Livewire\PreparationController;
 
 use App\Http\Controllers\FileController;
-
-use App\Livewire\BrewingController;
-use App\Livewire\PreparationController;
-use App\Livewire\MashController;
-use App\Livewire\BoilController;
-use App\Livewire\YeastController;
-use App\Livewire\FermentController;
-
-use App\Livewire\RecipesController;
-use App\Livewire\RecipeDetailsController;
-
 use App\Livewire\CreateBrewingController;
+use App\Livewire\RecipeDetailsController;
 
 
 /*
@@ -42,6 +44,7 @@ Route::middleware([
     })->name('dashboard');
 });
 
+route::get('/', HomeController::Class)->name('home');
 Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
 Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
 
@@ -58,3 +61,4 @@ Route::get('/recipes/{recipe}/brewings/{brewing}/mash', MashController::class)->
 Route::get('/recipes/{recipe}/brewings/{brewing}/boil', BoilController::class)->name('boil');
 Route::get('/recipes/{recipe}/brewings/{brewing}/yeast', YeastController::class)->name('yeast');
 Route::get('/recipes/{recipe}/brewings/{brewing}/ferment', FermentController::class)->name('ferment');
+Route::get('/recipes/{recipe}/brewings/{brewing}/note', NoteController::class)->name('note');

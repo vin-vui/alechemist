@@ -1,5 +1,8 @@
 <div>
     <div class="gap-y-10 m-4 flex flex-col justify-between items-center">
+        <div class="flex w-full justify-end">
+            <x-note-button />
+        </div>
         <div class="flex items-center text-lg gap-x-2 py-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
                 <path fill="currentColor"
@@ -17,17 +20,16 @@
             </div>
             @if ($this->brewing->ferment_start != null)
                 {{-- @if (!$this->endTime()) --}}
-                    <span wire:poll.1m>
-                        il reste
-                        {{ now()->diffForHumans(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($this->fermentTime)) }}
-                    </span>
+                <span wire:poll.1m>
+                    il reste
+                    {{ now()->diffForHumans(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($this->fermentTime)) }}
+                </span>
                 {{-- @else
                     <div class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Temps écoulé</div>
                 @endif --}}
             @else
                 <div class="flex justify-around py-2 w-full">
-                    <button
-                        class="rounded px-10 py-2 font-semibold text-black bg-xanthous shadow-md"
+                    <button class="rounded px-10 py-2 font-semibold text-black bg-xanthous shadow-md"
                         wire:click="startChrono">
                         Start
                     </button>
@@ -41,11 +43,7 @@
             @foreach ($this->steps as $step)
                 @php
                     $totalTime = $totalTime + $step->time;
-                    $time_left = now()->diffForHumans(
-                        Carbon\Carbon::create($this->brewing->ferment_start)
-                            ->addMinutes($totalTime),
-                        false,
-                    );
+                    $time_left = now()->diffForHumans(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime), false);
                 @endphp
                 <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->ferment_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}"
                     wire:click="statusChange({{ $step }})">

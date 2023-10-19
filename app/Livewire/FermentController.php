@@ -68,6 +68,11 @@ class FermentController extends Component
         $this->brewing->save();
     }
 
+    public function note()
+    {
+        return redirect()->route('note', [$this->recipe, $this->brewing]);
+    }
+
 
     public function render()
     {

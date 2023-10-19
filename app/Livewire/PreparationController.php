@@ -50,7 +50,10 @@ class PreparationController extends Component
         $this->allChecked();
     }
 
-
+    public function note()
+    {
+        return redirect()->route('note', [$this->recipe, $this->brewing]);
+    }
     public function render()
     {
         $this->steps = BrewingStep::where('type', 'Preparation')

@@ -1,5 +1,8 @@
 <div>
     <div class="gap-y-4 m-4 flex flex-col justify-between items-center">
+        <div class="flex w-full justify-end">
+            <x-note-button />
+        </div>
         <div class="flex items-center text-lg gap-x-2 py-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                 <path fill="currentColor"
