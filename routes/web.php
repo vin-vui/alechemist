@@ -44,7 +44,7 @@ Route::middleware([
     })->name('dashboard');
 });
 
-route::get('/', HomeController::Class)->name('home');
+route::get('/home', HomeController::Class)->name('alechemist.home');
 Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
 Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
 

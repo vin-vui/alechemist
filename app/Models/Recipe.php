@@ -20,9 +20,14 @@ class Recipe extends Model
         return $this->hasMany(Step::class);
     }
 
-    public function brewing(): BelongsTo
+    // public function brewing(): BelongsTo
+    // {
+    //     return $this->belongsTo(brewing::class);
+    // }
+
+    public function brewing(): HasMany
     {
-        return $this->belongsTo(brewing::class);
+        return $this->hasMany(brewing::class);
     }
 
     public function user()

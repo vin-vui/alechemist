@@ -19,20 +19,29 @@
         <div class="flex justify-between items-center px-4 py-2 capitalize font-semibold bg-old-gold">
             fermentation in progress
         </div>
-        <div class="flex flex-col">
-            @foreach ($this->recipes as $recipe)
-                <svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 24 24"
-                    class="ebc-{{ $recipe->color }}">
-                    <path fill="currentColor"
-                        d="M4 2h15l-2 20H6L4 2m2.2 2l1.6 16h1L7.43 6.34C8.5 6 9.89 5.89 11 7c1.56 1.56 4.33.69 5.5.23L16.8 4H6.2Z" />
-                </svg>
-            @endforeach
-            <div>
-                @foreach ($this->ferment_progress as $progress)
-                    {{ $progress->name }}
-                    {{ $progress->ferment_start }}
+        <div class="flex flex-wrap gap-y-4">
+            @foreach ($this->fermentRecipes as $progress)
+                @foreach ($progress->brewing as $brewing)
+                    @if ($brewing->current_step == 'ferment')
+                        <div class="flex p-4 w-full bg-gray-50 shadow-lg">
+                            <div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="84" height="84"
+                                    viewBox="0 0 24 24" class="ebc-{{ $progress->color }}">
+                                    <path fill="currentColor"
+                                        d="M4 2h15l-2 20H6L4 2m2.2 2l1.6 16h1L7.43 6.34C8.5 6 9.89 5.89 11 7c1.56 1.56 4.33.69 5.5.23L16.8 4H6.2Z" />
+                                </svg>
+                                <div class="flex">
+                                    {{ $progress->name }}
+                                    {{ $brewing->name }}
+                                </div>
+                                <div class="flex justify-end items-end">
+                                    {{ Carbon\Carbon::parse($brewing->ferment_start)->format('j F Y') }}
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 @endforeach
-            </div>
+            @endforeach
         </div>
     </div>
 </div>
