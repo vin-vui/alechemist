@@ -16,8 +16,6 @@ class FermentController extends Component
         $this->brewing = $brewing;
 
 
-
-
         $this->stepsCount = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
         ->where('brewing_id', $this->brewing->id)->count();
 
@@ -42,11 +40,6 @@ class FermentController extends Component
         }
     }
 
-    public function next()
-    {
-        return redirect()->route('brewing.index', [$this->recipe, $this->brewing]);
-    }
-
     public function statusChange(BrewingStep $step)
     {
         $step->status = !$step->status;
@@ -62,15 +55,18 @@ class FermentController extends Component
 
     }
 
-    public function startChrono()
-    {
-        $this->brewing->ferment_start = now();
-        $this->brewing->save();
-    }
-
     public function note()
     {
         return redirect()->route('note', [$this->recipe, $this->brewing]);
+    }
+
+    public function end()
+    {
+        $this->brewing->ferment_end = now();
+        $this->brewing->current_step = 'completed';
+        $this->brewing->save();
+
+        return redirect()->route('brewing.index', [$this->recipe, $this->brewing]);
     }
 
 

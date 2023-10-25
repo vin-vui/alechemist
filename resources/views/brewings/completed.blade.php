@@ -1,7 +1,7 @@
 <div>
-    <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center">
-        <h2 class="text-xl font-semibold tracking-widest">Recipe</h2>
-        <a href="{{ route('brewing.index', $recipe) }}">
+    <div class="bg-white sticky px-4 py-2.5 flex justify-between items-center ">
+        <h2 class="text-xl px-2 font-semibold tracking-widest">{{ $this->brewing->name }}</h2>
+        <a href=" {{ route('brewing.index', [$recipe, $this->brewing])}}">
             <button
                 class="bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-3 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
@@ -13,66 +13,7 @@
             </button>
         </a>
     </div>
-    <div class="flex flex-col gap-4 lg: pt-4 pb-12">
-        <div class="bg-gray-50 shadow-lg">
-            <div class="flex gap-4 items-center">
-                <div class="shrink-0">
-                    <img class="h-32 object-cover"
-                        src="https://images.unsplash.com/photo-1613478223984-2926776f434a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80">
-                </div>
-                <div class="w-full">
-                    <div class="flex justify-between items-center">
-                        <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}
-                        </h3>
-                    </div>
-                    <h4 class="text-md text-gray-500 uppercase">{{ $recipe->type }}</h4>
-                    <span
-                        class="text-xs bg-xanthous py-0.5 px-1.5 rounded text-gray-900 uppercase">{{ $recipe->alcohol }}
-                        %</span>
-                    <div class="flex justify-between pt-1 pr-4">
-                        <div class="text-xs">Created at {{ $recipe->created_at->format('Y-m-d') }}</div>
-                        <div class="text-xs">Modified at {{ $recipe->updated_at->format('Y-m-d') }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="mx-4">
-        <div class="flex w-full items-center bg-gray-50 shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 24 24"
-                class="ebc-{{ $recipe->color }}">
-                <path fill="currentColor"
-                    d="M4 2h15l-2 20H6L4 2m2.2 2l1.6 16h1L7.43 6.34C8.5 6 9.89 5.89 11 7c1.56 1.56 4.33.69 5.5.23L16.8 4H6.2Z" />
-            </svg>
-            <div class="flex flex-col w-1/2">
-                <div class="flex">
-                    <div class="text-sm font-semibold mb-1">Method</div>
-                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->method }}</div>
-                </div>
-                <div class="flex">
-                    <div class="text-sm font-semibold mb-1">Volume</div>
-                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->volume }} l</div>
-                </div>
-                <div class="flex">
-                    <div class="text-sm font-semibold mb-1">Ferment</div>
-                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->ferment }}</div>
-                </div>
-            </div>
-            <div class="flex flex-col w-1/2 ml-2">
-                <div class="flex">
-                    <div class="text-sm font-semibold mb-1"> Initial density</div>
-                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->initial_density }}</div>
-                </div>
-                <div class="flex">
-                    <div class="text-sm font-semibold mb-1"> Final density</div>
-                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->final_density }}</div>
-                </div>
-                <div class="flex">
-                    <div class="text-sm font-semibold mb-1"> Carbonation</div>
-                    <div class="text-sm ml-2 text-gray-500">{{ $recipe->carbonation }}</div>
-                </div>
-            </div>
-        </div>
         <div class="flex items-center gap-x-2 py-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                 <path fill="currentColor"
@@ -81,21 +22,19 @@
             <span>Preparation</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col" class="px-4 py-3">Quantity</th>
-                        <th scope="col" class="px-4 py-3">Name</th>
-                        <th scope="col" class="px-4 py-3">Add</th>
+                        <th scope="col" class="px-4 py-3">Method</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Preparation')
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}  </td>
                                 <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->type }} </td>
                             @endif
                         </tr>
                     @endforeach
@@ -110,31 +49,29 @@
             <span>Mash</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
-                            class="flex justify-center  px-2 py-3">
+                            class="flex justify-center items-center px-2 py-3">
                             Quantity
                         </th>
                         <th scope="col" class="px-2 py-3">Name</th>
-                        <th scope="col" class="px-2 py-3">Add</th>
                         <th scope="col"
-                            class="flex  px-2 py-3">
+                            class="flex justify-center px-2 py-3">
                             Minutes</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Mash')
                                 <td
-                                    class="px-2 py-3">
+                                    class="sm:justify-start   px-2 py-3">
                                     {{ $step->quantity }} {{ $step->unit }}</td>
                                 <td class="px-2 py-3">{{ $step->field }} </td>
-                                <td class="px-2 py-3">{{ $step->type }} </td>
                                 <td
-                                    class="px-2 py-3">
+                                    class="sm:justify-start px-2 py-3">
                                     {{ $step->time }} </td>
                             @endif
                         </tr>
@@ -150,31 +87,31 @@
             <span>Boil</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
                             class="flex justify-center px-2 py-3">
                             Quantity</th>
+
                         <th scope="col" class="px-2 py-3">Name</th>
-                        <th scope="col" class="px-2 py-3">Add</th>
-                        <th scope="col"
-                            class="flex justify-center px-2 py-3">
-                            Minutes</th>
+                        <th scope="col" class="flex justify-center px-2 py-3">Minutes</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Boil' || $step->type == 'Aroma')
-                                <td
-                                    class="flex justify-center px-2 py-3">
-                                    {{ $step->quantity }} {{ $step->unit }}</td>
+                                <td class="flex justify-center px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+
                                 <td class="px-2 py-3">{{ $step->field }} </td>
-                                <td class="px-2 py-3">{{ $step->type }} </td>
-                                <td
-                                    class="flex justify-center px-2 py-3">
-                                    {{ $step->time }} </td>
+                                <td class="flex justify-center px-2 py-3">
+                                    @if ($step->time != $this->recipeSteps[$loop->index]->time)
+                                    {{ $step->time }} <span class="text-red-500 ml-2">{{$this->recipeSteps[$loop->index]->time}}</span>
+                                    @else
+                                    {{ $step->time }}
+                                    @endif
+                                </td>
                             @endif
                         </tr>
                     @endforeach
@@ -189,28 +126,26 @@
             <span>Yeasts</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
                             class="flex justify-center px-2 py-3">
                             Quantity</th>
                         <th scope="col" class="px-2 py-3">Name</th>
-                        <th scope="col" class="px-2 py-3">Add</th>
                         <th scope="col"
                             class="flex justify-center px-2 py-3">
                             Minutes</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Yeast' || $step->type == 'Dry Hop')
                                 <td
                                     class="flex justify-center px-2 py-3">
                                     {{ $step->quantity }} {{ $step->unit }}</td>
                                 <td class="px-2 py-3">{{ $step->field }} </td>
-                                <td class="px-2 py-3">{{ $step->type }} </td>
                                 <td
                                     class="flex justify-center px-2 py-3">
                                     {{ $step->time }} </td>
@@ -220,7 +155,6 @@
                 </tbody>
             </table>
         </div>
-
         <div class="flex items-center gap-x-2 py-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
                 <path fill="currentColor"
@@ -231,7 +165,7 @@
             </div>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col" class="px-4 py-3">Step</th>
@@ -240,7 +174,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Primary')
                                 <td class="px-4 py-3">{{ $step->field }} </td>
@@ -251,7 +185,7 @@
                     @endforeach
                 </tbody>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Secondary')
                                 <td class="px-4 py-3">{{ $step->field }} </td>
@@ -262,7 +196,7 @@
                     @endforeach
                 </tbody>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Tertiary')
                                 <td class="px-4 py-3">{{ $step->field }} </td>
@@ -273,7 +207,7 @@
                     @endforeach
                 </tbody>
                 <tbody>
-                    @foreach ($recipe->steps as $step)
+                    @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Bottle')
                                 <td class="px-4 py-3">{{ $step->field }} </td>
@@ -284,6 +218,14 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="py-4">
+            <x-note-button />
+       </div>
+        <div class="pb-4">
+            <div class="text-sm text-gray-500 bg-white p-2">
+                <textarea rows="10" class="flex w-full border-none">{{ $this->brewing->note}}</textarea>
+            </div>
         </div>
     </div>
 </div>

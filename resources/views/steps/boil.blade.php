@@ -16,15 +16,21 @@
                     <path fill="currentColor"
                         d="M9 3V1h6v2H9Zm2 11h2V8h-2v6Zm1 8q-1.85 0-3.488-.713T5.65 19.35q-1.225-1.225-1.938-2.863T3 13q0-1.85.713-3.488T5.65 6.65q1.225-1.225 2.863-1.938T12 4q1.55 0 2.975.5t2.675 1.45l1.4-1.4l1.4 1.4l-1.4 1.4Q20 8.6 20.5 10.025T21 13q0 1.85-.713 3.488T18.35 19.35q-1.225 1.225-2.863 1.938T12 22Zm0-2q2.9 0 4.95-2.05T19 13q0-2.9-2.05-4.95T12 6Q9.1 6 7.05 8.05T5 13q0 2.9 2.05 4.95T12 20Zm0-7Z" />
                 </svg>
-                <div class="text-xl font-bold text-black w-1/3 mr-4">Chrono</div>
+                <div class="flex text-xl font-bold text-black mr-4">Chrono</div>
             </div>
             @if ($this->brewing->boil_start != null)
                 @if (!$this->endTime())
-                    <span wire:poll.1m>
-                        il reste
+                <span wire:poll.s>
+                    il reste
+                    @if (now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)) < 1)
+                        {{ now()->diffInSeconds(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)) }}
+                        seconde(s)
+                    @else
                         {{ now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)) }}
-                        minutes
-                    </span>
+                        minute(s)
+                    @endif
+                </span>
+
                 @else
                     <div class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Temps écoulé</div>
                 @endif

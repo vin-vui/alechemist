@@ -2,9 +2,9 @@
     <div class="mt-4 px-4">
         <div class="flex flex-col  text-sm text-gray-500 uppercase bg-gray-100 rounded mt-4">
 
-            <div class="flex gap-x-2 p-4 w-full">
-                <div class="font-semibold text-gray-500" for="name">Brewing</div>
-                 <span class="font-semibold text-black">{{ $this->brewing->name }}</span>
+            <div class="flex gap-x-2 p-4 w-full bg-old-gold text-black font-semibold">
+                <div for="name">Brewing</div>
+                 <span>{{ $this->brewing->name }}</span>
             </div>
 
             <div class="p-4 w-full">

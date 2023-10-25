@@ -19,29 +19,26 @@
                     @else
                         <a href="{{ route('preparation', [$recipe, $brewing]) }}" class="flex flex-col w-full">
                 @endif
-                {{-- <a href="{{ route('preparation', [$recipe, $brewing]) }}" class="flex flex-col w-full"> --}}
                 <div class="flex justify-start items-center">
                     <div class="shrink-0 w-1/3">
-                        <img class="h-28 object-cover"
+                        <img class="h-32 object-cover"
                             src="https://images.pexels.com/photos/1267359/pexels-photo-1267359.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1">
                     </div>
-                    <div class="flex flex-col gap-y-8 w-full">
-                        <div class="flex justify-between">
-                            <div class="flex justify-between px-4">
-                                <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">
+                    <div class="flex flex-col gap-y-2 w-full">
+                            <div class="flex  px-2">
+                                <h3 class="text-lg font-semibold sm:flex text-gray-900 uppercase">
                                     {{ $brewing->name }}
                                 </h3>
                             </div>
-                            <div class="flex justify-end capitalize mx-4 {{ $brewing->current_step ? '' : 'hidden' }}">
-                                step {{ $brewing->current_step }}
-                            </div>
+                        <div class="flex justify-start text-gray-500 capitalize mx-4 {{ $brewing->current_step ? '' : 'hidden' }}">
+                            {{ $brewing->current_step }}
                         </div>
-                        <div class="flex justify-start gap-x-5 items-center mx-1">
+                        <div class="flex justify-between gap-x-2 items-center pl-2">
                             <div class="text-xs bg-old-gold py-0.5 px-1.5 rounded text-gray-900 uppercase">
                                 {{ $brewing->alcohol }} %
                             </div>
-                            <div class="text-sm min-w-fit bg-old-gold py-1 px-1.5 rounded text-gray-900 uppercase">
-                                {{ $brewing->date_start }}
+                            <div class="text-xs min-w-fit py-1 px-1.5 rounded text-gray-900 uppercase">
+                                {{ Carbon\Carbon::parse($brewing->date_start)->format('j m Y') }}
                             </div>
                             <div class="self-end p-2">
                                 <button wire:click="delete({{ $brewing }})"

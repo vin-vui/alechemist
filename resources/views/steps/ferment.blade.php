@@ -10,7 +10,7 @@
             </svg>
             <span class="border-b-old-gold border-0 border-b-2 w-1/5">Ferment</span>
         </div>
-        <div class="flex flex-col items-center justify-center shadow-md rounded gap-y-6 bg-gray-100 px-4 w-full">
+        {{-- <div class="flex flex-col items-center justify-center shadow-md rounded gap-y-6 bg-gray-100 px-4 w-full">
             <div class="flex justify-center gap-x-8 items-center py-2 w-full">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="currentColor"
@@ -19,14 +19,12 @@
                 <div class="text-xl font-bold text-black w-1/3 mr-4">Chrono</div>
             </div>
             @if ($this->brewing->ferment_start != null)
-                {{-- @if (!$this->endTime()) --}}
+
                 <span wire:poll.1m>
                     il reste
                     {{ now()->diffForHumans(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($this->fermentTime)) }}
                 </span>
-                {{-- @else
-                    <div class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Temps écoulé</div>
-                @endif --}}
+
             @else
                 <div class="flex justify-around py-2 w-full">
                     <button class="rounded px-10 py-2 font-semibold text-black bg-xanthous shadow-md"
@@ -35,7 +33,7 @@
                     </button>
                 </div>
             @endif
-        </div>
+        </div> --}}
         <div class="flex flex-col w-full gap-2">
             @php
                 $totalTime = 0;
@@ -43,7 +41,7 @@
             @foreach ($this->steps as $step)
                 @php
                     $totalTime = $totalTime + $step->time;
-                    $time_left = now()->diffForHumans(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime), false);
+                    $time_left = now()->diffInDays(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime), false);
                 @endphp
                 <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->ferment_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}"
                     wire:click="statusChange({{ $step }})">
@@ -63,7 +61,7 @@
                                     {{ $step->unit }}
                                 </div>
                                 <div class="flex justify-end text-sm w-1/3 ">
-                                    {{ $time_left }}
+                                    {{ $time_left }} days left
                                 </div>
                             </div>
                         </div>
@@ -71,11 +69,11 @@
                 </div>
             @endforeach
         </div>
-        @if ($this->allChecked && ($this->brewing->ferment_start != null && ($time_left = 0)))
-            <button type="button" wire:click="next"
+        @if ($this->allChecked && ($this->brewing->ferment_start != null) && ($time_left <= 0))
+            <button type="button" wire:click="end"
                 class="bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-4 flex items-center shrink-0 w-full justify-between font-semibold uppercase">
                 <div></div>
-                <div class="ml-16">Next step</div>
+                <div class="ml-16">end of brewing</div>
                 <svg class="mr-16"xmlns="http://www.w3.org/2000/svg" width="30" height="30"
                     viewBox="0 0 100 100">
                     <path fill="currentColor"
@@ -85,7 +83,7 @@
         @else
             <button type="button"
                 class="bg-gray-100 rounded py-4 flex items-center w-full justify-center font-semibold uppercase">
-                Next step
+                end of brewing
             </button>
         @endif
     </div>

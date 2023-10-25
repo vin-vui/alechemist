@@ -12,8 +12,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Brewing extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'type', 'volume', 'alcohol', 'boil_time', 'boil_start', 'ferment_start', 'initial_density', 'final_density', 'before_boil_density',
-    'carbonation', 'date_start', 'current_step', 'note', 'recipe_id'];
+    protected $fillable = ['name', 'type', 'volume', 'alcohol', 'boil_time', 'boil_start', 'ferment_start', 'ferment_end', 'initial_density', 'final_density',
+    'before_boil_density', 'carbonation', 'date_start', 'current_step', 'note', 'recipe_id'];
 
     public function BrewingSteps(): HasMany
     {

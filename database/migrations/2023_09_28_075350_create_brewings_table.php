@@ -21,10 +21,11 @@ return new class extends Migration
             $table->integer('boil_time');
             $table->dateTime('boil_start')->nullable();
             $table->dateTime('ferment_start')->nullable();
+            $table->dateTime('ferment_end')->nullable();
             $table->float('before_boil_density')->nullable();
             $table->float('carbonation');
             $table->date('date_start');
-            $table->enum('current_step',['preparation', 'mash', 'boil', 'yeast', 'ferment'])->nullable();
+            $table->enum('current_step',['preparation', 'mash', 'boil', 'yeast', 'ferment', 'completed'])->nullable();
             $table->text('note')->nullable();
             $table->foreignId('recipe_id');
             $table->timestamps();

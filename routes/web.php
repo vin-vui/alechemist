@@ -11,9 +11,10 @@ use App\Livewire\BrewingController;
 use App\Livewire\FermentController;
 use App\Livewire\RecipesController;
 
+use App\Livewire\CompletedController;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\PreparationController;
 
+use App\Livewire\PreparationController;
 use App\Http\Controllers\FileController;
 use App\Livewire\CreateBrewingController;
 use App\Livewire\RecipeDetailsController;
@@ -44,7 +45,7 @@ Route::middleware([
     })->name('dashboard');
 });
 
-route::get('/home', HomeController::Class)->name('alechemist.home');
+Route::get('/home', HomeController::Class)->name('alechemist.home');
 Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
 Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
 
@@ -61,4 +62,5 @@ Route::get('/recipes/{recipe}/brewings/{brewing}/mash', MashController::class)->
 Route::get('/recipes/{recipe}/brewings/{brewing}/boil', BoilController::class)->name('boil');
 Route::get('/recipes/{recipe}/brewings/{brewing}/yeast', YeastController::class)->name('yeast');
 Route::get('/recipes/{recipe}/brewings/{brewing}/ferment', FermentController::class)->name('ferment');
+Route::get('/recipes/{recipe}/brewings/{brewing}/completed', CompletedController::class)->name('completed');
 Route::get('/recipes/{recipe}/brewings/{brewing}/note', NoteController::class)->name('note');
