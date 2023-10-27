@@ -14,9 +14,12 @@
 
             </div>
 
-            <div class="flex justify-center">
+            <div class="flex justify-center gap-x-8">
                 <button
-                    type="submit" class="mt-4 bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-2 px-3 flex items-center gap-2">Submit
+                    type="submit" value="submit" name="action" class="mt-4 bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-2 px-3 flex items-center gap-2">Submit
+                </button>
+                <button
+                    type="submit" value="cancel" name="action" class="mt-4 bg-xanthous rounded hover:bg-tawny hover:text-white transition-all duration-300 py-2 px-3 flex items-center gap-2">Cancel
                 </button>
             </div>
 

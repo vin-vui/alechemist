@@ -20,12 +20,12 @@
                         <a href="{{ route('preparation', [$recipe, $brewing]) }}" class="flex flex-col w-full">
                 @endif
                 <div class="flex justify-start items-center">
-                    <div class="shrink-0 w-1/3">
+                    <div class="flex shrink-0 w-1/4">
                         <img class="h-32 object-cover"
-                            src="https://images.pexels.com/photos/1267359/pexels-photo-1267359.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1">
+                            src="/pictures/brew.jpg">
                     </div>
                     <div class="flex flex-col gap-y-2 w-full">
-                            <div class="flex  px-2">
+                            <div class="flex px-2">
                                 <h3 class="text-lg font-semibold sm:flex text-gray-900 uppercase">
                                     {{ $brewing->name }}
                                 </h3>

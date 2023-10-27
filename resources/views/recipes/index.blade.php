@@ -18,7 +18,7 @@
                     <div class="flex gap-4 justify-start items-center">
                         <div class="shrink-0">
                             <img class="h-28 object-cover"
-                                src="https://images.unsplash.com/photo-1613478223984-2926776f434a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80">
+                                src="/pictures/recipe.jpg">
                         </div>
                         <div class="w-3/4">
                             <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">

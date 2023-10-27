@@ -13,12 +13,12 @@
             </button>
         </a>
     </div>
-    <div class="flex flex-col gap-4 lg: pt-4 pb-12">
+    <div class="flex flex-col gap-4 py-4">
         <div class="bg-gray-50 shadow-lg">
             <div class="flex gap-4 items-center">
                 <div class="shrink-0">
                     <img class="h-32 object-cover"
-                        src="https://images.unsplash.com/photo-1613478223984-2926776f434a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1935&q=80">
+                        src="/pictures/recipe.jpg">
                 </div>
                 <div class="w-full">
                     <div class="flex justify-between items-center">
@@ -38,7 +38,7 @@
         </div>
     </div>
     <div class="mx-4">
-        <div class="flex w-full items-center bg-gray-50 shadow-lg">
+        <div class="flex w-full items-center bg-gray-50 shadow-lg mb-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 24 24"
                 class="ebc-{{ $recipe->color }}">
                 <path fill="currentColor"
@@ -81,7 +81,7 @@
             <span>Preparation</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col" class="px-4 py-3">Quantity</th>
@@ -91,7 +91,7 @@
                 </thead>
                 <tbody>
                     @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
+                        <tr class="text-center bg-white border-b">
                             @if ($step->type == 'Preparation')
                                 <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
                                 <td class="px-4 py-3">{{ $step->field }} </td>
@@ -110,23 +110,23 @@
             <span>Mash</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
-                            class="flex justify-center  px-2 py-3">
+                            class="px-2 py-3">
                             Quantity
                         </th>
                         <th scope="col" class="px-2 py-3">Name</th>
                         <th scope="col" class="px-2 py-3">Add</th>
                         <th scope="col"
-                            class="flex  px-2 py-3">
+                            class="px-2 py-3">
                             Minutes</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
+                        <tr class="text-center bg-white border-b">
                             @if ($step->type == 'Mash')
                                 <td
                                     class="px-2 py-3">
@@ -150,30 +150,30 @@
             <span>Boil</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                            class="px-2 py-3">
                             Quantity</th>
                         <th scope="col" class="px-2 py-3">Name</th>
                         <th scope="col" class="px-2 py-3">Add</th>
                         <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                            class="px-2 py-3">
                             Minutes</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
+                        <tr class="text-center bg-white border-b">
                             @if ($step->type == 'Boil' || $step->type == 'Aroma')
                                 <td
-                                    class="flex justify-center px-2 py-3">
+                                    class="px-2 py-3">
                                     {{ $step->quantity }} {{ $step->unit }}</td>
                                 <td class="px-2 py-3">{{ $step->field }} </td>
                                 <td class="px-2 py-3">{{ $step->type }} </td>
                                 <td
-                                    class="flex justify-center px-2 py-3">
+                                    class="px-2 py-3">
                                     {{ $step->time }} </td>
                             @endif
                         </tr>
@@ -189,30 +189,30 @@
             <span>Yeasts</span>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                            class="px-2 py-3">
                             Quantity</th>
                         <th scope="col" class="px-2 py-3">Name</th>
                         <th scope="col" class="px-2 py-3">Add</th>
                         <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                            class="px-2 py-3">
                             Minutes</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
+                        <tr class="text-center bg-white border-b">
                             @if ($step->type == 'Yeast' || $step->type == 'Dry Hop')
                                 <td
-                                    class="flex justify-center px-2 py-3">
+                                    class="px-2 py-3">
                                     {{ $step->quantity }} {{ $step->unit }}</td>
                                 <td class="px-2 py-3">{{ $step->field }} </td>
                                 <td class="px-2 py-3">{{ $step->type }} </td>
                                 <td
-                                    class="flex justify-center px-2 py-3">
+                                    class="px-2 py-3">
                                     {{ $step->time }} </td>
                             @endif
                         </tr>
@@ -231,7 +231,7 @@
             </div>
         </div>
         <div class="pb-4">
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
                         <th scope="col" class="px-4 py-3">Step</th>
@@ -241,8 +241,8 @@
                 </thead>
                 <tbody>
                     @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Primary')
+                        <tr class="text-center bg-white border-b">
+                            @if ($step->type == 'Primary' || $step->type == 'Secondary' || $step->type == 'Tertiary' || $step->type == 'Bottle')
                                 <td class="px-4 py-3">{{ $step->field }} </td>
                                 <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
                                 <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
@@ -250,7 +250,7 @@
                         </tr>
                     @endforeach
                 </tbody>
-                <tbody>
+                {{-- <tbody>
                     @foreach ($recipe->steps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Secondary')
@@ -282,7 +282,7 @@
                             @endif
                         </tr>
                     @endforeach
-                </tbody>
+                </tbody> --}}
             </table>
         </div>
     </div>

@@ -1,7 +1,7 @@
 <div>
     <div class="bg-white sticky px-4 py-2.5 flex justify-between items-center ">
         <h2 class="text-xl px-2 font-semibold tracking-widest">{{ $this->brewing->name }}</h2>
-        <a href=" {{ route('brewing.index', [$recipe, $this->brewing])}}">
+        <a href=" {{ route('brewing.index', [$recipe, $this->brewing]) }}">
             <button
                 class="bg-xanthous hover:bg-tawny hover:text-white transition-all duration-300 py-1.5 px-3 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
@@ -17,81 +17,20 @@
         <div class="flex items-center gap-x-2 py-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                 <path fill="currentColor"
-                    d="M7.33 18.33c-.83-1.16-.83-2.5-.83-3.83c1.67 1 3.33 2 4.17 3.17l.33.56v-2.28c-1.5-.9-2.92-1.82-3.67-2.87c-.83-1.16-.83-2.5-.83-3.83c1.67 1 3.33 2 4.17 3.17L11 13v-2.3c-1.5-.9-2.92-1.82-3.67-2.87C6.5 6.67 6.5 5.33 6.5 4c1.67 1 3.33 2 4.17 3.17c.1.14.19.29.27.45c-.17-.62-.28-1.2-.29-1.8c-.01-1.51.65-3.06 1.31-4.61c.69 1.48 1.38 2.97 1.39 4.48c.01.63-.1 1.27-.28 1.9c.08-.14.16-.28.26-.42C14.17 6 15.83 5 17.5 4c0 1.33 0 2.67-.83 3.83C15.92 8.88 14.5 9.8 13 10.7V13l.33-.58c.84-1.17 2.5-2.17 4.17-3.17c0 1.33 0 2.67-.83 3.83c-.75 1.05-2.17 1.97-3.67 2.87v2.28l.33-.56c.84-1.17 2.5-2.17 4.17-3.17c0 1.33 0 2.67-.83 3.83c-.75 1.05-2.17 1.97-3.67 2.87V23h-2v-1.8c-1.5-.9-2.92-1.82-3.67-2.87Z" />
-            </svg>
-            <span>Preparation</span>
-        </div>
-        <div class="pb-4">
-            <table class="w-full text-sm text-center text-gray-500">
-                <thead class="text-xs text-gray-800 uppercase bg-old-gold">
-                    <tr>
-                        <th scope="col" class="px-4 py-3">Quantity</th>
-                        <th scope="col" class="px-4 py-3">Method</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($this->brewing->brewingSteps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Preparation')
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}  </td>
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="flex items-center gap-x-2 py-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                <path fill="currentColor"
-                    d="M21 12s-8.5-2-8.5-10c0 0 8.5 0 8.5 10M3 12C3 2 11.5 2 11.5 2c0 8-8.5 10-8.5 10m9-5.5s1 2.16 3 4c-.24 3.66-3 5.5-3 5.5s-2.76-1.84-3-5.5c2-1.84 3-4 3-4m8.75 6.75S20 17 18 19c0 0-2.47-1.64-3.67-4.19c.72-1.23 1.17-2.69 1.42-3.68c1.38 1.05 3 1.87 5 2.12m-5.25 5c-1 2-3.5 3.5-3.5 3.5s-2.5-1.5-3.5-3.5c0 0 1.09-.91 1.85-2.45c.47.55 1.01.99 1.65 1.2c.64-.21 1.18-.65 1.65-1.2c.76 1.54 1.85 2.45 1.85 2.45m-12.25-5c2-.25 3.62-1.07 5-2.12c.25.99.7 2.45 1.42 3.68C8.47 17.36 6 19 6 19c-2-2-2.75-5.75-2.75-5.75Z" />
-            </svg>
-            <span>Mash</span>
-        </div>
-        <div class="pb-4">
-            <table class="w-full text-sm text-center text-gray-500">
-                <thead class="text-xs text-gray-800 uppercase bg-old-gold">
-                    <tr>
-                        <th scope="col"
-                            class="flex justify-center items-center px-2 py-3">
-                            Quantity
-                        </th>
-                        <th scope="col" class="px-2 py-3">Name</th>
-                        <th scope="col"
-                            class="flex justify-center px-2 py-3">
-                            Minutes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($this->brewing->brewingSteps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Mash')
-                                <td
-                                    class="sm:justify-start   px-2 py-3">
-                                    {{ $step->quantity }} {{ $step->unit }}</td>
-                                <td class="px-2 py-3">{{ $step->field }} </td>
-                                <td
-                                    class="sm:justify-start px-2 py-3">
-                                    {{ $step->time }} </td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        <div class="flex items-center gap-x-2 py-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                <path fill="currentColor"
                     d="M19 5c-1.11 0-2 .89-2 2v6.76c-.64.57-1 1.39-1 2.24c0 1.66 1.34 3 3 3s3-1.34 3-3c0-.85-.36-1.67-1-2.23V7c0-1.11-.89-2-2-2m0 1c.55 0 1 .45 1 1v1h-2V7c0-.55.45-1 1-1M8 3.54l-.75.84S5.97 5.83 4.68 7.71S2 11.84 2 14c0 3.31 2.69 6 6 6s6-2.69 6-6c0-2.16-1.39-4.41-2.68-6.29S8.75 4.38 8.75 4.38L8 3.54m0 3.13c.44.52.84.95 1.68 2.17C10.89 10.6 12 12.84 12 14c0 2.22-1.78 4-4 4s-4-1.78-4-4c0-1.16 1.11-3.4 2.32-5.16C7.16 7.62 7.56 7.19 8 6.67Z" />
             </svg>
             <span>Boil</span>
         </div>
+        <div class="flex justify-end w-full">
+            <div class="flex justify-center p-1 text-sm border w-1/3 bg-tawny">
+                {{ Carbon\Carbon::parse($brewing->boil_start)->format('j F Y') }}
+            </div>
+        </div>
         <div class="pb-4">
             <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
-                        <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                        <th scope="col" class="flex justify-center px-2 py-3">
                             Quantity</th>
 
                         <th scope="col" class="px-2 py-3">Name</th>
@@ -107,9 +46,10 @@
                                 <td class="px-2 py-3">{{ $step->field }} </td>
                                 <td class="flex justify-center px-2 py-3">
                                     @if ($step->time != $this->recipeSteps[$loop->index]->time)
-                                    {{ $step->time }} <span class="text-red-500 ml-2">{{$this->recipeSteps[$loop->index]->time}}</span>
+                                        {{ $step->time }} <span
+                                            class="text-red-500 ml-2">{{ $this->recipeSteps[$loop->index]->time }}</span>
                                     @else
-                                    {{ $step->time }}
+                                        {{ $step->time }}
                                     @endif
                                 </td>
                             @endif
@@ -129,12 +69,10 @@
             <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
                     <tr>
-                        <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                        <th scope="col" class="flex justify-center px-2 py-3">
                             Quantity</th>
                         <th scope="col" class="px-2 py-3">Name</th>
-                        <th scope="col"
-                            class="flex justify-center px-2 py-3">
+                        <th scope="col" class="flex justify-center px-2 py-3">
                             Minutes</th>
                     </tr>
                 </thead>
@@ -142,12 +80,10 @@
                     @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
                             @if ($step->type == 'Yeast' || $step->type == 'Dry Hop')
-                                <td
-                                    class="flex justify-center px-2 py-3">
+                                <td class="flex justify-center px-2 py-3">
                                     {{ $step->quantity }} {{ $step->unit }}</td>
                                 <td class="px-2 py-3">{{ $step->field }} </td>
-                                <td
-                                    class="flex justify-center px-2 py-3">
+                                <td class="flex justify-center px-2 py-3">
                                     {{ $step->time }} </td>
                             @endif
                         </tr>
@@ -164,6 +100,14 @@
                 <div>Ferment</div>
             </div>
         </div>
+        <div class="flex w-full">
+            <div class="flex justify-center p-1 text-sm border w-1/2 bg-tawny">
+                {{ Carbon\Carbon::parse($brewing->ferment_start)->format('j F Y') }}
+            </div>
+            <div class="flex justify-center p-1 text-sm border w-1/2 bg-tawny">
+                {{ Carbon\Carbon::parse($brewing->ferment_end)->format('j F Y') }}
+            </div>
+        </div>
         <div class="pb-4">
             <table class="w-full text-sm text-center text-gray-500">
                 <thead class="text-xs text-gray-800 uppercase bg-old-gold">
@@ -176,40 +120,7 @@
                 <tbody>
                     @foreach ($this->brewing->brewingSteps as $step)
                         <tr class="bg-white border-b">
-                            @if ($step->type == 'Primary')
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tbody>
-                    @foreach ($this->brewing->brewingSteps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Secondary')
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tbody>
-                    @foreach ($this->brewing->brewingSteps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Tertiary')
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tbody>
-                    @foreach ($this->brewing->brewingSteps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Bottle')
+                            @if ($step->type == 'Primary' || $step->type == 'Secondary' || $step->type == 'Tertiary' || $step->type == 'Bottle')
                                 <td class="px-4 py-3">{{ $step->field }} </td>
                                 <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
                                 <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
@@ -221,10 +132,10 @@
         </div>
         <div class="py-4">
             <x-note-button />
-       </div>
+        </div>
         <div class="pb-4">
             <div class="text-sm text-gray-500 bg-white p-2">
-                <textarea rows="10" class="flex w-full border-none">{{ $this->brewing->note}}</textarea>
+                <textarea rows="10" class="flex w-full border-none">{{ $this->brewing->note }}</textarea>
             </div>
         </div>
     </div>

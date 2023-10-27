@@ -18,6 +18,10 @@ class FileController extends Controller
 
     public function store(Request $request)
     {
+        if($request->action == 'cancel'){
+            return redirect()->route('recipes.index');
+        }
+
         $request->validate([
             'file' => 'required|file|mimes:xml|max:2048'
         ]);
@@ -131,7 +135,9 @@ class FileController extends Controller
             $this->createStep($recipe['AGE_TEMP'], '°C', 'Garde en bouteille', $recipe['AGE']*1440, 'Bottle', $imported_recipe->id);
         }
 
+
         return redirect()->route('recipes.show',['recipe'=> $imported_recipe->id]);
+
     }
 
     // createStep($quantity, $unit, $field, $time, $type, $recipe_id)

@@ -23,10 +23,13 @@
                     name="note" wire:model="note">
                 </textarea>
             </div>
-            <div class="flex justify-center">
+            <div class="flex justify-center gap-x-8">
                 <button type="button" wire:click="store"
                     class="flex items-center justify-center h-8 px-2 w-36 bg-old-gold mt-8 rounded font-semibold text-sm text-black hover:bg-tawny">Save
                 </button>
+                <button type="button" wire:click="back"
+                class="flex items-center justify-center h-8 px-2 w-36 bg-old-gold mt-8 rounded font-semibold text-sm text-black hover:bg-tawny">Back
+            </button>
             </div>
         </div>
     </div>

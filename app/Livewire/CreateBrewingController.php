@@ -70,6 +70,11 @@ class CreateBrewingController extends Component
         }
     }
 
+    public function back()
+    {
+        return redirect()->route('brewing.index', ['recipe'=> $this->recipe]);
+    }
+
     public function render()
     {
         return view('brewings.create')->layout('layouts.app');
