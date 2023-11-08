@@ -16,7 +16,11 @@ class BoilController extends Component
     {
         $this->brewing = $brewing;
         $this->stepsCount = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->count();
+        // SELECT COUNT(*) FROM brewing_steps WHERE type = 'Boil' AND brewing_id = [$this->brewing->id];
+
         $this->checkStep = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->where('status', true)->count();
+        // SELECT COUNT(*) FROM brewing_steps WHERE type = 'Boil'AND brewing_id = [$this->brewing->id] AND status = 1;
+
         $this->allChecked();
     }
 
@@ -89,6 +93,7 @@ class BoilController extends Component
     public function render()
     {
         $this->steps = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->get();
+        // SELECT * FROM brewing_steps WHERE type = 'Boil' AND brewing_id = $this->brewing->id
 
         return view('steps.boil')->layout('layouts.app');
     }

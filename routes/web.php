@@ -32,7 +32,7 @@ use App\Livewire\RecipeDetailsController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth/register');
 });
 
 Route::middleware([

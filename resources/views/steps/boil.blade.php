@@ -83,7 +83,7 @@
                             </div>
                             <div class="block text-sm">
                                 @if ($this->brewing->boil_start != null && $time_left <= 0 && !$step->status)
-                                    en retard batard
+                                    en retard
                                 @elseif ($this->brewing->boil_start != null && $time_left > 0)
                                     dans {{ $time_left }} minutes
                                 @endif

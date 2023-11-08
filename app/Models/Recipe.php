@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Models\Step;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Recipe extends Model
@@ -19,11 +18,6 @@ class Recipe extends Model
     {
         return $this->hasMany(Step::class);
     }
-
-    // public function brewing(): BelongsTo
-    // {
-    //     return $this->belongsTo(brewing::class);
-    // }
 
     public function brewing(): HasMany
     {

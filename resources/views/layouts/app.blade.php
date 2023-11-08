@@ -17,7 +17,7 @@
     <!-- Styles -->
     @livewireStyles
 </head>
-<body class="font-sans antialiased bg-anti-flash-white">
+<body class="font-sans antialiased bg-anti-flash-white">                   
     <x-banner />
 
     <div x-data="{ open: false }" @keydown.window.escape="open = false">
