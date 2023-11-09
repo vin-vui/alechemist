@@ -44,16 +44,9 @@
             @if (auth()->id())
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <div>
-                    <x-section-border />
-                        <a href="{{ route('logout') }}" onclick="event.preventDefault();
-                                this.closest('form').submit(); " role="button">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <div class="flex mt-10 sm:mt-0 font-semibold p-1.5 bg-xanthous hover:bg-tawny hover:text-white">
-                                {{ __('Log Out') }}
-                            </div>
-                        </a>
-                </div>
+                    <x-button>
+                        {{ __('Log Out') }}
+                    </x-button>
             </form>
         @else
             <li class="nav-item">

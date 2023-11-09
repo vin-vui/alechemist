@@ -220,7 +220,6 @@
                 </tbody>
             </table>
         </div>
-
         <div class="flex items-center gap-x-2 py-4">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
                 <path fill="currentColor"
@@ -250,40 +249,23 @@
                         </tr>
                     @endforeach
                 </tbody>
-                {{-- <tbody>
-                    @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Secondary')
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tbody>
-                    @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Tertiary')
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tbody>
-                    @foreach ($recipe->steps as $step)
-                        <tr class="bg-white border-b">
-                            @if ($step->type == 'Bottle')
-                                <td class="px-4 py-3">{{ $step->field }} </td>
-                                <td class="px-4 py-3">{{ $step->time / 1440 }} </td>
-                                <td class="px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody> --}}
             </table>
+        </div>
+        <div>
+            <button wire:click="delete({{ $recipe }})"
+                class="bg-tawny rounded mx-auto hover:bg-licorice hover:text-white transition-all duration-300 py-1.5 px-3 flex w-full items-center justify-center my-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                    viewBox="0 0 512 512">
+                    <path fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="32"
+                        d="m112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" />
+                    <path fill="currentColor" stroke="currentColor" stroke-linecap="round"
+                        stroke-miterlimit="10" stroke-width="32" d="M80 112h352" />
+                    <path fill="none" stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="32"
+                        d="M192 112V72h0a23.93 23.93 0 0 1 24-24h80a23.93 23.93 0 0 1 24 24h0v40m-64 64v224m-72-224l8 224m136-224l-8 224" />
+                </svg>
+            </button>
         </div>
     </div>
 </div>
