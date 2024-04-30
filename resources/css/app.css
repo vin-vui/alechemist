@@ -16,6 +16,14 @@
     display: none;
 }
 
+.btn-yellow {
+    @apply bg-xanthous hover:bg-tawny hover:text-white shadow-lg transition-all duration-300 py-1.5 px-3 flex items-center gap-2 whitespace-nowrap;
+}
+
+.btn-yellow svg {
+    @apply size-6;
+}
+
 .ebc {
     color: #000
 }

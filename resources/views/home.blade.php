@@ -19,7 +19,7 @@
         <div class="flex justify-between items-center px-4 py-2 capitalize font-semibold bg-old-gold">
             ferment in progress
         </div>
-        <div class="flex flex-col w-full mt-4 gap-y-4">
+        <div class="flex flex-col w-full gap-y-4">
             @foreach ($this->fermentRecipes as $recipe)
                 @foreach ($recipe->brewing as $brewing)
                     @if ($brewing->current_step == 'ferment')
@@ -31,13 +31,13 @@
                                         <div class="text-gray-500">{{ $brewing->name }}</div>
                                     </div>
                                     <div>
-                                        <div class="flex justify-between py-4">
+                                        <div class="flex flex-col md:flex-row justify-between py-4 gap-6">
                                             @php
                                                 $totalTime = 0;
                                             @endphp
                                             @foreach ($brewing->BrewingSteps as $brewingStep)
                                                 @if (
-                                                    $brewingStep->type == 'Primary' ||
+                                                        $brewingStep->type == 'Primary' ||
                                                         $brewingStep->type == 'Secondary' ||
                                                         $brewingStep->type == 'Tertiary' ||
                                                         $brewingStep->type == 'Bottle')
@@ -48,9 +48,9 @@
                                                         $time = (1 - ($time_left_min / $totalTime)) * 100;
                                                     @endphp
                                                     @if ($time_left > 0)
-                                                        <div class="flex flex-col justify-items-center">
+                                                        <div class="flex flex-col justify-items-center w-full">
                                                             <div>{{ $brewingStep->type }}</div>
-                                                            <div>{{ $time_left }} days left</div>
+                                                            <div>{{ round($time_left) }} days left</div>
                                                             <div class="bg-gray-500 h-2">
                                                                 <div style="width: {{ $time }}%" class="bg-xanthous h-2"></div>
                                                             </div>
@@ -64,6 +64,31 @@
                             </div>
                         </a>
                     @endif
+                @endforeach
+            @endforeach
+        </div>
+    </div>
+    <div class="shadow-lg">
+        <div class="flex justify-between items-center px-4 py-2 capitalize font-semibold bg-old-gold">
+            recipes in progress
+        </div>
+        <div class="flex flex-col w-full gap-y-4">
+            @foreach ($this->progressRecipes as $recipe)
+                @foreach ($recipe->brewing as $brewing)
+                <a href="{{ route($brewing->current_step, [$recipe, $brewing]) }}">
+                    <div class="flex p-4 w-full bg-gray-50 shadow-lg">
+                        <div class="flex w-full flex-col">
+                            <div class="flex flex-col">
+                                <div class="text-xl font-semibold">{{ $recipe->name }}</div>
+                                <div class="text-gray-500">{{ $brewing->name }}</div>
+                            </div>
+                        </div>
+                        <div class="">
+                            <div class="text-gray-500">Step</div>
+                            <div class="text-xl font-semibold uppercase">{{ $brewing->current_step }}</div>
+                        </div>
+                    </div>
+                </a>
                 @endforeach
             @endforeach
         </div>

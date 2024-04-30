@@ -40,27 +40,19 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', HomeController::Class)->name('alechemist.home');
+    Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
+    Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
+    
+    Route::get('/recipes', RecipesController::class)->name('recipes.index');
+    Route::get('/recipes/{recipe}', RecipeDetailsController::class)->name('recipes.show');
+    Route::get('/recipes/{recipe}/brewings', BrewingController::class)->name('brewing.index');
+    Route::get('/recipes/{recipe}/brewings/new', CreateBrewingController::class)->name('brewing.create');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/preparation', PreparationController::class)->name('preparation');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/mash', MashController::class)->name('mash');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/boil', BoilController::class)->name('boil');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/yeast', YeastController::class)->name('yeast');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/ferment', FermentController::class)->name('ferment');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/completed', CompletedController::class)->name('completed');
+    Route::get('/recipes/{recipe}/brewings/{brewing}/note', NoteController::class)->name('note');
 });
-
-Route::get('/home', HomeController::Class)->name('alechemist.home');
-Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
-Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
-
-Route::get('/recipes', RecipesController::class)->name('recipes.index');
-Route::get('/recipes/{recipe}', RecipeDetailsController::class)->name('recipes.show');
-
-Route::get('/recipes/{recipe}/brewings', BrewingController::class)->name('brewing.index');
-
-Route::get('/recipes/{recipe}/brewings/new', CreateBrewingController::class)->name('brewing.create');
-
-
-Route::get('/recipes/{recipe}/brewings/{brewing}/preparation', PreparationController::class)->name('preparation');
-Route::get('/recipes/{recipe}/brewings/{brewing}/mash', MashController::class)->name('mash');
-Route::get('/recipes/{recipe}/brewings/{brewing}/boil', BoilController::class)->name('boil');
-Route::get('/recipes/{recipe}/brewings/{brewing}/yeast', YeastController::class)->name('yeast');
-Route::get('/recipes/{recipe}/brewings/{brewing}/ferment', FermentController::class)->name('ferment');
-Route::get('/recipes/{recipe}/brewings/{brewing}/completed', CompletedController::class)->name('completed');
-Route::get('/recipes/{recipe}/brewings/{brewing}/note', NoteController::class)->name('note');
