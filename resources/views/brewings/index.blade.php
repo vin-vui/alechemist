@@ -1,4 +1,4 @@
-<div>
+<div class="pb-20">
 
     {{-- Header --}}
     <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center shadow-lg z-30">
@@ -13,6 +13,24 @@
         </div>
     </div>
 
+    <div class="bg-gray-50 relative z-20">
+        <div class="flex gap-4 justify-start items-center">
+            <div class="shrink-0">
+                <img class="h-28 object-cover" src="/pictures/recipe.jpg">
+            </div>
+            <div class="w-3/4 mr-4">
+                <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}</h3>
+                <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $recipe->type }}</h4>
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+                    <div class="text-sm font-semibold">Method</div>
+                    <div class="text-xs text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->method }}</div>
+                    <div class="text-sm font-semibold">Volume</div>
+                    <div class="text-xs text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->volume }} l</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- New Brewing Fixed Button --}}
     <div class="fixed bottom-4 right-4">
         <a href="{{ route('brewing.create', $recipe) }}" class="btn-yellow">
@@ -23,9 +41,9 @@
         </a>
     </div>
 
-    <div class="flex flex-col gap-y-4">
+    <div class="flex flex-col gap-y-4 mt-8 px-3">
         @foreach ($this->brewings as $brewing)
-            <div class="flex bg-gray-50 shadow">
+            <div class="flex bg-gray-50 shadow-md">
                 @if ($brewing->current_step != null)
                 <a href="{{ route($brewing->current_step, [$recipe, $brewing]) }}" class="flex flex-col w-full">
                 @else
@@ -37,19 +55,17 @@
                     </div>
                     <div class="flex flex-col gap-y-2 w-full px-2">
                         <div class="flex">
-                            <h3 class="text-lg font-semibold sm:flex text-gray-900 uppercase">
-                                {{ $brewing->name }}
-                            </h3>
+                            <h3 class="text-lg font-semibold sm:flex text-gray-900 uppercase">{{ $brewing->name }}</h3>
+                        </div>
+                        <div class="-mt-4">
+                            <span class="text-sm text-gray-500 uppercase -mt-2">{{ Carbon\Carbon::parse($brewing->date_start)->format('d/m/Y') }}</span>
                         </div>
                         @if($brewing->current_step)
-                        <div class="flex gap-1">
-                            <div class="font-semibold">Current step</div>
-                            <div class="text-gray-900 bg-old-gold px-1 rounded flex items-center justify-center">{{ $brewing->current_step }}</div>
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-1">
+                            <div class="text-sm font-semibold">Current step</div>
+                            <div class="text-xs text-gray-900 bg-old-gold px-1 rounded flex items-center justify-center">{{ $brewing->current_step }}</div>
                         </div>
                         @endif
-                        <div class="">
-                            <span class="text-xs bg-gray-100 flex-none text-gray-500 py-0.5 px-1.5 rounded">Started at {{ Carbon\Carbon::parse($brewing->date_start)->format('d/m/Y') }}</span>
-                        </div>
                     </div>
                 </div>
                 </a>

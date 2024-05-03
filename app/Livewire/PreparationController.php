@@ -3,8 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Brewing;
-use App\Models\BrewingStep;
 use Livewire\Component;
+use App\Models\BrewingStep;
 
 class PreparationController extends Component
 {

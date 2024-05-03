@@ -13,10 +13,9 @@ class BrewingDetailsController extends Component
 
     public function mount($brewingId)
     {
-
-    $this->brewing = Brewing::find($brewingId);
-    $this->recipe = Recipe::where('id', $brewingId)->get();
-    $this->steps = Step::whereRelation('Recipe', 'id', $this->recipe['0']['id'])->get();
+        $this->brewing = Brewing::find($brewingId);
+        $this->recipe = Recipe::where('id', $brewingId)->get();
+        $this->steps = Step::whereRelation('Recipe', 'id', $this->recipe['0']['id'])->get();
     }
 
     public function render()

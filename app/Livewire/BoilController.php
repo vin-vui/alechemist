@@ -16,11 +16,7 @@ class BoilController extends Component
     {
         $this->brewing = $brewing;
         $this->stepsCount = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->count();
-        // SELECT COUNT(*) FROM brewing_steps WHERE type = 'Boil' AND brewing_id = [$this->brewing->id];
-
         $this->checkStep = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->where('status', true)->count();
-        // SELECT COUNT(*) FROM brewing_steps WHERE type = 'Boil'AND brewing_id = [$this->brewing->id] AND status = 1;
-
         $this->allChecked();
     }
 
@@ -37,6 +33,7 @@ class BoilController extends Component
     {
         $this->brewing->current_step = 'yeast';
         $this->brewing->save();
+
         return redirect()->route('yeast', [$this->recipe, $this->brewing]);
     }
 
@@ -64,24 +61,31 @@ class BoilController extends Component
     {
         $boilStart = Carbon::create($this->brewing->boil_start);
         $boilEnd = $boilStart->addMinutes($this->brewing->boil_time);
+
         return now() > $boilEnd;
     }
 
     public function modifyBoilTime(Brewing $brewing)
     {
-        $brewing->boil_time = $this->newBoilTime;
-        $brewing->save();
-
+        if ($this->newBoilTime > 0) {
+            $brewing->boil_time = $this->newBoilTime;
+            $brewing->save();
+        } else {
+            $this->newBoilTime = $this->brewing->boil_time;
+        }
+        
         $this->closeModal();
     }
 
     public function openModal()
     {
         $this->newBoilTime = $this->brewing->boil_time;
-        $this->isOpen = true;
+        $this->isOpen = !$this->isOpen;
     }
+
     public function closeModal()
     {
+        $this->brewing->boil_time = intval($this->newBoilTime);
         $this->isOpen = false;
     }
 
@@ -93,8 +97,6 @@ class BoilController extends Component
     public function render()
     {
         $this->steps = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->get();
-        // SELECT * FROM brewing_steps WHERE type = 'Boil' AND brewing_id = $this->brewing->id
-
         return view('steps.boil')->layout('layouts.app');
     }
 }

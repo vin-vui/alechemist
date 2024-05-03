@@ -17,11 +17,18 @@
 }
 
 .btn-yellow {
-    @apply bg-xanthous hover:bg-tawny hover:text-white shadow-lg transition-all duration-300 py-1.5 px-3 flex items-center gap-2 whitespace-nowrap;
+    @apply bg-xanthous hover:bg-tawny hover:text-white shadow-lg transition-all duration-300 py-1.5 px-3 flex items-center justify-center gap-2 whitespace-nowrap;
 }
 
 .btn-yellow svg {
     @apply size-6;
+}
+
+.info-label-inprogress {
+    @apply bg-gray-200 px-1 py-0.5 rounded;
+}
+.info-label-inprogress-yellow {
+    @apply bg-old-gold px-1 py-0.5 rounded;
 }
 
 .ebc {

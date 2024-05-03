@@ -21,19 +21,16 @@ class CreateBrewingController extends Component
 
     public function store()
     {
-        // champ requis dans ma vue brewing.create
         $validated = $this->validate([
             'name' => 'required|max:255',
             'note' => 'nullable',
             'date_start' => 'required',
         ]);
-        // dans ma variable $brewing, j'utilise ma fonction newBrewing qui insère mes données dans ma db, avec les valeur requise et celles qui
-        // proviennent de ma recette, et je retourne ma varible $brewing
+
         $brewing = $this->newBrewing($validated);
-        // J'utilise ma fontion bewingSteps pour insérer mes differentes étapes dans mon nouveau brassin depuis ma recette
         $this->brewingSteps($brewing);
 
-        return redirect()->route('brewing.index', $this->recipe);
+        return redirect()->route('preparation', [$this->recipe, $brewing]);
     }
 
     private function newBrewing($validated)
@@ -50,6 +47,7 @@ class CreateBrewingController extends Component
         $brewing->before_boil_density = $this->recipe->before_boil_density;
         $brewing->carbonation = $this->recipe->carbonation;
         $brewing->recipe_id = $this->recipe->id;
+        $brewing->current_step = 'preparation';
 
         $brewing->save();
         return $brewing;

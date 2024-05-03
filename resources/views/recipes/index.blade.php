@@ -23,22 +23,22 @@
         </a>
     </div>
 
-    <div class="flex flex-col gap-y-4">
+    <div class="flex flex-col gap-y-4 px-3 mt-8">
         @foreach ($this->recipes as $recipe)
             <a href="{{ route('recipes.show', $recipe) }}">
-                <div class="bg-gray-50 shadow">
+                <div class="bg-gray-50 shadow-md">
                     <div class="flex gap-4 justify-start items-center">
                         <div class="shrink-0">
                             <img class="h-28 object-cover" src="/pictures/recipe.jpg">
                         </div>
                         <div class="w-3/4">
                             <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}</h3>
-                            <h4 class="text-md text-gray-500 uppercase">{{ $recipe->type }}</h4>
+                            <h4 class="text-md text-gray-500 uppercase -mt-2">{{ $recipe->type }}</h4>
                             @php
                                 $brewings = App\Models\Brewing::where('recipe_id', $recipe->id)->count();
                             @endphp
                             @if($brewings > 0)
-                            <div class="">
+                            <div class="mt-2">
                                 <span class="bg-old-gold px-1.5 rounded font-semibold">{{ $brewings }}</span>
                                 <span class="text-sm text-gray-400">{{ Str::plural('brewing', $brewings) }} in progress</span>
                             </div>

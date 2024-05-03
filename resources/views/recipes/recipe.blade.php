@@ -37,7 +37,7 @@
                 <div class="">
                     <span class="text-xs bg-old-gold py-0.5 px-1.5 rounded text-gray-900 uppercase">{{ $recipe->alcohol }} %</span>
                 </div>
-                <div class="">
+                <div class="mt-2">
                     <span class="text-xs bg-gray-100 flex-none text-gray-500 py-0.5 px-1.5 rounded">Created at {{ $recipe->created_at->format('d/m/Y') }}</span>
                 </div>
                 <div class="">
