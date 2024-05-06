@@ -9,7 +9,7 @@
         </a>
         <h2 class="text-xl font-semibold tracking-widest truncate">Recipes</h2>
         <div class="size-6">
-            <span class="bg-gray-100 text-gray-600 px-2 rounded">{{ count($this->recipes) }}</span>
+            <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded">{{ count($this->recipes) }}</span>
         </div>
     </div>
 

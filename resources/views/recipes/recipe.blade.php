@@ -7,8 +7,8 @@
                 <path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/>
             </svg>
         </button>
-        <h2 class="text-xl font-semibold tracking-widest truncate">{{ $recipe->name }}</h2>
-        {{-- TODO faire la vue pour modifier la recette --}}
+        <h2 class="text-xl font-semibold tracking-widest truncate px-4">{{ $recipe->name }}</h2>
+        {{-- TODO:: faire la vue pour modifier la recette --}}
         <button>
             <svg class="size-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M9 15v-4.25l9.175-9.175q.3-.3.675-.45t.75-.15q.4 0 .763.15t.662.45L22.425 3q.275.3.425.663T23 4.4t-.137.738t-.438.662L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h8.925L7 9.925V17h7.05L21 10.05V19q0 .825-.587 1.413T19 21z"/>
@@ -247,7 +247,7 @@
 
     {{-- Delete Button --}}
     <div class="flex pt-4 px-4">
-        <button wire:click="delete({{ $recipe }})"
+        <button wire:click="delete({{ $recipe }})" wire:confirm="Are you sure?"
             class="bg-transparent border-2 border-tawny transition-all duration-300 py-1.5 px-3 flex items-center gap-2 justify-center">
             <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512">
                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" />

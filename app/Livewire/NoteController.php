@@ -9,6 +9,7 @@ use Livewire\Component;
 class NoteController extends Component
 {
     public $recipe, $note, $brewing;
+
     public function mount(Brewing $brewing)
     {
         $this->brewing = $brewing;
@@ -35,6 +36,7 @@ class NoteController extends Component
     {
         return redirect()->route($this->brewing->current_step, ['recipe'=> $this->recipe, 'brewing'=> $this->brewing]);
     }
+
     public function render()
     {
         return view('_partials.note')->layout('layouts.app');

@@ -11,13 +11,13 @@
             <div class="text-xl font-bold">Chrono</div>
             <div class="text-sm text-gray-400 mt-1">{{ $this->newBoilTime == null ? $this->brewing->boil_time : $this->newBoilTime }} min</div>
         </div>
+        {{-- TODO:: if time left > 1 minute, poll every minute, not every second --}}
         @if ($this->brewing->boil_start != null)
             @if (!$this->endTime())
-            <span wire:poll.s class="text-gray-100">
+            <span wire:poll.s class="info-label-inprogress-yellow">
                 @php
                     $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time), false);
                 @endphp
-                il reste
                 @if ($time_left < 1)
                     @php
                         $seconds_left = now()->diffInSeconds(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time));
@@ -26,9 +26,10 @@
                 @else
                     {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
                 @endif
+                left
             </span>
             @else
-            <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Temps écoulé</span>
+            <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Time elapsed</span>
             @endif
         @else
             @if (!$isOpen)
@@ -87,7 +88,7 @@
                             </div>
                             <div class="block text-sm">
                                 @if ($this->brewing->boil_start != null && $time_left <= 0 && !$step->status)
-                                    en retard
+                                    late
                                 @elseif ($this->brewing->boil_start != null && $time_left > 0)
                                     in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
                                 @endif

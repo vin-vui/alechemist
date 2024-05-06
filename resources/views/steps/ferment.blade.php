@@ -63,7 +63,7 @@
                                     ends {{ Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
                                 </div>
                                 <div class="info-label-inprogress-yellow text-sm">
-                                    {{ round($time_left) }} days left
+                                    {{ $time_left <= 0 ? 'finished' : round($time_left) . ' days left' }}
                                 </div>
                             </div>
                         </div>

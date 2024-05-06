@@ -15,18 +15,9 @@ class FermentController extends Component
     {
         $this->brewing = $brewing;
 
-
-        $this->stepsCount = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
-        ->where('brewing_id', $this->brewing->id)->count();
-
-        $this->checkStep = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
-        ->where('brewing_id', $this->brewing->id)
-        ->where('status', true)->count();
-
-        $this->fermentTime = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
-        ->where('brewing_id', $this->brewing->id)
-        ->sum('time');
-
+        $this->stepsCount = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])->where('brewing_id', $this->brewing->id)->count();
+        $this->checkStep = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])->where('brewing_id', $this->brewing->id)->where('status', true)->count();
+        $this->fermentTime = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])->where('brewing_id', $this->brewing->id)->sum('time');
 
         $this->allChecked();
     }
@@ -52,7 +43,6 @@ class FermentController extends Component
         }
 
         $this->allChecked();
-
     }
 
     public function note()
@@ -60,7 +50,7 @@ class FermentController extends Component
         return redirect()->route('note', [$this->recipe, $this->brewing]);
     }
 
-    public function end()
+    public function next()
     {
         $this->brewing->ferment_end = now();
         $this->brewing->current_step = 'completed';
@@ -72,8 +62,7 @@ class FermentController extends Component
 
     public function render()
     {
-        $this->steps = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])
-        ->where('brewing_id', $this->brewing->id)->get();
+        $this->steps = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])->where('brewing_id', $this->brewing->id)->get();
         // $this->steps = BrewingStep::where('type', 'Primary')
         // ->orWhere('type', 'Secondary')
         // ->orWhere('type', 'Tertiary')

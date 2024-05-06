@@ -32,5 +32,5 @@
 </div>
 
 <div class="fixed bottom-4 right-4">
-<x-note-button />
+    <x-note-button />
 </div>

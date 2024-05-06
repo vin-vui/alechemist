@@ -43,7 +43,7 @@ Route::middleware([
     Route::get('/dashboard', HomeController::Class)->name('alechemist.home');
     Route::get('/uploadFile',[FileController::class,'index'])->name('fileUpload');
     Route::post('/uploadFile',[FileController::class,'store'])->name('upload.store');
-    
+
     Route::get('/recipes', RecipesController::class)->name('recipes.index');
     Route::get('/recipes/{recipe}', RecipeDetailsController::class)->name('recipes.show');
     Route::get('/recipes/{recipe}/brewings', BrewingController::class)->name('brewing.index');
@@ -56,3 +56,4 @@ Route::middleware([
     Route::get('/recipes/{recipe}/brewings/{brewing}/completed', CompletedController::class)->name('completed');
     Route::get('/recipes/{recipe}/brewings/{brewing}/note', NoteController::class)->name('note');
 });
+

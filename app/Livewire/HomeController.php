@@ -25,7 +25,7 @@ class HomeController extends Component
             })->get();
         $this->progressRecipes = Recipe::where('user_id', Auth::user()->id)
             ->whereHas('brewing', function ($query) {
-                $query->where('current_step', '<>' ,'ferment');
+                $query->whereNotIn('current_step', ['ferment', 'completed']);
             })->get();
     }
 
