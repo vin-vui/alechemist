@@ -1,0 +1,18 @@
+{
+  "background_color": "#000000",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "AleChemist",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "AleChemist",
+  "start_url": "/login",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "type": "image/x-icon"
+    }
+  ],
+  "lang": "en"
+}
