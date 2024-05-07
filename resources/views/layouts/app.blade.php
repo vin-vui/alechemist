@@ -6,8 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#000000">
     <meta name="author" content="vinvui">
-    <link rel="canonical" href="{{ url('/') }}">
-    <link rel="shortcut icon" href="{{ url('favicon.ico') }}" type="image/x-icon">
+    <link rel="canonical" href="https://alechemist.vinvui.com/">
+    <link rel="shortcut icon" href="https://alechemist.vinvui.com/favicon.ico" type="image/x-icon">
+    <link rel='manifest' href='https://alechemist.vinvui.com/manifest.json'>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -16,7 +17,6 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    <link rel='manifest' href='{{ asset('manifest.json') }}'>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -81,6 +81,6 @@
     @livewireScripts
 
     <pwa-update></pwa-update>
-    
+
 </body>
 </html>
