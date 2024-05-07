@@ -6,7 +6,7 @@
   "orientation": "portrait",
   "scope": "/",
   "short_name": "AleChemist",
-  "start_url": "/login",
+  "start_url": "https://alechemist.vinvui.com/login",
   "theme_color": "#000000",
   "icons": [
     {
