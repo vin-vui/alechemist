@@ -23,60 +23,68 @@
                 <span class="info-label">{{ count($this->fermentRecipes) }}</span>
             </div>
             <div class="flex flex-col w-full gap-y-4 px-4">
-                @foreach ($this->fermentRecipes as $recipe)
-                @foreach ($recipe->brewing as $brewing)
-                @if ($brewing->current_step == 'ferment')
-                <a href="{{ route('ferment', [$recipe, $brewing]) }}">
-                    <div class="flex p-4 w-full bg-gray-50 shadow-md">
-                        <div class="flex w-full flex-col">
-                            <div class="flex flex-col">
-                                <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->name }}</h3>
-                                <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $recipe->name }}</h4>
-                            </div>
-                            <div>
-                                <div class="flex flex-col md:flex-row justify-between py-4 gap-6">
-                                    @php
-                                    $totalTime = 0;
-                                    @endphp
-                                    @foreach ($brewing->BrewingSteps as $brewingStep)
-                                    @if ($brewingStep->type == 'Primary' ||
-                                    $brewingStep->type == 'Secondary' ||
-                                    $brewingStep->type == 'Tertiary' ||
-                                    $brewingStep->type == 'Bottle')
-                                    @php
-                                    $totalTime = $totalTime + $brewingStep->time;
-                                    $time_left = now()->diffInDays(Carbon\Carbon::create($brewing->ferment_start)->addMinutes($totalTime), false);
-                                    $time_left_min = now()->diffInMinutes(now()->addDays($time_left));
-                                    $time = (1 - ($time_left_min / $totalTime)) * 100;
-                                    @endphp
-                                    @if ($time_left > 0)
-                                    <div class="flex flex-col justify-items-center w-full">
-                                        <div class="flex justify-between">
-                                            <div class="">{{ $brewingStep->field }}</div>
-                                            <div class="info-label-yellow text-sm">
-                                                {{ $time_left <= 0 ? 'finished' : round($time_left) . ' days left' }}
-                                            </div>
+                @if(count($this->fermentRecipes) > 0)
+                    @foreach ($this->fermentRecipes as $recipe)
+                        @foreach ($recipe->brewing as $brewing)
+                            @if ($brewing->current_step == 'ferment')
+                            <a href="{{ route('ferment', [$recipe, $brewing]) }}">
+                                <div class="flex p-4 w-full bg-gray-50 shadow-md">
+                                    <div class="flex w-full flex-col">
+                                        <div class="flex flex-col">
+                                            <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->name }}</h3>
+                                            <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $recipe->name }}</h4>
                                         </div>
-                                        <div class="bg-gray-500 h-2 my-1">
-                                            <div style="width: {{ $time }}%" class="bg-xanthous h-2"></div>
-                                        </div>
-                                        <div class="flex justify-start">
-                                            <div class="info-label text-xs">
-                                                ends {{ Carbon\Carbon::create($brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
+                                        <div>
+                                            <div class="flex flex-col md:flex-row justify-between py-4 gap-6">
+                                                @php
+                                                $totalTime = 0;
+                                                @endphp
+                                                @foreach ($brewing->BrewingSteps as $brewingStep)
+                                                @if ($brewingStep->type == 'Primary' ||
+                                                $brewingStep->type == 'Secondary' ||
+                                                $brewingStep->type == 'Tertiary' ||
+                                                $brewingStep->type == 'Bottle')
+                                                @php
+                                                $totalTime = $totalTime + $brewingStep->time;
+                                                $time_left = now()->diffInDays(Carbon\Carbon::create($brewing->ferment_start)->addMinutes($totalTime), false);
+                                                $time_left_min = now()->diffInMinutes(now()->addDays($time_left));
+                                                $time = (1 - ($time_left_min / $totalTime)) * 100;
+                                                @endphp
+                                                @if ($time_left > 0)
+                                                <div class="flex flex-col justify-items-center w-full">
+                                                    <div class="flex justify-between">
+                                                        <div class="">{{ $brewingStep->field }}</div>
+                                                        <div class="info-label-yellow text-sm">
+                                                            {{ $time_left <= 0 ? 'finished' : round($time_left) . ' days left' }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="bg-gray-500 h-2 my-1">
+                                                        <div style="width: {{ $time }}%" class="bg-xanthous h-2"></div>
+                                                    </div>
+                                                    <div class="flex justify-start">
+                                                        <div class="info-label text-xs">
+                                                            ends {{ Carbon\Carbon::create($brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endif
+                                                @endif
+                                                @endforeach
                                             </div>
                                         </div>
                                     </div>
-                                    @endif
-                                    @endif
-                                    @endforeach
                                 </div>
-                            </div>
-                        </div>
+                            </a>
+                            @endif
+                        @endforeach
+                    @endforeach
+                @else
+                <div class="flex justify-center items-center bg-white shadow-md p-4">
+                    <div class="text-center">
+                        <h3 class="text-lg font-bold text-gray-900 uppercase">No fermentations in progress</h3>
+                        <h4 class="text-sm text-gray-500 uppercase -mt-2">Start a new one</h4>
                     </div>
-                </a>
                 @endif
-                @endforeach
-                @endforeach
             </div>
         </div>
         <div class="">
@@ -86,19 +94,19 @@
             </div>
             <div class="flex flex-col w-full gap-y-4 px-4">
                 @foreach ($this->progressBrewings as $brewing)
-                <a href="{{ route($brewing->current_step, [$recipe, $brewing]) }}">
+                <a href="{{ route($brewing->current_step, [$brewing->recipe, $brewing]) }}">
                     <div class="flex gap-4 items-center bg-white shadow-md">
                         <div class="shrink-0">
                             <img class="bg-rich-black size-32 object-cover" src="/pictures/placeholder.webp">
                         </div>
                         <div class="w-3/4 mr-4">
-                            <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}</h3>
-                            <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $recipe->type }}</h4>
+                            <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->recipe->name }}</h3>
+                            <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $brewing->recipe->type }}</h4>
                             <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
                                 <div class="text-sm font-semibold">Started at</div>
                                 <div class="info-label text-xs text-center">{{ Carbon\Carbon::parse($brewing->date_start)->format('d/m/Y') }}</div>
                                 <div class="text-sm font-semibold">Volume</div>
-                                <div class="info-label text-xs text-center">{{ $recipe->volume }} l</div>
+                                <div class="info-label text-xs text-center">{{ $brewing->recipe->volume }} l</div>
                                 <div class="text-sm font-semibold">Step</div>
                                 <div class="info-label-yellow text-xs font-semibold text-center">{{ $brewing->current_step }}</div>
                             </div>
