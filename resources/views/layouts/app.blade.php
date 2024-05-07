@@ -79,5 +79,8 @@
     @stack('modals')
 
     @livewireScripts
+
+    <pwa-update></pwa-update>
+    
 </body>
 </html>
