@@ -23,7 +23,7 @@
         </a>
     </div>
 
-    <div class="flex flex-col gap-y-4 px-3 mt-8">
+    <div class="flex flex-col gap-y-4 px-3 mt-8 overflow-x-hidden">
         @foreach ($this->recipes as $recipe)
         <a href="{{ route('recipes.show', $recipe) }}">
             <div class="bg-gray-50 shadow-md">

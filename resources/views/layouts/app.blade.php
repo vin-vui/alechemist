@@ -65,7 +65,7 @@
         </div>
 
         <main class="lg:pl-64">
-                {{ $slot }}
+            {{ $slot }}
         </main>
     </div>
 
