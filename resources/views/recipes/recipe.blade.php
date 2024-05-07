@@ -4,16 +4,23 @@
     <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center shadow-lg z-30">
         <button wire:click="back">
             <svg class="size-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/>
+                <path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z" />
             </svg>
         </button>
         <h2 class="text-xl font-semibold tracking-widest truncate px-4">{{ $recipe->name }}</h2>
-        {{-- TODO:: faire la vue pour modifier la recette --}}
-        <button>
-            <svg class="size-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M9 15v-4.25l9.175-9.175q.3-.3.675-.45t.75-.15q.4 0 .763.15t.662.45L22.425 3q.275.3.425.663T23 4.4t-.137.738t-.438.662L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h8.925L7 9.925V17h7.05L21 10.05V19q0 .825-.587 1.413T19 21z"/>
+        @if ($isOpen)
+        <button type="button" wire:click="edit">
+            <svg class="size-6 text-green-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                <path fill="currentColor" d="m10 13.6l5.9-5.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-6.6 6.6q-.3.3-.7.3t-.7-.3l-2.6-2.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275z"/>
             </svg>
         </button>
+        @else
+        <button type="button" wire:click="update">
+            <svg class="size-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M9 15v-4.25l9.175-9.175q.3-.3.675-.45t.75-.15q.4 0 .763.15t.662.45L22.425 3q.275.3.425.663T23 4.4t-.137.738t-.438.662L13.25 15zm10.6-9.2l1.425-1.4l-1.4-1.4L18.2 4.4zM5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h8.925L7 9.925V17h7.05L21 10.05V19q0 .825-.587 1.413T19 21z" />
+            </svg>
+        </button>
+        @endif
     </div>
 
     {{-- New Brewing Fixed Button --}}
@@ -30,44 +37,51 @@
     <div class="bg-white shadow-lg relative z-20">
         <div class="flex gap-4 items-center">
             <div class="shrink-0">
-                <img class="h-32 object-cover" src="/pictures/recipe.jpg">
+                <img class="bg-rich-black size-32 object-cover" src="/pictures/placeholder.webp">
             </div>
             <div class="flex flex-col">
                 <h4 class="text-md text-gray-500 uppercase">{{ $recipe->type }}</h4>
-                <div class="">
-                    <span class="text-xs bg-old-gold py-0.5 px-1.5 rounded text-gray-900 uppercase">{{ $recipe->alcohol }} %</span>
-                </div>
-                <div class="mt-2">
-                    <span class="text-xs bg-gray-100 flex-none text-gray-500 py-0.5 px-1.5 rounded">Created at {{ $recipe->created_at->format('d/m/Y') }}</span>
-                </div>
-                <div class="">
-                    <span class="text-xs bg-gray-100 flex-none text-gray-500 py-0.5 px-1.5 rounded">Updatet at {{ $recipe->updated_at->format('d/m/Y') }}</span>
+                <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+                    <div class="text-sm font-semibold">Alcohol</div>
+                    <div class="info-label-yellow text-xs text-center">{{ $recipe->alcohol }} %</div>
+                    <div class="text-sm font-semibold">Created at</div>
+                    <div class="info-label text-xs text-center">{{ $recipe->created_at->format('d/m/Y') }}</div>
+                    <div class="text-sm font-semibold">Updatet at</div>
+                    <div class="info-label text-xs text-center">{{ $recipe->updated_at->format('d/m/Y') }}</div>
                 </div>
             </div>
         </div>
     </div>
 
     {{-- More Informations --}}
-    <div class="flex w-full items-center bg-gray-50 mb-8 pt-2">
+    <div class="flex w-full items-center bg-gray-50 mb-8 py-4 pr-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 24 24" class="ebc-{{ $recipe->color }}">
             <path fill="currentColor" d="M4 2h15l-2 20H6L4 2m2.2 2l1.6 16h1L7.43 6.34C8.5 6 9.89 5.89 11 7c1.56 1.56 4.33.69 5.5.23L16.8 4H6.2Z" />
         </svg>
         <div class="grid grid-cols-2 text-sm gap-4">
             <div class="grid grid-cols-2 gap-x-2 gap-y-1">
                 <div class="font-semibold">Method</div>
-                <div class="text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->method }}</div>
+                <div class="info-label text-center text-xs">{{ $recipe->method }}</div>
                 <div class="font-semibold">Volume</div>
-                <div class="text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->volume }} l</div>
+                <div class="info-label-yellow text-center text-xs">{{ $recipe->volume }} l</div>
                 <div class="font-semibold">Ferment</div>
-                <div class="text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->ferment }}</div>
+                <div class="info-label text-center text-xs">{{ $recipe->ferment }}</div>
+                <div class="font-semibold">IBU</div>
+                <div class="info-label text-center text-xs">{{ $recipe->bitterness }}</div>
             </div>
             <div class="grid grid-cols-2 gap-x-2 gap-y-1">
                 <div class="font-semibold truncate">Initial Density</div>
-                <div class="text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->initial_density }}</div>
+                <div class="info-label text-center text-xs">{{ $recipe->initial_density }}</div>
+                <div class="font-semibold truncate">Before Boil Density</div>
+                @if ($isOpen)
+                <input class="h-5 rounded text-center text-xs focus:outline-none focus:ring-2 focus:ring-old-gold focus:border-old-gold" type="text" wire:model='before_boil_density'>
+                @else
+                <div class="info-label text-center text-xs @if(!$recipe->before_boil_density) ring ring-inset ring-red-500 @endif">{{ $recipe->before_boil_density }}</div>
+                @endif
                 <div class="font-semibold truncate">Final Density</div>
-                <div class="text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->final_density }}</div>
+                <div class="info-label text-center text-xs">{{ $recipe->final_density }}</div>
                 <div class="font-semibold truncate">Carbonation</div>
-                <div class="text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->carbonation }}</div>
+                <div class="info-label text-center text-xs">{{ $recipe->carbonation }}</div>
             </div>
         </div>
     </div>
@@ -79,7 +93,7 @@
             <div class="bg-gray-100 px-1.5 rounded font-semibold">{{ $this->inProgressCount }}</div>
             <div>{{ Str::plural('Bewing', $this->inProgressCount) }} in progress</div>
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z"/>
+                <path fill="currentColor" d="M12.6 12L8.7 8.1q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275l4.6 4.6q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.6 4.6q-.275.275-.7.275t-.7-.275t-.275-.7t.275-.7z" />
             </svg>
         </a>
     </div>
@@ -91,7 +105,7 @@
         <div>
             <div class="flex items-center gap-x-2 p-2">
                 <svg class="size-6" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                    <path fill="currentColor"d="M7.33 18.33c-.83-1.16-.83-2.5-.83-3.83c1.67 1 3.33 2 4.17 3.17l.33.56v-2.28c-1.5-.9-2.92-1.82-3.67-2.87c-.83-1.16-.83-2.5-.83-3.83c1.67 1 3.33 2 4.17 3.17L11 13v-2.3c-1.5-.9-2.92-1.82-3.67-2.87C6.5 6.67 6.5 5.33 6.5 4c1.67 1 3.33 2 4.17 3.17c.1.14.19.29.27.45c-.17-.62-.28-1.2-.29-1.8c-.01-1.51.65-3.06 1.31-4.61c.69 1.48 1.38 2.97 1.39 4.48c.01.63-.1 1.27-.28 1.9c.08-.14.16-.28.26-.42C14.17 6 15.83 5 17.5 4c0 1.33 0 2.67-.83 3.83C15.92 8.88 14.5 9.8 13 10.7V13l.33-.58c.84-1.17 2.5-2.17 4.17-3.17c0 1.33 0 2.67-.83 3.83c-.75 1.05-2.17 1.97-3.67 2.87v2.28l.33-.56c.84-1.17 2.5-2.17 4.17-3.17c0 1.33 0 2.67-.83 3.83c-.75 1.05-2.17 1.97-3.67 2.87V23h-2v-1.8c-1.5-.9-2.92-1.82-3.67-2.87Z" />
+                    <path fill="currentColor" d="M7.33 18.33c-.83-1.16-.83-2.5-.83-3.83c1.67 1 3.33 2 4.17 3.17l.33.56v-2.28c-1.5-.9-2.92-1.82-3.67-2.87c-.83-1.16-.83-2.5-.83-3.83c1.67 1 3.33 2 4.17 3.17L11 13v-2.3c-1.5-.9-2.92-1.82-3.67-2.87C6.5 6.67 6.5 5.33 6.5 4c1.67 1 3.33 2 4.17 3.17c.1.14.19.29.27.45c-.17-.62-.28-1.2-.29-1.8c-.01-1.51.65-3.06 1.31-4.61c.69 1.48 1.38 2.97 1.39 4.48c.01.63-.1 1.27-.28 1.9c.08-.14.16-.28.26-.42C14.17 6 15.83 5 17.5 4c0 1.33 0 2.67-.83 3.83C15.92 8.88 14.5 9.8 13 10.7V13l.33-.58c.84-1.17 2.5-2.17 4.17-3.17c0 1.33 0 2.67-.83 3.83c-.75 1.05-2.17 1.97-3.67 2.87v2.28l.33-.56c.84-1.17 2.5-2.17 4.17-3.17c0 1.33 0 2.67-.83 3.83c-.75 1.05-2.17 1.97-3.67 2.87V23h-2v-1.8c-1.5-.9-2.92-1.82-3.67-2.87Z" />
                 </svg>
                 <span>Preparation</span>
             </div>
@@ -105,10 +119,10 @@
                     </thead>
                     <tbody>
                         @foreach ($recipe->steps->where('type', 'Preparation') as $step)
-                            <tr class="text-center bg-white border-b">
-                                <td class="text-left px-4 py-3">{{ $step->field }} </td>
-                                <td class="text-right px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                            </tr>
+                        <tr class="text-center bg-white border-b">
+                            <td class="text-left px-4 py-3">{{ $step->field }} </td>
+                            <td class="text-right px-4 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -134,11 +148,11 @@
                     </thead>
                     <tbody>
                         @foreach ($recipe->steps->where('type', 'Mash') as $step)
-                            <tr class="text-center bg-white border-b">
-                                <td class="text-left px-2 py-3">{{ $step->field }}</td>
-                                <td class="px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                                <td class="text-right px-2 py-3">{{ $step->time ? $step->time.' min' : '' }}</td>
-                            </tr>
+                        <tr class="text-center bg-white border-b">
+                            <td class="text-left px-2 py-3">{{ $step->field }}</td>
+                            <td class="px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                            <td class="text-right px-2 py-3">{{ $step->time ? $step->time.' min' : '' }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -164,11 +178,11 @@
                     </thead>
                     <tbody>
                         @foreach ($recipe->steps->whereIn('type', ['Boil', 'Aroma']) as $step)
-                            <tr class="text-center bg-white border-b">
-                                <td class="text-left px-2 py-3">{{ $step->field }} <span class="text-gray-300 text-xs">({{ $step->type }})</span></td>
-                                <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                                <td class="text-right px-2 py-3">{{ $step->time ? $step->time.' min' : '' }}</td>
-                            </tr>
+                        <tr class="text-center bg-white border-b">
+                            <td class="text-left px-2 py-3">{{ $step->field }} <span class="text-gray-300 text-xs">({{ $step->type }})</span></td>
+                            <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                            <td class="text-right px-2 py-3">{{ $step->time ? $step->time.' min' : '' }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -194,18 +208,18 @@
                     </thead>
                     <tbody>
                         @foreach ($recipe->steps->where('type', 'Yeast') as $step)
-                            <tr class="text-center bg-white border-b">
-                                <td class="text-left px-2 py-3">{{ $step->field }} <span class="text-gray-300 text-xs">({{ $step->type }})</span></td>
-                                <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                                <td class="text-right px-2 py-3"></td>
-                            </tr>
+                        <tr class="text-center bg-white border-b">
+                            <td class="text-left px-2 py-3">{{ $step->field }} <span class="text-gray-300 text-xs">({{ $step->type }})</span></td>
+                            <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                            <td class="text-right px-2 py-3"></td>
+                        </tr>
                         @endforeach
                         @foreach ($recipe->steps->where('type', 'Dry Hop') as $step)
-                            <tr class="text-center bg-white border-b">
-                                <td class="text-left px-2 py-3">{{ $step->field }} <span class="text-gray-300 text-xs">({{ $step->type }})</span></td>
-                                <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                                <td class="text-right px-2 py-3">{{ $step->time / 1440 }} days</td>
-                            </tr>
+                        <tr class="text-center bg-white border-b">
+                            <td class="text-left px-2 py-3">{{ $step->field }} <span class="text-gray-300 text-xs">({{ $step->type }})</span></td>
+                            <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                            <td class="text-right px-2 py-3">{{ $step->time / 1440 }} days</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -233,11 +247,11 @@
                     </thead>
                     <tbody>
                         @foreach ($recipe->steps->whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle']) as $step)
-                            <tr class="text-center bg-white border-b">
-                                <td class="text-left px-2 py-3">{{ $step->field }} </td>
-                                <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
-                                <td class="text-right px-2 py-3">{{ $step->time / 1440 }} days</td>
-                            </tr>
+                        <tr class="text-center bg-white border-b">
+                            <td class="text-left px-2 py-3">{{ $step->field }} </td>
+                            <td class="text-left px-2 py-3">{{ $step->quantity }} {{ $step->unit }}</td>
+                            <td class="text-right px-2 py-3">{{ $step->time / 1440 }} days</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -247,8 +261,7 @@
 
     {{-- Delete Button --}}
     <div class="flex pt-4 px-4">
-        <button wire:click="delete({{ $recipe }})" wire:confirm="Are you sure?"
-            class="bg-transparent border-2 border-tawny transition-all duration-300 py-1.5 px-3 flex items-center gap-2 justify-center">
+        <button wire:click="delete({{ $recipe }})" wire:confirm="Are you sure?" class="bg-transparent border-2 border-tawny transition-all duration-300 py-1.5 px-3 flex items-center gap-2 justify-center">
             <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512">
                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" />
                 <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" />

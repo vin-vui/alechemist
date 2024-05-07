@@ -1,11 +1,11 @@
 @php
-    $recipe = App\Models\Recipe::find($recipe);
+$recipe = App\Models\Recipe::find($recipe);
 @endphp
 
 <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center shadow-lg z-30">
     <a href="{{ route('recipes.show', $recipe->id) }}">
         <svg class="size-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z"/>
+            <path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z" />
         </svg>
     </a>
     <h2 class="text-xl font-semibold tracking-widest truncate">{{ $brewing->name }}</h2>
@@ -16,7 +16,7 @@
 <div class="bg-white relative z-20">
     <div class="flex gap-4 items-center">
         <div class="shrink-0">
-            <img class="h-32 object-cover" src="/pictures/recipe.jpg">
+            <img class="bg-rich-black size-32 object-cover" src="/pictures/placeholder.webp">
         </div>
         <div class="w-3/4 mr-4">
             <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}</h3>

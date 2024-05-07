@@ -23,56 +23,52 @@
                 <span wire:poll.1m>
                     il reste
                     {{ now()->diffForHumans(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($this->fermentTime)) }}
-                </span>
+        </span>
 
-            @else
-                <div class="flex justify-around py-2 w-full">
-                    <button class="rounded px-10 py-2 font-semibold text-black bg-xanthous shadow-md"
-                        wire:click="startChrono">
-                        Start
-                    </button>
-                </div>
-            @endif
-        </div> --}}
-        <div class="flex flex-col w-full gap-2">
-            @php
-                $totalTime = 0;
-            @endphp
-            @foreach ($this->steps as $step)
-                @php
-                    $totalTime = $totalTime + $step->time;
-                    $time_left = now()->diffInDays(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime), false);
-                @endphp
-                <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->ferment_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}"
-                    wire:click="statusChange({{ $step }})">
-                    <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
-                        <div class="w-full flex flex-col">
-                            <div class="flex items-center w-full gap-x-4 justify-between">
-                                <div class="info-label-inprogress text-sm">
-                                    {{ round(- Carbon\Carbon::now()->addMinutes($step->time)->diffInDays()) }} days
-                                </div>
-                                <div class="block text-sm truncate">
-                                    {{ $step->field }}
-                                </div>
-                                <div class="block text-sm whitespace-nowrap">
-                                    {{ $step->quantity }} {{ $step->unit }}
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <div class="flex justify-end text-sm">
-                                    ends {{ Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
-                                </div>
-                                <div class="info-label-inprogress-yellow text-sm">
-                                    {{ $time_left <= 0 ? 'finished' : round($time_left) . ' days left' }}
-                                </div>
-                            </div>
+        @else
+        <div class="flex justify-around py-2 w-full">
+            <button class="rounded px-10 py-2 font-semibold text-black bg-xanthous shadow-md" wire:click="startChrono">
+                Start
+            </button>
+        </div>
+        @endif
+    </div> --}}
+    <div class="flex flex-col w-full gap-2">
+        @php
+        $totalTime = 0;
+        @endphp
+        @foreach ($this->steps as $step)
+        @php
+        $totalTime = $totalTime + $step->time;
+        $time_left = now()->diffInDays(Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime), false);
+        @endphp
+        <div class="rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->ferment_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}" wire:click="statusChange({{ $step }})">
+            <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
+                <div class="w-full flex flex-col">
+                    <div class="flex items-center w-full gap-x-4 justify-between">
+                        <div class="info-label text-sm">
+                            {{ round(- Carbon\Carbon::now()->addMinutes($step->time)->diffInDays()) }} days
+                        </div>
+                        <div class="block text-sm truncate">
+                            {{ $step->field }}
+                        </div>
+                        <div class="block text-sm whitespace-nowrap">
+                            {{ $step->quantity }} {{ $step->unit }}
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex justify-end text-sm">
+                            ends {{ Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
+                        </div>
+                        <div class="info-label-yellow text-sm">
+                            {{ $time_left <= 0 ? 'finished' : round($time_left) . ' days left' }}
                         </div>
                     </div>
                 </div>
-            @endforeach
+            </div>
         </div>
-
-        @include('steps._next', ['allChecked' => $this->allChecked && ($this->brewing->ferment_start != null) && ($time_left <= 0)])
-
+        @endforeach
     </div>
+
+    @include('steps._next', ['allChecked' => $this->allChecked && ($this->brewing->ferment_start != null) && ($time_left <= 0)]) </div>
 </div>

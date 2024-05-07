@@ -13,44 +13,45 @@
         </div>
         {{-- TODO:: if time left > 1 minute, poll every minute, not every second --}}
         @if ($this->brewing->boil_start != null)
-            @if (!$this->endTime())
-            <span wire:poll.s class="info-label-inprogress-yellow">
-                @php
-                    $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time), false);
+        @if (!$this->endTime())
+        <span wire:poll.s class="info-label-yellow">
+            @php
+            $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time), false);
+            @endphp
+            @if ($time_left < 1) @php $seconds_left=now()->diffInSeconds(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time));
                 @endphp
-                @if ($time_left < 1)
-                    @php
-                        $seconds_left = now()->diffInSeconds(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time));
-                    @endphp
-                    {{ round($seconds_left) }} {{ Str::plural('seconde', round($seconds_left)) }}
+                {{ round($seconds_left) }} {{ Str::plural('seconde', round($seconds_left)) }}
                 @else
-                    {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
+                {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
                 @endif
                 left
-            </span>
-            @else
-            <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Time elapsed</span>
-            @endif
+        </span>
         @else
-            @if (!$isOpen)
-                <div class="flex justify-between w-full gap-4">
-                    <button class="btn-yellow w-full" wire:click="startChrono">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712"/></svg>
-                        Start
-                    </button>
-                    <button class="btn-yellow w-full" wire:click="openModal">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="m12 11.6l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T10 11.975V8q0-.425.288-.712T11 7t.713.288T12 8zM18 6h-2q-.425 0-.712-.287T15 5t.288-.712T16 4h2V2q0-.425.288-.712T19 1t.713.288T20 2v2h2q.425 0 .713.288T23 5t-.288.713T22 6h-2v2q0 .425-.288.713T19 9t-.712-.288T18 8zm-7 15q-1.875 0-3.512-.7t-2.863-1.925T2.7 15.512T2 12t.7-3.512t1.925-2.863T7.488 3.7T11 3q.275 0 .513.013t.512.062q.425 0 .713.288t.287.712t-.288.713t-.712.287q-.275 0-.513-.038T11 5Q8.05 5 6.025 7.025T4 12t2.025 4.975T11 19t4.975-2.025T18 12q0-.425.288-.712T19 11t.713.288T20 12q0 1.875-.7 3.513t-1.925 2.862t-2.863 1.925T11 21"/></svg>
-                        Change
-                    </button>
-                </div>
-            @endif
+        <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Time elapsed</span>
+        @endif
+        @else
+        @if (!$isOpen)
+        <div class="flex justify-between w-full gap-4">
+            <button class="btn-yellow w-full" wire:click="startChrono">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712" /></svg>
+                Start
+            </button>
+            <button class="btn-yellow w-full" wire:click="openModal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="m12 11.6l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T10 11.975V8q0-.425.288-.712T11 7t.713.288T12 8zM18 6h-2q-.425 0-.712-.287T15 5t.288-.712T16 4h2V2q0-.425.288-.712T19 1t.713.288T20 2v2h2q.425 0 .713.288T23 5t-.288.713T22 6h-2v2q0 .425-.288.713T19 9t-.712-.288T18 8zm-7 15q-1.875 0-3.512-.7t-2.863-1.925T2.7 15.512T2 12t.7-3.512t1.925-2.863T7.488 3.7T11 3q.275 0 .513.013t.512.062q.425 0 .713.288t.287.712t-.288.713t-.712.287q-.275 0-.513-.038T11 5Q8.05 5 6.025 7.025T4 12t2.025 4.975T11 19t4.975-2.025T18 12q0-.425.288-.712T19 11t.713.288T20 12q0 1.875-.7 3.513t-1.925 2.862t-2.863 1.925T11 21" /></svg>
+                Change
+            </button>
+        </div>
+        @endif
         @endif
 
         @if ($isOpen)
         <div class="flex justify-between w-full gap-4">
             <input class="text-black w-full py-1 text-center focus:outline-none focus:ring-2 focus:ring-old-gold focus:border-old-gold" type="number" wire:model="newBoilTime" placeholder="{{ $brewing->boil_time}}">
             <button class="btn-yellow w-full" wire:click="modifyBoilTime({{ $brewing->id }})">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M15.275 12.475L11.525 8.7L14.3 5.95l-.725-.725L8.1 10.7L6.7 9.3l5.45-5.475q.6-.6 1.413-.6t1.412.6l.725.725l1.25-1.25q.3-.3.713-.3t.712.3L20.7 5.625q.3.3.3.713t-.3.712zM6.75 21H3v-3.75l7.1-7.125l3.775 3.75z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M15.275 12.475L11.525 8.7L14.3 5.95l-.725-.725L8.1 10.7L6.7 9.3l5.45-5.475q.6-.6 1.413-.6t1.412.6l.725.725l1.25-1.25q.3-.3.713-.3t.712.3L20.7 5.625q.3.3.3.713t-.3.712zM6.75 21H3v-3.75l7.1-7.125l3.775 3.75z" /></svg>
                 Change Time
             </button>
         </div>
@@ -68,41 +69,39 @@
 
         <div class="flex flex-col w-full gap-2">
             @foreach ($steps as $step)
-                @php
-                    $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)->subMinutes($step->time), false);
-                @endphp
-                <div class="shadow-md rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->boil_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}"
-                    wire:click="statusChange({{ $step }})">
-                    <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
-                        <div class="ml-3 w-full flex gap-x-1 justify-between">
-                            <div class="flex gap-x-1">
-                                <div class="block text-sm font-medium">
-                                    {{ $step->quantity }}
-                                </div>
-                                <div class="block text-sm">
-                                    {{ $step->unit }}
-                                </div>
-                                <div class="block text-sm">
-                                    {{ $step->field }}
-                                </div>
+            @php
+            $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)->subMinutes($step->time), false);
+            @endphp
+            <div class="shadow-md rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->boil_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}" wire:click="statusChange({{ $step }})">
+                <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
+                    <div class="ml-3 w-full flex gap-x-1 justify-between">
+                        <div class="flex gap-x-1">
+                            <div class="block text-sm font-medium">
+                                {{ $step->quantity }}
                             </div>
                             <div class="block text-sm">
-                                @if ($this->brewing->boil_start != null && $time_left <= 0 && !$step->status)
-                                    late
-                                @elseif ($this->brewing->boil_start != null && $time_left > 0)
-                                    in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
-                                @endif
+                                {{ $step->unit }}
+                            </div>
+                            <div class="block text-sm">
+                                {{ $step->field }}
                             </div>
                         </div>
-                        @if ($time_left <= 0 && !$step->status)
-                            <span class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
-                                <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                            </span>
-                        @endif
+                        <div class="block text-sm">
+                            @if ($this->brewing->boil_start != null && $time_left <= 0 && !$step->status)
+                                late
+                                @elseif ($this->brewing->boil_start != null && $time_left > 0)
+                                in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
+                                @endif
+                        </div>
                     </div>
+                    @if ($time_left <= 0 && !$step->status)
+                        <span class="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        @endif
                 </div>
+            </div>
             @endforeach
         </div>
 

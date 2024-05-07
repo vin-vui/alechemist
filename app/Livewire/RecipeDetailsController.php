@@ -8,7 +8,9 @@ use Livewire\Component;
 
 class RecipeDetailsController extends Component
 {
-    public $recipe;
+    public $recipe, $inProgressCount;
+    public $isOpen = false;
+    public $before_boil_density;
 
     public function mount(Recipe $recipe)
     {
@@ -19,6 +21,31 @@ class RecipeDetailsController extends Component
     public function render()
     {
         return view('recipes.recipe')->layout('layouts.app');
+    }
+
+    public function update()
+    {
+        $this->before_boil_density = $this->recipe->before_boil_density;
+        $this->openModal();
+    }
+
+    public function edit()
+    {
+        $recipe = $this->recipe;
+        $recipe->before_boil_density = $this->before_boil_density;
+        $recipe->save();
+
+        $this->closeModal();
+    }
+
+    public function openModal()
+    {
+        $this->isOpen = true;
+    }
+
+    public function closeModal()
+    {
+        $this->isOpen = false;
     }
 
     public function back()

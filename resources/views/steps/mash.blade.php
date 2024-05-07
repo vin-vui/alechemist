@@ -11,22 +11,21 @@
         </div>
         <div class="flex flex-col w-full gap-2">
             @foreach ($steps as $step)
-                <div class="shadow-md rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : 'border-transparent' }}"
-                    wire:click="statusChange({{ $step }})">
-                    <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
-                        <div class="ml-3 flex gap-x-1 justify-between">
-                            <div class="text-sm font-medium">
-                                @if($step->time != null)
-                                {{ $step->field }} at
-                                <span class="info-label-inprogress">{{ $step->quantity }}{{ $step->unit }}</span>
-                                for <span class="info-label-inprogress-yellow">{{ $step->time }} min</span>
-                                @else
-                                {{ $step->field }} at <span class="info-label-inprogress">{{ $step->quantity }}{{ $step->unit }}</span>
-                                @endif
-                            </div>
+            <div class="shadow-md rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : 'border-transparent' }}" wire:click="statusChange({{ $step }})">
+                <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
+                    <div class="ml-3 flex gap-x-1 justify-between">
+                        <div class="text-sm font-medium">
+                            @if($step->time != null)
+                            {{ $step->field }} at
+                            <span class="info-label">{{ $step->quantity }}{{ $step->unit }}</span>
+                            for <span class="info-label-yellow">{{ $step->time }} min</span>
+                            @else
+                            {{ $step->field }} at <span class="info-label">{{ $step->quantity }}{{ $step->unit }}</span>
+                            @endif
                         </div>
                     </div>
                 </div>
+            </div>
             @endforeach
         </div>
 
