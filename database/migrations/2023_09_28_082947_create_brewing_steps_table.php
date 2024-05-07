@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('Brewing_Steps', function (Blueprint $table) {
+        Schema::create('brewing_steps', function (Blueprint $table) {
             $table->id();
             $table->float('quantity');
             $table->enum('unit', ['g', 'l', '°C']);
