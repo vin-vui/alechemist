@@ -21,7 +21,7 @@ class Recipe extends Model
 
     public function brewing(): HasMany
     {
-        return $this->hasMany(brewing::class);
+        return $this->hasMany(Brewing::class);
     }
 
     public function user()
