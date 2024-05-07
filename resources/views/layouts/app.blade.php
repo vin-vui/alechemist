@@ -50,15 +50,14 @@
             @include('_partials.sidebar')
         </div>
 
-        <div class="sticky top-0 z-40 flex items-center gap-x-6 bg-rich-black px-4 py-4 shadow-sm sm:px-6 lg:hidden">
+        <div class="sticky top-0 z-40 h-12 flex items-center justify-between bg-rich-black px-4 py-4 shadow-sm sm:px-6 lg:hidden">
             <button type="button" class="-m-2.5 p-2.5 text-tawny lg:hidden" @click="open = true">
                 <span class="sr-only">Open sidebar</span>
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
                 </svg>
             </button>
-            <div class="flex-1 text-sm font-semibold leading-6 text-white">{{ $title ?? 'no title' }}</div>
-            <a href="#" class="text-white hover:text-rich-black hover:bg-white group flex gap-x-3 p-2 text-sm leading-6 font-semibold" x-state:on="Current" x-state:off="Default" x-state-description="Current: &quot;bg-gray-50 text-rich-black&quot;, Default: &quot;text-white hover:text-rich-black hover:bg-white&quot;">
+            <a href="#" class="-m-2.5 text-white hover:text-rich-black hover:bg-white group flex gap-x-3 p-2 text-sm leading-6 font-semibold" x-state:on="Current" x-state:off="Default" x-state-description="Current: &quot;bg-gray-50 text-rich-black&quot;, Default: &quot;text-white hover:text-rich-black hover:bg-white&quot;">
                 <svg class="h-6 w-6 shrink-0 text-tawny group-hover:text-xanthous" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                 </svg>
@@ -66,9 +65,7 @@
         </div>
 
         <main class="lg:pl-64">
-            <div class="px-4 sm:px-6 lg:px-8">
                 {{ $slot }}
-            </div>
         </main>
     </div>
 

@@ -36,12 +36,19 @@ return [
             'throw' => false,
         ],
 
+        // 'public' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/public'),
+        //     'url' => env('APP_URL').'/storage',
+        //     'visibility' => 'public',
+        //     'throw' => false,
+        // ],
+
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'root' => public_path('files'),  // Utiliser public_path pour un test rapide
+            'url' => env('APP_URL').'/files',
             'visibility' => 'public',
-            'throw' => false,
         ],
 
         's3' => [

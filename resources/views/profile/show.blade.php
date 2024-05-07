@@ -40,6 +40,22 @@
                     @livewire('profile.delete-user-form')
                 </div>
             @endif
+
+            @if (auth()->id())
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                    <x-button>
+                        {{ __('Log Out') }}
+                    </x-button>
+            </form>
+        @else
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('login') }}" role="button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+            </li>
+        @endif
         </div>
     </div>
 </x-app-layout>
