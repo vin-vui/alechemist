@@ -10,9 +10,31 @@
   "theme_color": "#000000",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "type": "image/x-icon"
+      "src": "https://alechemist.vinvui.com/assets/logo/alechemist@52.png",
+      "type": "image/png",
+      "sizes": "52x52",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://alechemist.vinvui.com/assets/logo/alechemist@148.png",
+      "type": "image/png",
+      "sizes": "148x148",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://alechemist.vinvui.com/assets/logo/alechemist@512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "https://alechemist.vinvui.com/assets/logo/alechemist@1024.png",
+      "type": "image/png",
+      "sizes": "1024x1024",
+      "purpose": "maskable any"
     }
   ],
-  "lang": "en"
+  "lang": "en",
+  "url": "https://alechemist.vinvui.com/",
+  "manifestUrl": "https://alechemist.vinvui.com/manifest.json"
 }
