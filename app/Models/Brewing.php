@@ -15,16 +15,12 @@ class Brewing extends Model
     protected $fillable = ['name', 'type', 'volume', 'alcohol', 'boil_time', 'boil_start', 'ferment_start', 'ferment_end', 'initial_density', 'final_density',
     'before_boil_density', 'carbonation', 'date_start', 'current_step', 'note', 'recipe_id'];
 
-    public function BrewingSteps(): HasMany
+    public function brewingSteps(): HasMany
     {
         return $this->hasMany(BrewingStep::class);
     }
 
-    // public function recipe(): HasMany
-    // {
-    //     return $this->hasMany(Recipe::class);
-    // }
-    public function Recipe(): belongsTo
+    public function recipe(): BelongsTo
     {
         return $this->belongsTo(Recipe::class);
     }
