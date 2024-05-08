@@ -41,7 +41,7 @@
             </div>
             <div class="flex flex-col truncate flex-1 mr-4 py-2">
                 <h4 class="text-md text-gray-500 uppercase">{{ $recipe->type }}</h4>
-                <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+                <div class="w-max grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
                     <div class="text-sm font-semibold">Alcohol</div>
                     <div class="info-label-yellow text-xs text-center">{{ $recipe->alcohol }} %</div>
                     <div class="text-sm font-semibold">Created at</div>

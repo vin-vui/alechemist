@@ -33,9 +33,7 @@
                 <div class="flex flex-col truncate mr-4 py-2">
                     <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}</h3>
                     <h4 class="text-md text-gray-500 uppercase -mt-2">{{ $recipe->type }}</h4>
-                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
-                        <div class="text-sm font-semibold">Volume</div>
-                        <div class="info-label text-xs text-center">{{ $recipe->volume }} l</div>
+                    <div class="w-max grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
                         <div class="text-sm font-semibold">Volume</div>
                         <div class="info-label text-xs text-center">{{ $recipe->volume }} l</div>
                     </div>
