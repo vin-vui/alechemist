@@ -41,4 +41,10 @@ class NoteController extends Component
     {
         return view('_partials.note')->layout('layouts.app');
     }
+
+    public function delete()
+    {
+        $this->brewing->delete();
+        return redirect()->route('recipes.index');
+    }
 }

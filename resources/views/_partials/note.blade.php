@@ -35,6 +35,7 @@
             <textarea rows="15" class="flex items-center px-2 w-full bg-white mt-1 focus:outline-none focus:ring-2 focus:ring-old-gold focus:border-old-gold" name="note" wire:model="note">{{$this->brewing->note}}
             </textarea>
         </div>
+        <button type="button" wire:click="delete" wire:confirm="Are you sure?" class="underline text-red-600 text-xs">delete this brewing</button>
     </div>
     <div class="flex justify-between gap-x-1 px-8 mt-2 fixed bottom-8 w-full md:relative">
         <button wire:click="back" class="bg-transparent border-2 border-tawny transition-all duration-300 py-1 px-3 flex items-center gap-1 justify-center">
