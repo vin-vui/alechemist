@@ -12,10 +12,10 @@
     </div>
 
     <div class="relative z-10">
-        <form class="flex flex-col text-sm bg-white py-4 md:min-h-screen justify-between" action="{{ route('upload.store') }}" method="POST" enctype="multipart/form-data">
+        <form class="flex flex-col text-sm bg-white py-4 md:min-h-screen justify-between -mt-12" action="{{ route('upload.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @error('file')<span class="flex justify-center text-xs text-tawny">{{ $message }} </span> @enderror
-            <div class="flex flex-col justify-center items-center py-8 gap-y-4">
+            <div class="flex flex-col justify-center items-center py-16 gap-y-4">
                 <label class="mb-2 text-lg font-medium text-gray-900" for="file">File BeerXML Format Only</label>
                 <div class="mt-2 flex justify-center rounded-lg border-2 border-dashed border-gray-900/25 px-6 py-10">
                     <div class="text-center">
