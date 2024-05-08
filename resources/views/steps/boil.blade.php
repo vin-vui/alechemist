@@ -18,13 +18,15 @@
             @php
             $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time), false);
             @endphp
-            @if ($time_left < 1) @php $seconds_left=now()->diffInSeconds(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time));
+            @if ($time_left < 1)
+                @php
+                    $seconds_left=now()->diffInSeconds(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time));
                 @endphp
                 {{ round($seconds_left) }} {{ Str::plural('seconde', round($seconds_left)) }}
-                @else
+            @else
                 {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
-                @endif
-                left
+            @endif
+            left
         </span>
         @else
         <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Time elapsed</span>
@@ -87,11 +89,15 @@
                             </div>
                         </div>
                         <div class="block text-sm">
-                            @if ($this->brewing->boil_start != null && $time_left <= 0 && !$step->status)
-                                late
-                                @elseif ($this->brewing->boil_start != null && $time_left > 0)
-                                in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
+                            @if($this->brewing->boil_start != null)
+                                @if ($time_left <= 0 && !$step->status)
+                                    late
+                                @elseif ($time_left > 0)
+                                    in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
                                 @endif
+                            @else
+                                at <span class="info-label-yellow">{{ $step->time }} min</span> before ends
+                            @endif
                         </div>
                     </div>
                     @if ($time_left <= 0 && !$step->status)
@@ -99,7 +105,7 @@
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                         </span>
-                        @endif
+                    @endif
                 </div>
             </div>
             @endforeach
