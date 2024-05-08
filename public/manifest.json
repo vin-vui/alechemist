@@ -1,5 +1,5 @@
 {
-  "background_color": "#000000",
+  "background_color": "#12121A",
   "dir": "ltr",
   "display": "standalone",
   "name": "AleChemist",
@@ -7,7 +7,7 @@
   "scope": "/",
   "short_name": "AleChemist",
   "start_url": "https://alechemist.vinvui.com/",
-  "theme_color": "#000000",
+  "theme_color": "#12121A",
   "icons": [
     {
       "src": "https://alechemist.vinvui.com/assets/logo/alechemist@52.png",

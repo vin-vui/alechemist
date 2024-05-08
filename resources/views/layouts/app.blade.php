@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#12121A">
     <meta name="author" content="vinvui">
     <link rel="canonical" href="https://alechemist.vinvui.com/">
     <link rel="shortcut icon" href="https://alechemist.vinvui.com/favicon.ico" type="image/x-icon">

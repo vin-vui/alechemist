@@ -6,11 +6,11 @@
                 <div class="flex justify-between items-center px-4 py-2 bg-white">
                     <div class="flex items-center">
                         <img class="size-24" src="/pictures/recipe.webp" alt="">
-                        <div class="font-bold text-3xl">
+                        <div class="font-bold text-3xl font-shangrila-caps">
                             {{ __('Recipes') }}
                         </div>
                     </div>
-                    <div class="font-semibold text-4xl bg-gray-100 py-1 px-2 rounded">
+                    <div class="font-semibold text-4xl bg-gray-100 py-1 px-2 rounded font-shangrila-caps">
                         {{ count($this->recipes) }}
                     </div>
                 </div>
@@ -79,10 +79,9 @@
                         @endforeach
                     @endforeach
                 @else
-                <div class="flex justify-center items-center bg-white shadow-md p-4">
+                <div class="flex justify-center items-center bg-white shadow-md p-4 mb-8">
                     <div class="text-center">
-                        <h3 class="text-lg font-bold text-gray-900 uppercase">No fermentations in progress</h3>
-                        <h4 class="text-sm text-gray-500 uppercase -mt-2">Start a new one</h4>
+                        <h3 class="text-lg font-bold text-gray-900 uppercase font-shangrila-caps">No fermentations in progress</h3>
                     </div>
                 @endif
             </div>
@@ -94,13 +93,13 @@
             </div>
             <div class="flex flex-col w-full gap-y-4 px-4">
                 @foreach ($this->progressBrewings as $brewing)
-                <a href="{{ route($brewing->current_step, [$brewing->recipe, $brewing]) }}">
-                    <div class="flex gap-4 items-center bg-white shadow-md">
-                        <div class="shrink-0">
-                            <img class="bg-rich-black size-32 object-cover" src="/pictures/placeholder.webp">
+                <a href="{{ route($brewing->current_step, [$brewing->recipe, $brewing]) }}" class="bg-white shadow-md">
+                    <div class="max-w-full flex gap-4">
+                        <div class="flex flex-shrink-0 w-20">
+                            <img class="object-cover bg-rich-black" src="/pictures/placeholder.webp">
                         </div>
-                        <div class="w-3/4 mr-4">
-                            <h3 class="truncate mr-4 text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->recipe->name }}</h3>
+                        <div class="flex flex-col truncate flex-1 mr-4 py-2">
+                            <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->recipe->name }}</h3>
                             <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $brewing->recipe->type }}</h4>
                             <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
                                 <div class="text-sm font-semibold">Started at</div>

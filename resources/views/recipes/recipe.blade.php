@@ -1,4 +1,4 @@
-<div class="pb-4">
+<div class="pb-8">
 
     {{-- Header --}}
     <div class="bg-white sticky sm:top-0 top-12 px-4 py-2.5 flex justify-between items-center shadow-lg z-30">
@@ -7,11 +7,11 @@
                 <path fill="currentColor" d="m10.8 12l3.9 3.9q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-4.6-4.6q-.15-.15-.212-.325T8.425 12t.063-.375t.212-.325l4.6-4.6q.275-.275.7-.275t.7.275t.275.7t-.275.7z" />
             </svg>
         </button>
-        <h2 class="text-xl font-semibold tracking-widest truncate px-4">{{ $recipe->name }}</h2>
+        <h2 class="text-lg font-semibold tracking-widest truncate px-4 font-shangrila-caps">{{ $recipe->name }}</h2>
         @if ($isOpen)
         <button type="button" wire:click="edit">
             <svg class="size-6 text-green-600" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
-                <path fill="currentColor" d="m10 13.6l5.9-5.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-6.6 6.6q-.3.3-.7.3t-.7-.3l-2.6-2.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275z"/>
+                <path fill="currentColor" d="m10 13.6l5.9-5.9q.275-.275.7-.275t.7.275t.275.7t-.275.7l-6.6 6.6q-.3.3-.7.3t-.7-.3l-2.6-2.6q-.275-.275-.275-.7t.275-.7t.7-.275t.7.275z" />
             </svg>
         </button>
         @else
@@ -24,7 +24,7 @@
     </div>
 
     {{-- New Brewing Fixed Button --}}
-    <div class="fixed bottom-4 right-4">
+    <div class="fixed bottom-8 right-8 shadow-xl">
         <a href="{{ route('brewing.create', $recipe) }}" class="btn-yellow">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2v-6Z" />
@@ -35,11 +35,11 @@
 
     {{-- Informations --}}
     <div class="bg-white shadow-lg relative z-20">
-        <div class="flex gap-4 items-center">
-            <div class="shrink-0">
-                <img class="bg-rich-black size-32 object-cover" src="/pictures/placeholder.webp">
+        <div class="max-w-full flex gap-4">
+            <div class="flex flex-shrink-0 w-20">
+                <img class="object-cover bg-rich-black" src="/pictures/placeholder.webp">
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col truncate flex-1 mr-4 py-2">
                 <h4 class="text-md text-gray-500 uppercase">{{ $recipe->type }}</h4>
                 <div class="grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
                     <div class="text-sm font-semibold">Alcohol</div>
@@ -260,8 +260,8 @@
     </div>
 
     {{-- Delete Button --}}
-    <div class="flex pt-4 px-4">
-        <button wire:click="delete({{ $recipe }})" wire:confirm="Are you sure?" class="bg-transparent border-2 border-tawny transition-all duration-300 py-1.5 px-3 flex items-center gap-2 justify-center">
+    <div class="flex pt-4 px-8">
+        <button wire:click="delete({{ $recipe }})" wire:confirm="Are you sure?" class="bg-transparent border-2 border-tawny transition-all duration-300 py-1 px-3 flex items-center gap-2 justify-center">
             <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512">
                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" />
                 <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" />
