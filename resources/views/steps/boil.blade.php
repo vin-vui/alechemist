@@ -91,21 +91,20 @@
                             <div class="text-sm">
                                 {{ $step->field }}
                             </div>
-                            @if($step->type === 'Aroma')
-                                <div class="textsm">
-                                    <span class="text-sm info-label-yellow">{{ __('flame-out') }}</span>
-                                </div>
-                            @endif
                         </div>
                         <div class="text-sm">
                             @if($this->brewing->boil_start != null)
-                                @if ($time_left <= 0 && !$step->status)
-                                    late
-                                @elseif ($time_left > 0)
-                                    in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
+                                @if($step->type === 'Aroma')
+                                    <span class="info-label-yellow">flame-out</span> during {{ $step->time }} min
+                                @else
+                                    @if ($time_left <= 0 && !$step->status)
+                                        late
+                                    @elseif ($time_left > 0)
+                                        in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
+                                    @endif
                                 @endif
                             @else
-                                {{ __('at') }} <span class="info-label-yellow">{{ $step->time }} min</span> {{ $step->type === 'Aroma' ? 'after' : 'before' }} ends
+                            {{ $step->type === 'Aroma' ? 'flame-out' : 'at' }} <span class="info-label-yellow">{{ $step->time }} min</span> {{ $step->type === 'Aroma' ? '' : 'before ends' }}
                             @endif
                         </div>
                     </div>
