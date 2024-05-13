@@ -105,7 +105,7 @@
                                     in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
                                 @endif
                             @else
-                                at <span class="info-label-yellow">{{ $step->time }} min</span> before ends
+                                {{ __('at') }} <span class="info-label-yellow">{{ $step->time }} min</span> {{ $step->type === 'Aroma' ? 'after' : 'before' }} ends
                             @endif
                         </div>
                     </div>
