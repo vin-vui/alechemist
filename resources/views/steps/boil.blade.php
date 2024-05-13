@@ -80,24 +80,24 @@
             @endphp
             <div class="shadow-md rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->boil_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}" wire:click="statusChange({{ $step }})">
                 <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
-                    <div class="ml-3 w-full flex gap-x-1 justify-between">
+                    <div class="ml-3 w-full flex items-center gap-x-1 justify-between">
                         <div class="flex items-center gap-x-1">
-                            <div class="block text-sm font-medium">
+                            <div class="text-sm font-medium">
                                 {{ $step->quantity }}
                             </div>
-                            <div class="block text-sm">
+                            <div class="text-sm">
                                 {{ $step->unit }}
                             </div>
-                            <div class="block text-sm">
+                            <div class="text-sm">
                                 {{ $step->field }}
                             </div>
                             @if($step->type === 'Aroma')
-                                <div class="block textsm">
+                                <div class="textsm">
                                     <span class="text-sm info-label-yellow">{{ __('flame-out') }}</span>
                                 </div>
                             @endif
                         </div>
-                        <div class="block text-sm">
+                        <div class="text-sm">
                             @if($this->brewing->boil_start != null)
                                 @if ($time_left <= 0 && !$step->status)
                                     late
