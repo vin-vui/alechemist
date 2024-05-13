@@ -22,9 +22,9 @@ $recipe = App\Models\Recipe::find($recipe);
             <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">{{ $recipe->name }}</h3>
             <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $recipe->type }}</h4>
             <div class="w-max grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
-                <div class="text-sm font-semibold">Started at</div>
+                <div class="text-sm font-semibold">{{ __('Started at') }}</div>
                 <div class="text-xs text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ Carbon\Carbon::parse($brewing->date_start)->format('d/m/Y') }}</div>
-                <div class="text-sm font-semibold">Volume</div>
+                <div class="text-sm font-semibold">{{ __('Volume') }}</div>
                 <div class="text-xs text-gray-600 bg-gray-100 px-1 rounded flex items-center justify-center">{{ $recipe->volume }} l</div>
             </div>
         </div>

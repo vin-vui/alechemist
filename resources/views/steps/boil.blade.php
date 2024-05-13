@@ -26,10 +26,10 @@
             @else
                 {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
             @endif
-            left
+            {{ __('left') }}
         </span>
         @else
-        <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">Time elapsed</span>
+        <span class="flex justify-center font-semibold text-tawny pb-2 animate-pulse">{{ __('Time elapsed') }}</span>
         @endif
         @else
         @if (!$isOpen)
@@ -37,12 +37,12 @@
             <button class="btn-yellow w-full" wire:click="startChrono">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M8 17.175V6.825q0-.425.3-.713t.7-.287q.125 0 .263.037t.262.113l8.15 5.175q.225.15.338.375t.112.475t-.112.475t-.338.375l-8.15 5.175q-.125.075-.262.113T9 18.175q-.4 0-.7-.288t-.3-.712" /></svg>
-                Start
+                {{ __('Start') }}
             </button>
             <button class="btn-yellow w-full" wire:click="openModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="currentColor" d="m12 11.6l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-2.8-2.8q-.15-.15-.225-.337T10 11.975V8q0-.425.288-.712T11 7t.713.288T12 8zM18 6h-2q-.425 0-.712-.287T15 5t.288-.712T16 4h2V2q0-.425.288-.712T19 1t.713.288T20 2v2h2q.425 0 .713.288T23 5t-.288.713T22 6h-2v2q0 .425-.288.713T19 9t-.712-.288T18 8zm-7 15q-1.875 0-3.512-.7t-2.863-1.925T2.7 15.512T2 12t.7-3.512t1.925-2.863T7.488 3.7T11 3q.275 0 .513.013t.512.062q.425 0 .713.288t.287.712t-.288.713t-.712.287q-.275 0-.513-.038T11 5Q8.05 5 6.025 7.025T4 12t2.025 4.975T11 19t4.975-2.025T18 12q0-.425.288-.712T19 11t.713.288T20 12q0 1.875-.7 3.513t-1.925 2.862t-2.863 1.925T11 21" /></svg>
-                Change
+                {{ __('Change') }}
             </button>
         </div>
         @endif
@@ -54,7 +54,7 @@
             <button class="btn-yellow w-full" wire:click="modifyBoilTime({{ $brewing->id }})">
                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M15.275 12.475L11.525 8.7L14.3 5.95l-.725-.725L8.1 10.7L6.7 9.3l5.45-5.475q.6-.6 1.413-.6t1.412.6l.725.725l1.25-1.25q.3-.3.713-.3t.712.3L20.7 5.625q.3.3.3.713t-.3.712zM6.75 21H3v-3.75l7.1-7.125l3.775 3.75z" /></svg>
-                Change Time
+                {{ __('Change Time') }}
             </button>
         </div>
         @endif
@@ -66,7 +66,7 @@
             <svg class="size-8" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M19 5c-1.11 0-2 .89-2 2v6.76c-.64.57-1 1.39-1 2.24c0 1.66 1.34 3 3 3s3-1.34 3-3c0-.85-.36-1.67-1-2.23V7c0-1.11-.89-2-2-2m0 1c.55 0 1 .45 1 1v1h-2V7c0-.55.45-1 1-1M8 3.54l-.75.84S5.97 5.83 4.68 7.71S2 11.84 2 14c0 3.31 2.69 6 6 6s6-2.69 6-6c0-2.16-1.39-4.41-2.68-6.29S8.75 4.38 8.75 4.38L8 3.54m0 3.13c.44.52.84.95 1.68 2.17C10.89 10.6 12 12.84 12 14c0 2.22-1.78 4-4 4s-4-1.78-4-4c0-1.16 1.11-3.4 2.32-5.16C7.16 7.62 7.56 7.19 8 6.67Z" />
             </svg>
-            <span class="border-b-old-gold border-0 border-b-2 w-1/5">Boil</span>
+            <span class="border-b-old-gold border-0 border-b-2 w-1/5">{{ __('Boil') }}</span>
         </div>
 
         <div class="flex flex-col w-full gap-2">
@@ -95,16 +95,16 @@
                         <div class="text-sm">
                             @if($this->brewing->boil_start != null)
                                 @if($step->type === 'Aroma')
-                                    <span class="info-label-yellow">flame-out</span> during {{ $step->time }} min
+                                    <span class="info-label-yellow">{{ __('flame-out') }}</span> {{ __('during') }} {{ $step->time }} min
                                 @else
                                     @if ($time_left <= 0 && !$step->status)
-                                        late
+                                        {{ __('late') }}
                                     @elseif ($time_left > 0)
-                                        in {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
+                                    {{ __('in') }} {{ round($time_left) }} {{ Str::plural('minute', round($time_left)) }}
                                     @endif
                                 @endif
                             @else
-                            {{ $step->type === 'Aroma' ? 'flame-out' : 'at' }} <span class="info-label-yellow">{{ $step->time }} min</span> {{ $step->type === 'Aroma' ? '' : 'before ends' }}
+                            {{ $step->type === 'Aroma' ? __('flame-out') : __('at') }} <span class="info-label-yellow">{{ $step->time }} min</span> {{ $step->type === 'Aroma' ? '' : __('before ends') }}
                             @endif
                         </div>
                     </div>

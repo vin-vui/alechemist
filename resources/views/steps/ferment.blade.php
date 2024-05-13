@@ -47,7 +47,7 @@
                 <div class="w-full flex flex-col">
                     <div class="flex items-center w-full gap-x-4 justify-between">
                         <div class="info-label text-sm">
-                            {{ round(- Carbon\Carbon::now()->addMinutes($step->time)->diffInDays()) }} days
+                            {{ round(- Carbon\Carbon::now()->addMinutes($step->time)->diffInDays()) }} {{ __('days') }}
                         </div>
                         <div class="block text-sm truncate">
                             {{ $step->field }}
@@ -58,10 +58,10 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <div class="flex justify-end text-sm">
-                            ends {{ Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
+                            {{ __('ends') }} {{ Carbon\Carbon::create($this->brewing->ferment_start)->addMinutes($totalTime)->format('d/m/Y') }}
                         </div>
                         <div class="info-label-yellow text-sm">
-                            {{ $time_left <= 0 ? 'finished' : round($time_left) . ' days left' }}
+                            {{ $time_left <= 0 ? 'finished' : round($time_left) . ' ' . __('days left') }}
                         </div>
                     </div>
                 </div>
