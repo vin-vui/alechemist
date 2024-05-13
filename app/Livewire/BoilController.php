@@ -15,8 +15,9 @@ class BoilController extends Component
     public function mount(Brewing $brewing)
     {
         $this->brewing = $brewing;
-        $this->stepsCount = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->count();
-        $this->checkStep = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->where('status', true)->count();
+        $this->stepsCount = BrewingStep::whereIn('type', ['Boil', 'Aroma'])->where('brewing_id', $this->brewing->id)->count();
+        $this->checkStep = BrewingStep::whereIn('type', ['Boil', 'Aroma'])->where('brewing_id', $this->brewing->id)->where('status', true)->count();
+        $this->steps = BrewingStep::whereIn('type', ['Boil', 'Aroma'])->where('brewing_id', $this->brewing->id)->get();
         $this->allChecked();
     }
 
@@ -73,7 +74,7 @@ class BoilController extends Component
         } else {
             $this->newBoilTime = $this->brewing->boil_time;
         }
-        
+
         $this->closeModal();
     }
 
@@ -96,7 +97,6 @@ class BoilController extends Component
 
     public function render()
     {
-        $this->steps = BrewingStep::where('type', 'Boil')->where('brewing_id', $this->brewing->id)->get();
         return view('steps.boil')->layout('layouts.app');
     }
 }

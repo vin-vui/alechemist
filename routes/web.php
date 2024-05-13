@@ -32,7 +32,7 @@ use App\Livewire\RecipeDetailsController;
 */
 
 Route::get('/', function () {
-    return view('auth/register');
+    return view('alechemist.home');
 });
 
 Route::middleware([

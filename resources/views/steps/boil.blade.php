@@ -72,12 +72,16 @@
         <div class="flex flex-col w-full gap-2">
             @foreach ($steps as $step)
             @php
-            $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)->subMinutes($step->time), false);
+            if ($step->type === 'Aroma') {
+                $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time), false);
+            } else {
+                $time_left = now()->diffInMinutes(Carbon\Carbon::create($this->brewing->boil_start)->addMinutes($this->brewing->boil_time)->subMinutes($step->time), false);
+            }
             @endphp
             <div class="shadow-md rounded-md border-2 bg-white {{ $step->status ? 'border-old-gold' : ($this->brewing->boil_start != null && $time_left <= 0 ? 'border-red-600' : 'border-transparent') }}" wire:click="statusChange({{ $step }})">
                 <div class="rounded-tl-md rounded-tr-md relative flex cursor-pointer p-4 focus:outline-none">
                     <div class="ml-3 w-full flex gap-x-1 justify-between">
-                        <div class="flex gap-x-1">
+                        <div class="flex items-center gap-x-1">
                             <div class="block text-sm font-medium">
                                 {{ $step->quantity }}
                             </div>
@@ -87,6 +91,11 @@
                             <div class="block text-sm">
                                 {{ $step->field }}
                             </div>
+                            @if($step->type === 'Aroma')
+                                <div class="block textsm">
+                                    <span class="text-sm info-label-yellow">{{ __('flame-out') }}</span>
+                                </div>
+                            @endif
                         </div>
                         <div class="block text-sm">
                             @if($this->brewing->boil_start != null)

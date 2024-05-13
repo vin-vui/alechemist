@@ -86,35 +86,36 @@
                     @endif
                 </div>
             </div>
-            <div class="">
-                <div class="flex justify-between items-center px-4 py-2 capitalize font-semibold bg-old-gold sticky md:top-0 top-12 mb-6">
-                    <span>{{ Str::plural('recipe', count($this->progressBrewings)) }} in progress</span>
-                    <span class="info-label">{{ count($this->progressBrewings) }}</span>
-                </div>
-                <div class="flex flex-col w-full gap-y-4 px-4">
-                    @foreach ($this->progressBrewings as $brewing)
-                    <a href="{{ route($brewing->current_step, [$brewing->recipe, $brewing]) }}" class="bg-white shadow-md">
-                        <div class="max-w-full flex gap-4">
-                            <div class="flex flex-shrink-0 w-20">
-                                <img class="object-cover bg-rich-black" src="/pictures/placeholder.webp">
-                            </div>
-                            <div class="flex flex-col truncate flex-1 mr-4 py-2">
-                                <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->recipe->name }}</h3>
-                                <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $brewing->recipe->type }}</h4>
-                                <div class="w-max grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
-                                    <div class="text-sm font-semibold">Started at</div>
-                                    <div class="info-label text-xs text-center">{{ Carbon\Carbon::parse($brewing->date_start)->format('d/m/Y') }}</div>
-                                    <div class="text-sm font-semibold">Volume</div>
-                                    <div class="info-label text-xs text-center">{{ $brewing->recipe->volume }} l</div>
-                                    <div class="text-sm font-semibold">Step</div>
-                                    <div class="info-label-yellow text-xs font-semibold text-center">{{ $brewing->current_step }}</div>
-                                </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="flex justify-between items-center px-4 py-2 capitalize font-semibold bg-old-gold sticky md:top-0 top-12 mb-6">
+                <span>{{ Str::plural('recipe', count($this->progressBrewings)) }} in progress</span>
+                <span class="info-label">{{ count($this->progressBrewings) }}</span>
+            </div>
+            <div class="flex flex-col w-full gap-y-4 px-4">
+                @foreach ($this->progressBrewings as $brewing)
+                <a href="{{ route($brewing->current_step, [$brewing->recipe, $brewing]) }}" class="bg-white shadow-md">
+                    <div class="max-w-full flex gap-4">
+                        <div class="flex flex-shrink-0 w-20">
+                            <img class="object-cover bg-rich-black" src="/pictures/placeholder.webp">
+                        </div>
+                        <div class="flex flex-col truncate flex-1 mr-4 py-2">
+                            <h3 class="truncate text-lg font-bold sm:flex text-gray-900 uppercase">{{ $brewing->name }}</h3>
+                            <h4 class="text-sm text-gray-500 uppercase -mt-2">{{ $brewing->recipe->name }}</h4>
+                            <div class="w-max grid grid-cols-2 gap-x-2 gap-y-1 mt-2">
+                                <div class="text-sm font-semibold">Started at</div>
+                                <div class="info-label text-xs text-center">{{ Carbon\Carbon::parse($brewing->date_start)->format('d/m/Y') }}</div>
+                                <div class="text-sm font-semibold">Volume</div>
+                                <div class="info-label text-xs text-center">{{ $brewing->recipe->volume }} l</div>
+                                <div class="text-sm font-semibold">Step</div>
+                                <div class="info-label-yellow text-xs font-semibold text-center">{{ $brewing->current_step }}</div>
                             </div>
                         </div>
-                    </a>
-                    @endforeach
-                </div>
+                    </div>
+                </a>
+                @endforeach
             </div>
-
         </div>
+
     </div>
