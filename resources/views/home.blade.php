@@ -48,7 +48,11 @@
                                     $totalTime = $totalTime + $brewingStep->time;
                                     $time_left = now()->diffInDays(Carbon\Carbon::create($brewing->ferment_start)->addMinutes($totalTime), false);
                                     $time_left_min = now()->diffInMinutes(now()->addDays($time_left));
-                                    $time = (1 - ($time_left_min / $totalTime)) * 100;
+                                    if ($totalTime > 0) {
+                                        $time = (1 - ($time_left_min / $totalTime)) * 100;
+                                    } else {
+                                        $time = 0;
+                                    }
                                     @endphp
                                     @if ($time_left > 0)
                                     <div class="flex flex-col justify-items-center w-full">
