@@ -70,5 +70,7 @@
         @endforeach
     </div>
 
-    @include('steps._next', ['allChecked' => $this->allChecked && ($this->brewing->ferment_start != null) && ($time_left <= 0)]) </div>
+    <!-- @include('steps._next', ['allChecked' => $this->allChecked && ($this->brewing->ferment_start != null) && ($time_left <= 0)]) -->
+    @include('steps._next', ['allChecked' => $this->allChecked && ($this->brewing->ferment_start != null)])
+
 </div>
