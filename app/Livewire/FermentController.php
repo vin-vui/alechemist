@@ -3,16 +3,24 @@
 namespace App\Livewire;
 
 use App\Models\BrewingStep;
+use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class FermentController extends Component
 {
+    use AuthorizesRequests;
+
     public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $fermentTime;
 
 
-    public function mount(Brewing $brewing)
+    public function mount(Recipe $recipe, Brewing $brewing)
     {
+        abort_unless($brewing->recipe_id === $recipe->id, 404);
+        $this->authorize('view', $recipe);
+
+        $this->recipe = $recipe;
         $this->brewing = $brewing;
 
         $this->stepsCount = BrewingStep::whereIn('type', ['Primary', 'Secondary', 'Tertiary', 'Bottle'])->where('brewing_id', $this->brewing->id)->count();

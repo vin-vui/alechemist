@@ -3,17 +3,25 @@
 namespace App\Livewire;
 
 use Carbon\Carbon;
+use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
 use App\Models\BrewingStep;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class BoilController extends Component
 {
+    use AuthorizesRequests;
+
     public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount, $boilTime, $boilStart, $boilEnd, $newBoilTime;
     public $isOpen = false;
 
-    public function mount(Brewing $brewing)
+    public function mount(Recipe $recipe, Brewing $brewing)
     {
+        abort_unless($brewing->recipe_id === $recipe->id, 404);
+        $this->authorize('view', $recipe);
+
+        $this->recipe = $recipe;
         $this->brewing = $brewing;
         $this->stepsCount = BrewingStep::whereIn('type', ['Boil', 'Aroma'])->where('brewing_id', $this->brewing->id)->count();
         $this->checkStep = BrewingStep::whereIn('type', ['Boil', 'Aroma'])->where('brewing_id', $this->brewing->id)->where('status', true)->count();

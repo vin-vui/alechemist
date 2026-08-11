@@ -7,13 +7,18 @@ use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
 use App\Models\BrewingStep;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CreateBrewingController extends Component
 {
+    use AuthorizesRequests;
+
     public $name, $date_start, $note, $brewing_id, $recipe, $steps, $brewingStep;
 
-    public function mount (Recipe $recipe)
+    public function mount(Recipe $recipe)
     {
+        $this->authorize('view', $recipe);
+
         $this->recipe = $recipe;
         $this->steps = $recipe->steps;
         $this->date_start = Carbon::today()->format('Y-m-d');

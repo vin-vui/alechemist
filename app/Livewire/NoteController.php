@@ -5,16 +5,22 @@ namespace App\Livewire;
 use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class NoteController extends Component
 {
+    use AuthorizesRequests;
+
     public $recipe, $note, $brewing;
 
-    public function mount(Brewing $brewing)
+    public function mount(Recipe $recipe, Brewing $brewing)
     {
+        abort_unless($brewing->recipe_id === $recipe->id, 404);
+        $this->authorize('view', $recipe);
+
+        $this->recipe = $recipe;
         $this->brewing = $brewing;
         $this->note = $brewing->note;
-        $this->recipe = Recipe::find($brewing->recipe_id);
     }
 
     public function update(Brewing $brewing)

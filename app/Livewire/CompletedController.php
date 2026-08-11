@@ -7,14 +7,22 @@ use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
 use App\Models\BrewingStep;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CompletedController extends Component
 {
-    public $recipe, $brewing, $recipeStep;
-    public function mount(Brewing $brewing)
+    use AuthorizesRequests;
+
+    public $recipe, $brewing, $recipeSteps;
+
+    public function mount(Recipe $recipe, Brewing $brewing)
     {
+        abort_unless($brewing->recipe_id === $recipe->id, 404);
+        $this->authorize('view', $recipe);
+
+        $this->recipe = $recipe;
         $this->brewing = $brewing;
-        $this->recipeSteps = Step::where('recipe_id', $this->recipe)->get();
+        $this->recipeSteps = Step::where('recipe_id', $recipe->id)->get();
     }
 
     public function delete(Brewing $brewing)

@@ -5,14 +5,19 @@ namespace App\Livewire;
 use App\Models\Recipe;
 use App\Models\Brewing;
 use App\Models\BrewingStep;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
 class BrewingController extends Component
 {
+    use AuthorizesRequests;
+
     public $recipe, $brewings, $brewingSteps;
 
-    public function mount (Recipe $recipe)
+    public function mount(Recipe $recipe)
     {
+        $this->authorize('view', $recipe);
+
         $this->recipe = $recipe;
         $this->brewings = Brewing::where('recipe_id', $this->recipe->id)->get();
     }

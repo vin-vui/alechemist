@@ -2,16 +2,24 @@
 
 namespace App\Livewire;
 
+use App\Models\Recipe;
 use App\Models\Brewing;
 use Livewire\Component;
 use App\Models\BrewingStep;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class PreparationController extends Component
 {
+    use AuthorizesRequests;
+
     public $recipe, $steps, $brewing, $checkStep, $allChecked, $stepsCount;
 
-    public function mount(Brewing $brewing)
+    public function mount(Recipe $recipe, Brewing $brewing)
     {
+        abort_unless($brewing->recipe_id === $recipe->id, 404);
+        $this->authorize('view', $recipe);
+
+        $this->recipe = $recipe;
         $this->brewing = $brewing;
         $this->stepsCount = BrewingStep::where('type', 'Preparation')->where('brewing_id', $this->brewing->id)->count();
         $this->checkStep = BrewingStep::where('type', 'Preparation')->where('brewing_id', $this->brewing->id)->where('status', true)->count();

@@ -4,16 +4,21 @@ namespace App\Livewire;
 
 use App\Models\Recipe;
 use App\Models\Brewing;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
 class RecipeDetailsController extends Component
 {
+    use AuthorizesRequests;
+
     public $recipe, $inProgressCount;
     public $isOpen = false;
     public $before_boil_density;
 
     public function mount(Recipe $recipe)
     {
+        $this->authorize('view', $recipe);
+
         $this->recipe = $recipe;
         $this->inProgressCount = Brewing::where('recipe_id', $this->recipe->id)->count();
     }
