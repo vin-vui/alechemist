@@ -10,7 +10,7 @@ use Illuminate\View\View;
 
 class HomeController extends Component
 {
-    public $recipe_count, $recipes, $fermentRecipes, $fermentTime;
+    public $recipe_count, $recipes, $fermentRecipes, $fermentTime, $progressBrewings;
 
     /**
      * Mount the component.
@@ -18,12 +18,16 @@ class HomeController extends Component
      */
     public function mount(): void
     {
-        $this->recipes = Recipe::all()->where('user_id', Auth::user()->id)->pluck('id');
-        $this->fermentRecipes = Recipe::where('user_id', Auth::user()->id)
+        $this->recipes = Recipe::where('user_id', Auth::id())->pluck('id');
+        $this->fermentRecipes = Recipe::where('user_id', Auth::id())
             ->whereHas('brewing', function ($query) {
                 $query->where('current_step', 'ferment');
             })->get();
-        $this->progressBrewings = Brewing::whereIn('recipe_id', $this->recipes)->where('current_step', '<>', 'ferment')->where('current_step', '<>', 'completed')->oldest('updated_at')->get();
+        $this->progressBrewings = Brewing::whereIn('recipe_id', $this->recipes)
+            ->where('current_step', '<>', 'ferment')
+            ->where('current_step', '<>', 'completed')
+            ->oldest('updated_at')
+            ->get();
     }
 
     /**
