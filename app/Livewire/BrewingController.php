@@ -29,7 +29,9 @@ class BrewingController extends Component
 
     public function delete(Brewing $brewing)
     {
-        $this->brewingSteps = BrewingStep::where('brewing_id', $brewing->id)->delete();
+        abort_unless($brewing->recipe_id === $this->recipe->id, 403);
+
+        BrewingStep::where('brewing_id', $brewing->id)->delete();
         $brewing->delete();
     }
 

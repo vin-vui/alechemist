@@ -48,6 +48,8 @@ class BoilController extends Component
 
     public function statusChange(BrewingStep $step)
     {
+        abort_unless($step->brewing_id === $this->brewing->id, 403);
+
         $step->status = !$step->status;
         $step->save();
 
@@ -74,11 +76,11 @@ class BoilController extends Component
         return now() > $boilEnd;
     }
 
-    public function modifyBoilTime(Brewing $brewing)
+    public function modifyBoilTime()
     {
         if ($this->newBoilTime > 0) {
-            $brewing->boil_time = $this->newBoilTime;
-            $brewing->save();
+            $this->brewing->boil_time = intval($this->newBoilTime);
+            $this->brewing->save();
         } else {
             $this->newBoilTime = $this->brewing->boil_time;
         }

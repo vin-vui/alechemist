@@ -271,7 +271,7 @@
 
     {{-- Delete Button --}}
     <div class="flex pt-4 px-8">
-        <button wire:click="delete({{ $recipe }})" wire:confirm="Are you sure?" class="bg-transparent border-2 border-tawny transition-all duration-300 py-1 px-3 flex items-center gap-2 justify-center">
+        <button wire:click="delete" wire:confirm="Are you sure?" class="bg-transparent border-2 border-tawny transition-all duration-300 py-1 px-3 flex items-center gap-2 justify-center">
             <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512">
                 <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="m112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" />
                 <path fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352" />

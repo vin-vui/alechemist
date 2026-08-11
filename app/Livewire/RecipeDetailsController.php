@@ -58,9 +58,9 @@ class RecipeDetailsController extends Component
         return redirect()->route('recipes.index');
     }
 
-    public function delete(Recipe $recipe)
+    public function delete()
     {
-        $recipe->delete();
+        $this->recipe->delete();
         return redirect()->route('recipes.index');
     }
 

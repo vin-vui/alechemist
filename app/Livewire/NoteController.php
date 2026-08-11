@@ -23,7 +23,7 @@ class NoteController extends Component
         $this->note = $brewing->note;
     }
 
-    public function update(Brewing $brewing)
+    public function update()
     {
         $validated = $this->validate([
             'note' => 'required',

@@ -46,6 +46,8 @@ class PreparationController extends Component
 
     public function statusChange(BrewingStep $step)
     {
+        abort_unless($step->brewing_id === $this->brewing->id, 403);
+
         $step->status = !$step->status;
         $step->save();
 

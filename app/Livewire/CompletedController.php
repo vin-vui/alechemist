@@ -25,13 +25,12 @@ class CompletedController extends Component
         $this->recipeSteps = Step::where('recipe_id', $recipe->id)->get();
     }
 
-    public function delete(Brewing $brewing)
+    public function delete()
     {
-        $this->brewingSteps = BrewingStep::where('brewing_id', $brewing->id)->delete();
-        $brewing->delete();
+        BrewingStep::where('brewing_id', $this->brewing->id)->delete();
+        $this->brewing->delete();
 
         return redirect()->route('brewing.index', $this->recipe);
-
     }
 
     public function note()
