@@ -26,7 +26,7 @@
                                 <input name="file" id="file" type="file" accept=".xml" class="sr-only">
                             </label>
                         </div>
-                        <p class="text-xs leading-5 text-gray-600">XML up to 10MB</p>
+                        <p class="text-xs leading-5 text-gray-600">XML up to 2MB</p>
                     </div>
                 </div>
             </div>

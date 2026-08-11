@@ -12,7 +12,7 @@ class BrewingController extends Component
 {
     use AuthorizesRequests;
 
-    public $recipe, $brewings, $brewingSteps;
+    public $recipe, $brewings;
 
     public function mount(Recipe $recipe)
     {
