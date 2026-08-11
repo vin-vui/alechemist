@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Step;
 use App\Models\Recipe;
+use App\Models\Step;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FileController extends Controller
 {
@@ -23,20 +23,32 @@ class FileController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|file|mimes:xml|max:2048'
+            'file' => 'required|file|mimes:xml|max:2048',
         ]);
 
-        $file = $request->file('file');
-        $destinationPath = public_path('/files');
-        $fileName = $file->getClientOriginalName();
-        $fileContent = file_get_contents($file->move($destinationPath, $fileName));
-        $xmlFile = simplexml_load_string($fileContent);
-        $arrayFile = json_decode(json_encode($xmlFile), true);
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_string($request->file('file')->get(), 'SimpleXMLElement', LIBXML_NONET);
+        libxml_clear_errors();
 
-        $recipe = ($arrayFile['RECIPE']);
-        $mash = ($arrayFile['RECIPE']['MASH']);
+        if ($xml === false || ! isset($xml->RECIPE)) {
+            return back()->withErrors(['file' => __('Invalid BeerXML file')]);
+        }
 
-        // Informations recipes
+        $arrayFile = json_decode(json_encode($xml), true);
+
+        try {
+            $recipe = DB::transaction(fn () => $this->importRecipe($arrayFile['RECIPE']));
+        } catch (\Throwable $e) {
+            Log::warning('BeerXML import failed: '.$e->getMessage());
+
+            return back()->withErrors(['file' => __('Invalid BeerXML file')]);
+        }
+
+        return redirect()->route('recipes.show', ['recipe' => $recipe->id]);
+    }
+
+    private function importRecipe(array $recipe): Recipe
+    {
         $imported_recipe = Recipe::create([
             'name' => $recipe['NAME'],
             'type' => $recipe['STYLE']['NAME'],
@@ -51,12 +63,12 @@ class FileController extends Controller
             'final_density' => $recipe['EST_FG'],
             'boil_time' => $recipe['BOIL_TIME'],
             'carbonation' => $recipe['CARBONATION'],
-            'user_id' => Auth::user()->id
+            'user_id' => Auth::user()->id,
         ]);
 
         // Fermentables
         if (!empty($recipe['FERMENTABLES'])) {
-            foreach ($arrayFile['RECIPE']['FERMENTABLES']['FERMENTABLE'] as $fermentable) {
+            foreach ($recipe['FERMENTABLES']['FERMENTABLE'] as $fermentable) {
                 $this->createStep($fermentable['AMOUNT'] * 1000, 'g', $fermentable['NAME'], null, 'Preparation', $imported_recipe->id);
             }
         }
@@ -80,26 +92,24 @@ class FileController extends Controller
             } else {
                 $array_misc = $recipe['MISCS']['MISC'];
             }
-
             foreach ($array_misc as $misc) {
                 $this->createStep($misc['AMOUNT'] * 1000, 'g', $misc['NAME'], $misc['TIME'], $misc['USE'], $imported_recipe->id);
             }
         }
 
-        // Yeats
+        // Yeasts
         if (!empty($recipe['YEASTS'])) {
             if (isset($recipe['YEASTS']['YEAST']['NAME'])) {
                 $array_yeast = $recipe['YEASTS'];
             } else {
                 $array_yeast = $recipe['YEASTS']['YEAST'];
             }
-
             foreach ($array_yeast as $yeast) {
                 $this->createStep($yeast['AMOUNT'] * 1000, 'g', $yeast['NAME'], null, 'Yeast', $imported_recipe->id);
             }
         }
 
-        // MASH
+        // Mash
         $mash = $recipe['MASH']['MASH_STEPS']['MASH_STEP'];
 
         if (array_key_exists('INFUSE_AMOUNT', $mash)) {
@@ -126,39 +136,13 @@ class FileController extends Controller
             $this->createStep($recipe['AGE_TEMP'], '°C', 'Garde en bouteille', $recipe['AGE'] * 1440, 'Bottle', $imported_recipe->id);
         }
 
-        $this->deleteFile($fileName);
-
-        return redirect()->route('recipes.show', ['recipe' => $imported_recipe->id]);
+        return $imported_recipe;
     }
 
-    // createStep($quantity, $unit, $field, $time, $type, $recipe_id)
-    private function createStep(float $quantity, string $unit, string $field, int $time = null, string $type, int $recipe_id)
+    private function createStep(float $quantity, string $unit, string $field, ?int $time, string $type, int $recipe_id): void
     {
-        $test = Step::create(
-            compact(
-                'quantity',
-                'unit',
-                'field',
-                'time',
-                'type',
-                'recipe_id'
-            )
+        Step::create(
+            compact('quantity', 'unit', 'field', 'time', 'type', 'recipe_id')
         );
-
-        if ($test) {
-            Log::info('✅ Step ' . $type . ' extracted successfully');
-        } else {
-            Log::error('💣 Step ' . $type . ' NOT extracted');
-        }
-    }
-
-    public function deleteFile($fileName)
-    {
-        if (Storage::disk('public')->exists($fileName)) {
-            Storage::disk('public')->delete($fileName);
-            Log::info('✅ File ' . $fileName . ' deleted successfully');
-        } else {
-            Log::error('💣 File ' . $fileName . ' NOT deleted');
-        }
     }
 }
