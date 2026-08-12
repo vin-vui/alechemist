@@ -7,8 +7,10 @@ const { refreshIdentity } = useSanctumAuth()
 const useRecovery = ref(false)
 const form = reactive({ code: '', recovery_code: '' })
 const errors = ref<Record<string, string[]>>({})
+const pending = ref(false)
 
 async function submit() {
+  pending.value = true
   errors.value = {}
   try {
     const body = useRecovery.value ? { recovery_code: form.recovery_code } : { code: form.code }
@@ -17,6 +19,8 @@ async function submit() {
     await navigateTo('/')
   } catch (e) {
     errors.value = extractErrors(e)
+  } finally {
+    pending.value = false
   }
 }
 </script>
@@ -35,7 +39,7 @@ async function submit() {
         <input id="recovery_code" v-model="form.recovery_code" class="mt-1 w-full rounded border-gray-300" />
         <p v-if="errors.recovery_code" class="mt-1 text-sm text-red-600">{{ errors.recovery_code[0] }}</p>
       </div>
-      <button type="submit" class="btn-yellow w-full rounded">{{ $t('Log in') }}</button>
+      <button type="submit" class="btn-yellow w-full rounded" :disabled="pending">{{ $t('Log in') }}</button>
       <button type="button" class="w-full text-sm underline" @click="useRecovery = !useRecovery">
         {{ useRecovery ? $t('Use an authentication code') : $t('Use a recovery code') }}
       </button>
