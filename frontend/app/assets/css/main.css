@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'shangrila';
+  src: url('../fonts/SHANLN__.TTF') format('truetype');
+}
+
+@font-face {
+  font-family: 'shangrila-caps';
+  src: url('../fonts/SHANLNC_.TTF') format('truetype');
+}
+
+@theme {
+  --color-rich-black: #12121A;
+  --color-xanthous: #F3AE1A;
+  --color-tawny: #CA6018;
+  --color-old-gold: #E2C05D;
+  --color-licorice: #2A1515;
+  --color-anti-flash-white: #EFEFEF;
+  --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-shangrila: 'shangrila', serif;
+  --font-shangrila-caps: 'shangrila-caps', serif;
+}
+
+@layer components {
+  .btn-yellow {
+    @apply bg-xanthous hover:bg-tawny hover:text-white shadow-lg transition-all duration-300 py-1.5 px-3 flex items-center justify-center gap-2 whitespace-nowrap;
+  }
+  .btn-yellow svg { @apply size-6; }
+  .info-label { @apply bg-gray-200 px-1 py-0.5 rounded; }
+  .info-label-yellow { @apply bg-old-gold px-1 py-0.5 rounded; }
+}
