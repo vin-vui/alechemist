@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BrewingResource;
-use App\Http\Resources\RecipeResource;
 use App\Models\Brewing;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
@@ -17,16 +16,19 @@ class DashboardController extends Controller
 
         return response()->json([
             'data' => [
-                'ferment_recipes' => RecipeResource::collection(
-                    Recipe::where('user_id', $request->user()->id)
-                        ->whereHas('brewing', fn ($query) => $query->where('current_step', 'ferment'))
+                'recipe_count' => $recipeIds->count(),
+                'ferment_brewings' => BrewingResource::collection(
+                    Brewing::whereIn('recipe_id', $recipeIds)
+                        ->where('current_step', 'ferment')
+                        ->with(['recipe', 'brewingSteps'])
                         ->get()
                 ),
                 'in_progress_brewings' => BrewingResource::collection(
                     Brewing::whereIn('recipe_id', $recipeIds)
                         ->whereNotIn('current_step', ['ferment', 'completed'])
-                        ->oldest('updated_at')
+                        ->whereNotNull('current_step')
                         ->with('recipe')
+                        ->oldest('updated_at')
                         ->get()
                 ),
             ],
