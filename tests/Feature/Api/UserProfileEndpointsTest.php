@@ -70,6 +70,7 @@ class UserProfileEndpointsTest extends TestCase
         $step = Step::factory()->for($recipe)->create();
         $brewing = Brewing::factory()->for($recipe)->create();
         $brewingStep = BrewingStep::factory()->for($brewing)->create();
+        $user->createToken('test-token');
 
         $this->actingAs($user)
             ->withHeader('Referer', 'http://localhost')
@@ -85,6 +86,10 @@ class UserProfileEndpointsTest extends TestCase
         $this->assertDatabaseMissing('steps', ['id' => $step->id]);
         $this->assertDatabaseMissing('brewings', ['id' => $brewing->id]);
         $this->assertDatabaseMissing('brewing_steps', ['id' => $brewingStep->id]);
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'tokenable_id' => $user->id,
+            'tokenable_type' => User::class,
+        ]);
     }
 
     private function insertSession(string $id, int $userId): void
