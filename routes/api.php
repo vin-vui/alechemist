@@ -3,13 +3,18 @@
 use App\Http\Controllers\Api\BrewingController;
 use App\Http\Controllers\Api\BrewingStepController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DeleteUserController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\RecipeImportController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserSessionsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', UserController::class);
+    Route::get('/user/sessions', [UserSessionsController::class, 'index']);
+    Route::post('/user/sessions/logout-others', [UserSessionsController::class, 'logoutOthers']);
+    Route::delete('/user', DeleteUserController::class);
 
     Route::get('/dashboard', DashboardController::class);
 
