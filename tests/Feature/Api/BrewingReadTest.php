@@ -57,4 +57,20 @@ class BrewingReadTest extends TestCase
             ->getJson("/api/brewings/{$brewing->id}")
             ->assertNotFound();
     }
+
+    public function test_les_timestamps_d_etapes_sont_serialises_en_iso_8601(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'boil_start' => '2026-07-20 09:00:00',
+            'date_start' => '2026-07-20',
+        ]);
+
+        $response = $this->actingAs($user)->getJson("/api/brewings/{$brewing->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('data.boil_start', '2026-07-20T09:00:00.000000Z')
+            ->assertJsonPath('data.date_start', '2026-07-20');
+    }
 }
