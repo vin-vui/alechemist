@@ -15,5 +15,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
     Route::get('/recipes/{recipe}/brewings', [BrewingController::class, 'index']);
+    Route::post('/recipes/{recipe}/brewings', [BrewingController::class, 'store']);
     Route::get('/brewings/{brewing}', [BrewingController::class, 'show']);
 });
