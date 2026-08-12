@@ -92,4 +92,16 @@ class BrewingController extends Controller
 
         return new BrewingResource($brewing);
     }
+
+    public function destroy(Brewing $brewing)
+    {
+        $this->authorize('delete', $brewing);
+
+        DB::transaction(function () use ($brewing) {
+            $brewing->brewingSteps()->delete();
+            $brewing->delete();
+        });
+
+        return response()->noContent();
+    }
 }
