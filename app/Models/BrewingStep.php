@@ -12,7 +12,7 @@ class BrewingStep extends Model
     use HasFactory;
     protected $fillable = ['quantity', 'unit', 'field', 'date', 'time', 'type', 'status', 'brewing_id'];
 
-    public function recipe(): BelongsTo
+    public function brewing(): BelongsTo
     {
         return $this->belongsTo(Brewing::class);
     }

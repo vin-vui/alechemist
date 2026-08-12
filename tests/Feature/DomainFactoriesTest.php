@@ -31,4 +31,12 @@ class DomainFactoriesTest extends TestCase
         $this->assertInstanceOf(Recipe::class, $step->recipe);
         $this->assertNotNull($step->recipe->user_id);
     }
+
+    public function test_brewing_step_belongs_to_its_brewing(): void
+    {
+        $brewingStep = BrewingStep::factory()->create();
+
+        $this->assertInstanceOf(Brewing::class, $brewingStep->brewing);
+        $this->assertSame($brewingStep->brewing_id, $brewingStep->brewing->id);
+    }
 }
