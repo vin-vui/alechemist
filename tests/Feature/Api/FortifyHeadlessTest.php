@@ -5,6 +5,7 @@ namespace Tests\Feature\Api;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
@@ -40,6 +41,8 @@ class FortifyHeadlessTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)->postJson('/logout')->assertNoContent();
+
+        $this->getJson('/api/user')->assertUnauthorized();
     }
 
     public function test_registration_works_headlessly(): void
@@ -122,5 +125,7 @@ class FortifyHeadlessTest extends TestCase
                 'password_confirmation' => 'new-password',
             ])
             ->assertOk();
+
+        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
     }
 }
