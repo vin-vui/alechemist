@@ -37,6 +37,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Session Serialization
+    |--------------------------------------------------------------------------
+    |
+    | Figé à "php" pour préserver les sessions actives lors de l'upgrade L13
+    | (le défaut du skeleton 13 est passé à "json"). À passer à "json" en
+    | phase 3/4, quand la bascule d'authentification invalidera de toute
+    | façon les sessions.
+    |
+    */
+
+    'serialization' => 'php',
+
+    /*
+    |--------------------------------------------------------------------------
     | Session Encryption
     |--------------------------------------------------------------------------
     |
