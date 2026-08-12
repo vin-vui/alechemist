@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BrewingController;
 use App\Http\Controllers\Api\RecipeController;
 use App\Http\Controllers\Api\RecipeImportController;
 use App\Http\Resources\UserResource;
@@ -13,4 +14,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recipes/{recipe}', [RecipeController::class, 'show']);
     Route::patch('/recipes/{recipe}', [RecipeController::class, 'update']);
     Route::delete('/recipes/{recipe}', [RecipeController::class, 'destroy']);
+    Route::get('/recipes/{recipe}/brewings', [BrewingController::class, 'index']);
+    Route::get('/brewings/{brewing}', [BrewingController::class, 'show']);
 });
