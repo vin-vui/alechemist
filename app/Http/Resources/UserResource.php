@@ -16,7 +16,6 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'profile_photo_url' => $this->profile_photo_url,
             'two_factor_enabled' => $this->two_factor_confirmed_at !== null,
         ];
     }

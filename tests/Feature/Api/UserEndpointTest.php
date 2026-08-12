@@ -27,4 +27,15 @@ class UserEndpointTest extends TestCase
     {
         $this->getJson('/api/user')->assertUnauthorized();
     }
+
+    public function test_la_reponse_ne_contient_pas_profile_photo_url(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->getJson('/api/user');
+
+        $response->assertOk()
+            ->assertJsonStructure(['data' => ['id', 'name', 'email', 'two_factor_enabled']])
+            ->assertJsonMissingPath('data.profile_photo_url');
+    }
 }
