@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Parité avec l'ancien Kernel : throttle:api n'est pas dans le groupe
         // api par défaut de la nouvelle structure.
         $middleware->throttleApi();
+
+        // Sanctum mode SPA : les requêtes du front (SANCTUM_STATEFUL_DOMAINS)
+        // sont authentifiées par cookie de session.
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
