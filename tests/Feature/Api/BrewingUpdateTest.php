@@ -96,4 +96,69 @@ class BrewingUpdateTest extends TestCase
             ->postJson("/api/brewings/{$brewing->id}/start-boil")
             ->assertNotFound();
     }
+
+    public function test_un_aller_retour_vers_ferment_ne_reecrit_pas_ferment_start(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'current_step' => 'ferment',
+            'ferment_start' => '2026-08-01 10:00:00',
+        ]);
+
+        $this->actingAs($user)->patchJson("/api/brewings/{$brewing->id}", ['current_step' => 'yeast'])->assertOk();
+        $this->actingAs($user)->patchJson("/api/brewings/{$brewing->id}", ['current_step' => 'ferment'])->assertOk();
+
+        $this->assertSame('2026-08-01 10:00:00', (string) $brewing->fresh()->ferment_start);
+    }
+
+    public function test_un_aller_retour_vers_completed_ne_reecrit_pas_ferment_end(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'current_step' => 'completed',
+            'ferment_start' => '2026-08-01 10:00:00',
+            'ferment_end' => '2026-08-10 10:00:00',
+        ]);
+
+        $this->actingAs($user)->patchJson("/api/brewings/{$brewing->id}", ['current_step' => 'ferment'])->assertOk();
+        $this->actingAs($user)->patchJson("/api/brewings/{$brewing->id}", ['current_step' => 'completed'])->assertOk();
+
+        $this->assertSame('2026-08-10 10:00:00', (string) $brewing->fresh()->ferment_end);
+    }
+
+    public function test_le_retour_arriere_ne_nettoie_aucun_timestamp(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'current_step' => 'completed',
+            'boil_start' => '2026-07-20 09:00:00',
+            'ferment_start' => '2026-08-01 10:00:00',
+            'ferment_end' => '2026-08-10 10:00:00',
+        ]);
+
+        $this->actingAs($user)->patchJson("/api/brewings/{$brewing->id}", ['current_step' => 'mash'])->assertOk();
+
+        $fresh = $brewing->fresh();
+        $this->assertSame('mash', $fresh->current_step);
+        $this->assertNotNull($fresh->boil_start);
+        $this->assertNotNull($fresh->ferment_start);
+        $this->assertNotNull($fresh->ferment_end);
+    }
+
+    public function test_start_boil_est_idempotent(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'current_step' => 'boil',
+            'boil_start' => '2026-07-20 09:00:00',
+        ]);
+
+        $this->actingAs($user)->postJson("/api/brewings/{$brewing->id}/start-boil")->assertOk();
+
+        $this->assertSame('2026-07-20 09:00:00', (string) $brewing->fresh()->boil_start);
+    }
 }

@@ -71,10 +71,14 @@ class BrewingController extends Controller
 
         // Parité web : les timestamps de transition sont posés côté serveur
         // (YeastController::next → ferment_start, FermentController::next → ferment_end).
-        if (($validated['current_step'] ?? null) === 'ferment' && $brewing->current_step !== 'ferment') {
+        if (($validated['current_step'] ?? null) === 'ferment'
+            && $brewing->current_step !== 'ferment'
+            && $brewing->ferment_start === null) {
             $brewing->ferment_start = now();
         }
-        if (($validated['current_step'] ?? null) === 'completed' && $brewing->current_step !== 'completed') {
+        if (($validated['current_step'] ?? null) === 'completed'
+            && $brewing->current_step !== 'completed'
+            && $brewing->ferment_end === null) {
             $brewing->ferment_end = now();
         }
 
@@ -87,8 +91,10 @@ class BrewingController extends Controller
     {
         $this->authorize('update', $brewing);
 
-        $brewing->boil_start = now();
-        $brewing->save();
+        if ($brewing->boil_start === null) {
+            $brewing->boil_start = now();
+            $brewing->save();
+        }
 
         return new BrewingResource($brewing);
     }
