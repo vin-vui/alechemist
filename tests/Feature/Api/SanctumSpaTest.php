@@ -38,4 +38,14 @@ class SanctumSpaTest extends TestCase
             ->assertHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
             ->assertHeader('Access-Control-Allow-Credentials', 'true');
     }
+
+    public function test_the_api_group_registers_sanctum_stateful_middleware(): void
+    {
+        $apiGroup = app(\Illuminate\Routing\Router::class)->getMiddlewareGroups()['api'];
+
+        $this->assertContains(
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            $apiGroup
+        );
+    }
 }
