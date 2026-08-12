@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Brewing extends Model
 {
@@ -24,21 +23,6 @@ class Brewing extends Model
             'ferment_end' => 'datetime',
             'date_start' => 'date:Y-m-d',
         ];
-    }
-
-    protected function dateStart(): Attribute
-    {
-        return Attribute::make(
-            get: function($value) {
-                if (!$value) {
-                    return null;
-                }
-                if (is_string($value)) {
-                    return $value;
-                }
-                return $value->format('Y-m-d');
-            },
-        );
     }
 
     public function brewingSteps(): HasMany

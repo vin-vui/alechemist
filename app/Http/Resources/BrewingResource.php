@@ -25,7 +25,7 @@ class BrewingResource extends JsonResource
             'final_density' => $this->final_density,
             'before_boil_density' => $this->before_boil_density,
             'carbonation' => $this->carbonation,
-            'date_start' => $this->date_start,
+            'date_start' => $this->date_start?->format('Y-m-d'),
             'current_step' => $this->current_step,
             'note' => $this->note,
             'recipe_id' => $this->recipe_id,
