@@ -17,4 +17,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recipes/{recipe}/brewings', [BrewingController::class, 'index']);
     Route::post('/recipes/{recipe}/brewings', [BrewingController::class, 'store']);
     Route::get('/brewings/{brewing}', [BrewingController::class, 'show']);
+    Route::patch('/brewings/{brewing}', [BrewingController::class, 'update']);
+    Route::post('/brewings/{brewing}/start-boil', [BrewingController::class, 'startBoil']);
 });

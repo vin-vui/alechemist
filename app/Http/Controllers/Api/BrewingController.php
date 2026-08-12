@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBrewingRequest;
+use App\Http\Requests\UpdateBrewingRequest;
 use App\Http\Resources\BrewingResource;
 use App\Models\Brewing;
 use App\Models\BrewingStep;
@@ -62,5 +63,33 @@ class BrewingController extends Controller
         return (new BrewingResource($brewing->load('brewingSteps')))
             ->response()
             ->setStatusCode(201);
+    }
+
+    public function update(UpdateBrewingRequest $request, Brewing $brewing)
+    {
+        $validated = $request->validated();
+
+        // Parité web : les timestamps de transition sont posés côté serveur
+        // (YeastController::next → ferment_start, FermentController::next → ferment_end).
+        if (($validated['current_step'] ?? null) === 'ferment' && $brewing->current_step !== 'ferment') {
+            $brewing->ferment_start = now();
+        }
+        if (($validated['current_step'] ?? null) === 'completed' && $brewing->current_step !== 'completed') {
+            $brewing->ferment_end = now();
+        }
+
+        $brewing->fill($validated)->save();
+
+        return new BrewingResource($brewing);
+    }
+
+    public function startBoil(Brewing $brewing)
+    {
+        $this->authorize('update', $brewing);
+
+        $brewing->boil_start = now();
+        $brewing->save();
+
+        return new BrewingResource($brewing);
     }
 }
