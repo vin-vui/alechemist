@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const { logout } = useSanctumAuth()
 const links = [
   { to: '/', label: 'Dashboard', match: /^\/$/ },
   { to: '/recipes', label: 'Recipes', match: /^\/recipes/ },
@@ -27,6 +28,9 @@ const links = [
       <NuxtLink to="/profile" class="block rounded px-3 py-2 hover:bg-licorice">
         {{ $t('Profile') }}
       </NuxtLink>
+      <button type="button" class="block w-full rounded px-3 py-2 text-left hover:bg-licorice" @click="logout()">
+        {{ $t('Log Out') }}
+      </button>
     </div>
   </nav>
 </template>
