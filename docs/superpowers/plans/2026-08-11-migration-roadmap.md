@@ -34,6 +34,8 @@ Policies + autorisation dans les `mount()`, garde-fous sur les actions Livewire 
 
 **Sortie :** aucune donnée d'un utilisateur accessible/modifiable par un autre ; suite verte incluant les nouveaux tests d'autorisation et d'import.
 
+**✅ Réalisée le 2026-08-11** (mergée dans `main`). **Action de déploiement requise : purger `public/files/` sur le serveur de prod** — l'ancien code y a accumulé les XML uploadés, publiquement accessibles ; plus rien n'y écrit désormais (vérifié : ni photos de profil Jetstream ni autre usage du disque `public`). Prévoir aussi `php artisan optimize:clear` au déploiement. Découverte à normaliser en phase 2/3 : `config/filesystems.php` route le disque `public` vers `public_path('files')` (hack pré-existant, désormais sans consommateur).
+
 ### Phase 2 — Upgrade Laravel 11 → 12 → 13, PHP 8.3+
 
 - Corrections préalables déjà faites en phase 1 (propriétés dynamiques, signature `createStep`).
