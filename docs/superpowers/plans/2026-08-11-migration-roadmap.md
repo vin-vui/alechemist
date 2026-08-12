@@ -45,6 +45,8 @@ Policies + autorisation dans les `mount()`, garde-fous sur les actions Livewire 
 
 **Sortie :** suite verte sur la version de Laravel la plus récente que permet Jetstream (12 ou 13).
 
+**✅ Réalisée le 2026-08-12** (plan détaillé : `2026-08-12-phase-2-upgrade-laravel.md`). Le point de décision est tranché : Jetstream 5.5 supporte Laravel 13 — l'app est directement en **Laravel 13 / PHP ^8.3 / PHPUnit 12**, nouvelle structure `bootstrap/app.php` adoptée (kernels, Handler et middleware stock supprimés), CI GitHub Actions en place (la roadmap disait « GitLab CI » mais `origin` est GitHub), disque `public` normalisé, 0 advisory `composer audit` (46 au départ). **Actions de déploiement requises : PHP ≥ 8.3 sur le serveur AVANT déploiement**, puis `composer install --no-dev` et `php artisan optimize:clear`. `config/session.php` fige `serialization => php` (sessions préservées) — à passer à `json` en phase 3/4. La purge de `public/files/` en prod (phase 1) reste à faire si pas déjà faite.
+
 ### Phase 3 — API REST + Fortify headless
 
 - Controllers API (`RecipeController`, `BrewingController`, `BrewingStepController`, `RecipeImportController`) + Form Requests + API Resources, autorisés par les policies de la phase 1.
@@ -70,7 +72,7 @@ Policies + autorisation dans les `mount()`, garde-fous sur les actions Livewire 
 
 | Risque | Phase | Mitigation |
 |---|---|---|
-| Compat Jetstream ↔ Laravel 13 | 2 | Point de décision explicite ; repli sur L12 puis saut en phase 3 |
+| Compat Jetstream ↔ Laravel 13 | 2 | Résolu le 2026-08-12 : Jetstream 5.5.3 supporte L13 |
 | Réimplémentation 2FA côté Nuxt (flux challenge Fortify) | 4 | Fortify headless expose les endpoints standard ; `nuxt-auth-sanctum` documente le flux |
 | Comportement offline PWA (service worker artisanal actuel) | 4 | `@vite-pwa/nuxt` remplace `pwabuilder-sw.js` ; recette de test manuel avant bascule |
 | Import BeerXML : variantes de structure XML non couvertes (fermentable unique, multi-recettes) | 1/3 | Tests fixtures en phase 1, durcissement du service en phase 3 |
