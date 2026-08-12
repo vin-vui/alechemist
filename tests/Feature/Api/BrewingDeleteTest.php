@@ -30,11 +30,13 @@ class BrewingDeleteTest extends TestCase
     public function test_delete_is_forbidden_for_non_owner(): void
     {
         $brewing = Brewing::factory()->for(Recipe::factory())->create();
+        BrewingStep::factory()->count(2)->create(['brewing_id' => $brewing->id]);
 
         $this->actingAs(User::factory()->create())
             ->deleteJson("/api/brewings/{$brewing->id}")
             ->assertForbidden();
 
         $this->assertNotNull(Brewing::find($brewing->id));
+        $this->assertSame(2, BrewingStep::where('brewing_id', $brewing->id)->count());
     }
 }
