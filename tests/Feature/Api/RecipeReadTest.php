@@ -44,7 +44,7 @@ class RecipeReadTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->getJson("/api/recipes/{$recipe->id}")
-            ->assertForbidden();
+            ->assertNotFound();
     }
 
     public function test_show_returns_404_for_a_missing_recipe(): void

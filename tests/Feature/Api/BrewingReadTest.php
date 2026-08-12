@@ -31,7 +31,7 @@ class BrewingReadTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->getJson("/api/recipes/{$recipe->id}/brewings")
-            ->assertForbidden();
+            ->assertNotFound();
     }
 
     public function test_show_returns_the_brewing_with_all_its_steps(): void
@@ -55,6 +55,6 @@ class BrewingReadTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->getJson("/api/brewings/{$brewing->id}")
-            ->assertForbidden();
+            ->assertNotFound();
     }
 }

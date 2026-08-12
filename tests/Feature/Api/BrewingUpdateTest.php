@@ -73,7 +73,7 @@ class BrewingUpdateTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->patchJson("/api/brewings/{$brewing->id}", ['note' => 'intrusion'])
-            ->assertForbidden();
+            ->assertNotFound();
     }
 
     public function test_start_boil_stamps_boil_start_server_side(): void
@@ -94,6 +94,6 @@ class BrewingUpdateTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->postJson("/api/brewings/{$brewing->id}/start-boil")
-            ->assertForbidden();
+            ->assertNotFound();
     }
 }

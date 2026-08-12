@@ -41,7 +41,7 @@ class RecipeWriteTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->patchJson("/api/recipes/{$recipe->id}", ['before_boil_density' => 1.048])
-            ->assertForbidden();
+            ->assertNotFound();
     }
 
     public function test_owner_can_delete_a_recipe(): void
@@ -62,7 +62,7 @@ class RecipeWriteTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->deleteJson("/api/recipes/{$recipe->id}")
-            ->assertForbidden();
+            ->assertNotFound();
 
         $this->assertNotNull(Recipe::find($recipe->id));
     }

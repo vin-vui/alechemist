@@ -36,7 +36,7 @@ class PageAuthorizationTest extends TestCase
         $brewing = Brewing::factory()->for($recipe)->create();
 
         foreach ($this->pageUrls($recipe, $brewing) as $url) {
-            $this->actingAs($other)->get($url)->assertForbidden();
+            $this->actingAs($other)->get($url)->assertNotFound();
         }
     }
 

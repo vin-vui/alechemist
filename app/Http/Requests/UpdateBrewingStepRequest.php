@@ -2,14 +2,16 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Auth\Access\Response;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class UpdateBrewingStepRequest extends FormRequest
 {
-    public function authorize(): bool
+    public function authorize(): Response
     {
         // Remonte au propriétaire via brewing → recipe (BrewingPolicy::update)
-        return $this->user()->can('update', $this->route('brewingStep')->brewing);
+        return Gate::inspect('update', $this->route('brewingStep')->brewing);
     }
 
     /**

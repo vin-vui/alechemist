@@ -34,7 +34,7 @@ class BrewingDeleteTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->deleteJson("/api/brewings/{$brewing->id}")
-            ->assertForbidden();
+            ->assertNotFound();
 
         $this->assertNotNull(Brewing::find($brewing->id));
         $this->assertSame(2, BrewingStep::where('brewing_id', $brewing->id)->count());

@@ -59,6 +59,6 @@ class BrewingCreateTest extends TestCase
                 'name' => 'Intrusion',
                 'date_start' => '2026-08-12',
             ])
-            ->assertForbidden();
+            ->assertNotFound();
     }
 }

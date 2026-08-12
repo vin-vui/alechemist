@@ -58,7 +58,7 @@ class BrewingStepStatusTest extends TestCase
 
         $this->actingAs(User::factory()->create())
             ->patchJson("/api/brewing-steps/{$step->id}", ['status' => true])
-            ->assertForbidden();
+            ->assertNotFound();
 
         $this->assertFalse((bool) $step->fresh()->status);
     }
