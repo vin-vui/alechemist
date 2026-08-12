@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\Brewing;
+use App\Models\BrewingStep;
 use App\Models\Recipe;
+use App\Models\Step;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -65,5 +68,21 @@ class RecipeWriteTest extends TestCase
             ->assertNotFound();
 
         $this->assertNotNull(Recipe::find($recipe->id));
+    }
+
+    public function test_supprimer_une_recette_supprime_steps_brassins_et_brewing_steps(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $step = Step::factory()->for($recipe)->create();
+        $brewing = Brewing::factory()->for($recipe)->create();
+        $brewingStep = BrewingStep::factory()->for($brewing)->create();
+
+        $this->actingAs($user)->deleteJson("/api/recipes/{$recipe->id}")->assertNoContent();
+
+        $this->assertDatabaseMissing('recipes', ['id' => $recipe->id]);
+        $this->assertDatabaseMissing('steps', ['id' => $step->id]);
+        $this->assertDatabaseMissing('brewings', ['id' => $brewing->id]);
+        $this->assertDatabaseMissing('brewing_steps', ['id' => $brewingStep->id]);
     }
 }
