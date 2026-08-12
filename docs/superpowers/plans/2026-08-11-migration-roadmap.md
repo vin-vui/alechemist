@@ -58,6 +58,8 @@ Policies + autorisation dans les `mount()`, garde-fous sur les actions Livewire 
 
 **Sortie :** API complète couvrant tous les cas d'usage des 12 routes web, testée, consommable par un client externe.
 
+**✅ Réalisée le 2026-08-12** (plan détaillé : `2026-08-12-phase-3-api-rest.md`). API complète sous `/api` (user, dashboard, recettes CRUD + import BeerXML, brassins CRUD + start-boil + transitions d'étape serveur, statut d'étapes), autorisée par les policies phase 1, testée endpoint par endpoint. Import BeerXML extrait dans `App\Services\BeerXmlImporter` (partagé web/API). Sanctum en mode SPA (`statefulApi()`, CORS credentials sur `FRONTEND_URL`, `SANCTUM_STATEFUL_DOMAINS`), flux Fortify headless verrouillés par tests de caractérisation (login, 2FA, reset, profil). Reports phase 2 soldés : `session.serialization => json`, `cache.serializable_classes => false`. **Actions de déploiement : renseigner `FRONTEND_URL` et `SANCTUM_STATEFUL_DOMAINS` dans le `.env` de prod ; le passage des sessions en json déconnecte tous les utilisateurs une fois.** La relation cassée `BrewingStep::recipe()` a été réparée en `brewing()`.
+
 ### Phase 4 — Frontend Nuxt 4 + bascule
 
 - Projet Nuxt 4 (dépôt ou dossier `frontend/` — décision en début de phase), auth via `nuxt-auth-sanctum` (login + 2FA + reset), Tailwind 4.
