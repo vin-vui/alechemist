@@ -23,7 +23,6 @@ export function minutesToDays(minutes: number | null | undefined): number {
 
 export function fermentSchedule(fermentStart: string, steps: BrewingStep[], now: Date): FermentStepView[] {
   const relevant = steps.filter((s) => (FERMENT_TYPES as readonly string[]).includes(s.type))
-  const total = relevant.reduce((sum, s) => sum + (s.time ?? 0), 0)
   const fermentStartMs = new Date(fermentStart).getTime()
   let cumulativeMinutes = 0
 
@@ -32,7 +31,11 @@ export function fermentSchedule(fermentStart: string, steps: BrewingStep[], now:
     const endsAt = new Date(fermentStartMs + cumulativeMinutes * MINUTE_MS)
     const msLeft = endsAt.getTime() - now.getTime()
     const minutesLeftRaw = msLeft / MINUTE_MS
-    const progress = total > 0 ? Math.min(100, Math.max(0, (1 - minutesLeftRaw / total) * 100)) : 100
+    // Cumul jusqu'a la fin de l'etape COURANTE (et non le total de toutes les
+    // etapes de fermentation, cf. F4) : sinon la barre d'une etape anterieure a
+    // la derniere affiche une progression gonflee des le premier jour (son reste
+    // est rapporte a un total qui inclut des etapes pas encore entamees).
+    const progress = cumulativeMinutes > 0 ? Math.min(100, Math.max(0, (1 - minutesLeftRaw / cumulativeMinutes) * 100)) : 100
 
     return {
       step: s,

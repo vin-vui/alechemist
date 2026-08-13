@@ -51,4 +51,27 @@ describe('fermentSchedule', () => {
     const views = fermentSchedule(start, steps, new Date('2026-08-10T10:00:00Z'))
     expect(views[0].late).toBe(false)
   })
+
+  // F4 : la progression doit se baser sur le cumul jusqu'a la fin de l'etape
+  // COURANTE, pas sur le total de toutes les etapes de fermentation. Avec
+  // l'ancienne formule (denominateur = total), Primary 7j + Bottle 7j affichait
+  // 50% sur la barre de Primary des le premier jour (rien n'est encore entame).
+  it('calcule la progression sur le cumul jusqu a l etape courante, pas sur le total de toutes les etapes', () => {
+    const steps = [
+      step({ id: 1, type: 'Primary', time: 10080 }), // 7 jours
+      step({ id: 2, type: 'Bottle', time: 10080 }), // 7 jours
+    ]
+
+    // t = debut de fermentation : rien n'a encore ete entame, les deux barres
+    // doivent etre a 0%.
+    const atStart = fermentSchedule(start, steps, new Date(start))
+    expect(atStart[0].progress).toBe(0)
+    expect(atStart[1].progress).toBe(0)
+
+    // A mi-parcours de la 1ere etape (3.5j sur 7j) : 50% pour l'etape en cours ;
+    // pour la 2e etape, le cumul (10.5j restants sur 14j cumules) donne 25%.
+    const halfway = fermentSchedule(start, steps, new Date('2026-08-04T22:00:00.000Z'))
+    expect(halfway[0].progress).toBe(50)
+    expect(halfway[1].progress).toBe(25)
+  })
 })

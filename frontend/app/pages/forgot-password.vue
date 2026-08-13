@@ -11,6 +11,7 @@ const status = ref(false)
 async function submit() {
   pending.value = true
   errors.value = {}
+  status.value = false
   try {
     await client('/forgot-password', { method: 'POST', body: { email: email.value } })
     status.value = true

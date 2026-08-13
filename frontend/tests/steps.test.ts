@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { STEP_CONFIG, STEP_ORDER, isStepSlug, stepsForPage } from '../app/utils/steps'
+import {
+  COMPLETED_TABLES,
+  RECIPE_TABLES,
+  STEP_CONFIG,
+  STEP_ORDER,
+  formatStepTime,
+  isStepSlug,
+  stepsForPage,
+  timeUnitFor,
+} from '../app/utils/steps'
 import type { BrewingStep } from '../app/types/api'
 
 function step(over: Partial<BrewingStep>): BrewingStep {
@@ -44,5 +53,41 @@ describe('stepsForPage', () => {
   })
   it('conserve l ordre pour STEP_ORDER', () => {
     expect(STEP_ORDER).toEqual(['preparation', 'mash', 'boil', 'yeast', 'ferment', 'completed'])
+  })
+})
+
+// F3/F13 : point d'entree unique pour les descripteurs de tableaux (fiche recette
+// et recap de brassin termine), avec unite par ligne pour gerer le cas Dry Hop
+// (jours) mixe dans un tableau Yeasts sinon en minutes.
+describe('timeUnitFor / formatStepTime', () => {
+  it('resout minutes par defaut quand la table n a pas d unite', () => {
+    const table = RECIPE_TABLES.find((t) => t.title === 'Boil')!
+    expect(timeUnitFor(table, 'Boil')).toBe('minutes')
+    expect(formatStepTime(60, timeUnitFor(table, 'Boil'))).toBe('60')
+  })
+
+  it('resout jours pour le tableau Ferment de la fiche recette', () => {
+    const table = RECIPE_TABLES.find((t) => t.title === 'Ferment')!
+    expect(timeUnitFor(table, 'Primary')).toBe('days')
+    expect(formatStepTime(10080, timeUnitFor(table, 'Primary'))).toBe('7')
+  })
+
+  it('surcharge Dry Hop en jours dans le tableau Yeasts (minutes par ailleurs)', () => {
+    const table = RECIPE_TABLES.find((t) => t.title === 'Yeasts')!
+    expect(timeUnitFor(table, 'Yeast')).toBe('minutes')
+    expect(timeUnitFor(table, 'Dry Hop')).toBe('days')
+    expect(formatStepTime(20160, timeUnitFor(table, 'Dry Hop'))).toBe('14')
+  })
+
+  it('formate une valeur nulle en chaine vide', () => {
+    expect(formatStepTime(null, 'minutes')).toBe('')
+    expect(formatStepTime(undefined, 'days')).toBe('')
+  })
+
+  it('COMPLETED_TABLES ne convertit que Ferment (parite avec l ancien completed.blade.php)', () => {
+    const yeasts = COMPLETED_TABLES.find((t) => t.title === 'Yeasts')!
+    const ferment = COMPLETED_TABLES.find((t) => t.title === 'Ferment')!
+    expect(timeUnitFor(yeasts, 'Dry Hop')).toBe('minutes')
+    expect(timeUnitFor(ferment, 'Bottle')).toBe('days')
   })
 })
