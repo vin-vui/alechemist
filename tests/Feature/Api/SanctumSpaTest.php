@@ -50,6 +50,17 @@ class SanctumSpaTest extends TestCase
             ->assertHeader('Access-Control-Allow-Credentials', 'true');
     }
 
+    public function test_a_guest_gets_a_json_401_even_without_the_accept_header(): void
+    {
+        // Sans vues depuis la phase 4, il n'existe plus de route nommée `login`
+        // vers laquelle rediriger : un client qui n'annonce pas Accept:
+        // application/json (curl, navigateur) doit quand même recevoir un 401,
+        // pas une RouteNotFoundException en 500.
+        $this->get('/api/user')
+            ->assertUnauthorized()
+            ->assertJson(['message' => 'Unauthenticated.']);
+    }
+
     public function test_the_api_group_registers_sanctum_stateful_middleware(): void
     {
         $apiGroup = app(\Illuminate\Routing\Router::class)->getMiddlewareGroups()['api'];

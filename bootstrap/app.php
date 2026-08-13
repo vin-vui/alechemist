@@ -13,6 +13,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->redirectUsersTo('/');
 
+        // Backend sans vues depuis la phase 4 : il n'y a plus de route nommée
+        // `login` vers laquelle rediriger un invité. Sans ça, toute requête non
+        // authentifiée qui n'annonce pas Accept: application/json casse en 500
+        // (RouteNotFoundException) au lieu de rendre un 401.
+        $middleware->redirectGuestsTo(fn () => null);
+
         // Parité avec l'ancien Kernel : throttle:api n'est pas dans le groupe
         // api par défaut de la nouvelle structure.
         $middleware->throttleApi();
@@ -22,5 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Backend sans vues depuis la phase 4 : la route nommée `login` n'existe
+        // plus, donc la redirection des invités échouerait en 500. Tout client
+        // (navigateur compris) reçoit du JSON, y compris un 401 propre.
+        $exceptions->shouldRenderJsonWhen(fn () => true);
     })->create();
