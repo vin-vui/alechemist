@@ -20,11 +20,13 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
 </script>
 
 <template>
-  <!-- Rail desktop -->
+  <!-- Rail desktop : icones seules au repos (D1), libelle accessible (aria-label +
+       title) et deploiement au survol/focus qui revele le texte sans jamais le
+       rogner (cf. .app-rail__label / .app-rail__wordmark ci-dessous). -->
   <aside class="app-rail">
-    <NuxtLink to="/" class="app-rail__brand">
+    <NuxtLink to="/" class="app-rail__brand" aria-label="AleChemist" title="AleChemist">
       <img src="/assets/logo/alechemist@512.png" alt="" class="app-rail__logo" />
-      <span class="app-rail__wordmark">AleChemist</span>
+      <span class="app-rail__wordmark" aria-hidden="true">AleChemist</span>
     </NuxtLink>
     <nav class="app-rail__nav" :aria-label="$t('Main navigation')">
       <NuxtLink
@@ -33,9 +35,11 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
         :to="link.to"
         class="app-rail__link"
         :class="{ 'app-rail__link--active': link.match.test(route.path) }"
+        :aria-label="$t(link.label)"
+        :title="$t(link.label)"
       >
         <svg class="app-rail__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" v-html="ICONS[link.icon]" />
-        <span class="app-rail__label">{{ $t(link.label) }}</span>
+        <span class="app-rail__label" aria-hidden="true">{{ $t(link.label) }}</span>
       </NuxtLink>
     </nav>
   </aside>
@@ -85,7 +89,10 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
 .app-rail__brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  /* Au repos (4.5rem) : aucun gap reserve pour le mot-marque, qui est a largeur
+     nulle (cf. .app-rail__wordmark). Le bloc-marque Shangrila ne tient pas sous
+     24px (contrat typo) : seule l'icone du logo vit dans le rail replie. */
+  gap: 0;
   padding: 1rem;
   flex: 0 0 auto;
   white-space: nowrap;
@@ -102,6 +109,12 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   font-family: var(--font-brand);
   font-size: 1.5rem;
   color: var(--color-text);
+  /* Largeur nulle au repos : jamais de texte rogne (D1). Revele au deploiement. */
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.15s ease, opacity 0.15s ease;
 }
 
 .app-rail__nav {
@@ -114,7 +127,10 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
 .app-rail__link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  /* Icone seule et centree au repos (D1) : le libelle est a largeur nulle, donc
+     aucun gap tant qu'il n'est pas revele, sinon l'icone parait desaxee. */
+  gap: 0;
+  justify-content: center;
   padding: 0.625rem;
   border-radius: var(--radius);
   color: var(--color-text-dim);
@@ -142,6 +158,38 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   text-transform: uppercase;
   letter-spacing: -0.02em;
   font-size: var(--text-label);
+  /* Largeur nulle au repos : jamais de texte rogne (D1, le defaut le plus visible).
+     Le libelle reste accessible via aria-label/title sur le lien (cf. template). */
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.15s ease, opacity 0.15s ease;
+}
+
+/* Deploiement au survol/focus (souris ou clavier) : le rail s'elargit (regle
+   .app-rail:hover/:focus-within existante) et les libelles se revelent en meme
+   temps, sans jamais etre coupes en cours de route. */
+@media (min-width: 1024px) {
+  .app-rail:hover .app-rail__brand,
+  .app-rail:focus-within .app-rail__brand,
+  .app-rail:hover .app-rail__link,
+  .app-rail:focus-within .app-rail__link {
+    gap: 0.75rem;
+  }
+
+  .app-rail:hover .app-rail__link,
+  .app-rail:focus-within .app-rail__link {
+    justify-content: flex-start;
+  }
+
+  .app-rail:hover .app-rail__wordmark,
+  .app-rail:focus-within .app-rail__wordmark,
+  .app-rail:hover .app-rail__label,
+  .app-rail:focus-within .app-rail__label {
+    max-width: 10rem;
+    opacity: 1;
+  }
 }
 
 /* Barre basse mobile : 3 destinations, pouce a portee. */
