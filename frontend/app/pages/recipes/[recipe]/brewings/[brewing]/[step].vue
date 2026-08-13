@@ -3,6 +3,7 @@ import type { Brewing, BrewingStep } from '~/types/api'
 import { STEP_CONFIG, isStepSlug, stepsForPage, type StepSlug } from '~/utils/steps'
 
 definePageMeta({
+  key: (route) => route.fullPath,
   validate: (route) => isStepSlug(route.params.step),
 })
 
