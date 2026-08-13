@@ -65,12 +65,17 @@ class UserProfileEndpointsTest extends TestCase
 
     public function test_supprimer_le_compte_supprime_l_utilisateur_et_toutes_ses_donnees(): void
     {
+        // phpunit.xml force SESSION_DRIVER=array pour les tests ; la suppression des
+        // sessions résiduelles (F7) est conditionnée à SESSION_DRIVER=database.
+        config(['session.driver' => 'database']);
+
         $user = User::factory()->create();
         $recipe = Recipe::factory()->for($user)->create();
         $step = Step::factory()->for($recipe)->create();
         $brewing = Brewing::factory()->for($recipe)->create();
         $brewingStep = BrewingStep::factory()->for($brewing)->create();
         $user->createToken('test-token');
+        $this->insertSession('sess-delete', $user->id);
 
         $this->actingAs($user)
             ->withHeader('Referer', 'http://localhost')
@@ -90,6 +95,7 @@ class UserProfileEndpointsTest extends TestCase
             'tokenable_id' => $user->id,
             'tokenable_type' => User::class,
         ]);
+        $this->assertSame(0, DB::table('sessions')->where('user_id', $user->id)->count());
     }
 
     private function insertSession(string $id, int $userId): void

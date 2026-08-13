@@ -39,10 +39,21 @@ const canGoNext = computed(() => {
   return true
 })
 
+const mutationError = ref(false)
+
 async function toggle(step: BrewingStep) {
   if (!isCurrent.value) return
-  const updated = await apiSend<BrewingStep>(`/api/brewing-steps/${step.id}`, 'PATCH', { status: !step.status })
-  step.status = updated.status
+  try {
+    const updated = await apiSend<BrewingStep>(`/api/brewing-steps/${step.id}`, 'PATCH', { status: !step.status })
+    step.status = updated.status
+    mutationError.value = false
+  } catch {
+    // Le PATCH a echoue : la case cochee dans le template (:checked="view.step.status")
+    // n'a pas ete persistee. On resynchronise depuis le serveur pour ne pas laisser
+    // une case visuellement cochee sans effet, et on signale l'erreur.
+    mutationError.value = true
+    await refresh()
+  }
 }
 
 async function next() {
@@ -72,6 +83,10 @@ const now = ref(new Date())
 
     <p v-if="!isCurrent" class="rounded bg-gray-100 p-2 text-sm text-gray-600">
       {{ $t('Current step') }} : {{ $t(brewing.current_step ?? 'preparation') }}
+    </p>
+
+    <p v-if="mutationError" class="rounded bg-red-50 p-2 text-sm text-red-600">
+      {{ $t('Whoops! Something went wrong.') }}
     </p>
 
     <!-- Etapes ferment : echeancier -->

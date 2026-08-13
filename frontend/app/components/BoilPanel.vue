@@ -18,16 +18,27 @@ watchEffect(() => emit('done', started.value && elapsed.value))
 
 const modalOpen = ref(false)
 const newBoilTime = ref(props.brewing.boil_time)
+const mutationError = ref(false)
 
 async function start() {
-  await apiSend(`/api/brewings/${props.brewing.id}/start-boil`, 'POST')
-  emit('refresh')
+  try {
+    await apiSend(`/api/brewings/${props.brewing.id}/start-boil`, 'POST')
+    mutationError.value = false
+    emit('refresh')
+  } catch {
+    mutationError.value = true
+  }
 }
 
 async function saveBoilTime() {
   if (newBoilTime.value > 0) {
-    await apiSend(`/api/brewings/${props.brewing.id}`, 'PATCH', { boil_time: Math.trunc(newBoilTime.value) })
-    emit('refresh')
+    try {
+      await apiSend(`/api/brewings/${props.brewing.id}`, 'PATCH', { boil_time: Math.trunc(newBoilTime.value) })
+      mutationError.value = false
+      emit('refresh')
+    } catch {
+      mutationError.value = true
+    }
   }
   modalOpen.value = false
 }
@@ -35,6 +46,9 @@ async function saveBoilTime() {
 
 <template>
   <div class="space-y-3">
+    <p v-if="mutationError" class="rounded bg-red-50 p-2 text-sm text-red-600">
+      {{ $t('Whoops! Something went wrong.') }}
+    </p>
     <div class="flex items-center justify-between rounded bg-white p-4 shadow">
       <p class="font-shangrila text-lg">{{ $t('Chrono') }} - {{ brewing.boil_time }} min</p>
       <div class="flex items-center gap-2">

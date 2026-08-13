@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { Recipe } from '~/types/api'
 
-const { data: recipes } = await useAsyncData('recipes', () => apiGet<Recipe[]>('/api/recipes'))
+const { data: recipes, error } = await useAsyncData('recipes', () => apiGet<Recipe[]>('/api/recipes'))
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+}
 </script>
 
 <template>

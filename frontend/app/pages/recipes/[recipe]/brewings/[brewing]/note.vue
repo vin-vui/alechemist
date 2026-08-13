@@ -17,11 +17,16 @@ if (brewing.value && brewing.value.recipe_id !== recipeId) {
 }
 
 const note = ref(brewing.value?.note ?? '')
+const mutationError = ref(false)
 
 async function save() {
-  await apiSend(`/api/brewings/${brewingId}`, 'PATCH', { note: note.value })
-  brewing.value!.note = note.value
-  await navigateTo(brewingPath(brewing.value!))
+  try {
+    await apiSend(`/api/brewings/${brewingId}`, 'PATCH', { note: note.value })
+    brewing.value!.note = note.value
+    await navigateTo(brewingPath(brewing.value!))
+  } catch {
+    mutationError.value = true
+  }
 }
 
 async function destroyBrewing() {
@@ -35,6 +40,9 @@ async function destroyBrewing() {
   <div v-if="brewing" class="mx-auto max-w-md space-y-4">
     <NuxtLink :to="brewingPath(brewing)" class="text-sm underline">&larr; {{ $t('Back') }}</NuxtLink>
     <h1 class="font-shangrila text-2xl">{{ $t('Note') }} - {{ brewing.name }}</h1>
+    <p v-if="mutationError" class="rounded bg-red-50 p-2 text-sm text-red-600">
+      {{ $t('Whoops! Something went wrong.') }}
+    </p>
     <textarea v-model="note" rows="10" class="w-full rounded border-gray-300" />
     <div class="flex justify-between">
       <button type="button" class="btn-yellow rounded" @click="save">{{ $t('Save') }}</button>

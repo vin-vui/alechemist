@@ -30,6 +30,13 @@ class DeleteUserController extends Controller
 
             $user->tokens()->delete();
 
+            // Sessions résiduelles (IP, user agent, payload) : donnée personnelle qui
+            // survivrait sinon à la suppression du compte. Gardé par le driver : la
+            // table `sessions` n'existe/n'est pertinente qu'avec SESSION_DRIVER=database.
+            if (config('session.driver') === 'database') {
+                DB::table('sessions')->where('user_id', $user->id)->delete();
+            }
+
             // On supprime une instance fraîche (et non $user, mise en cache par le
             // guard) : Eloquent::delete() met exists=false sur l'instance supprimée ;
             // si c'était $user, le cycleRememberToken() de Auth::logout() ci-dessous
@@ -45,6 +52,22 @@ class DeleteUserController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
         }
+
+        // Le guard resolu par defaut pour cette requete API (Sanctum, via
+        // auth:sanctum) est un RequestGuard qui met en cache l'utilisateur resolu
+        // (par $request->user() plus haut) pour toute la duree de la requete et n'a
+        // pas de notion de logout() : Auth::guard('web')->logout() ne l'affecte pas.
+        // Sans les deux lignes suivantes, la persistance de session en fin de
+        // requete (Illuminate\Session\Middleware\StartSession::terminate) re-ecrirait
+        // une ligne `sessions` avec le user_id du compte pourtant deja supprime
+        // (contournant le nettoyage juste au-dessus). forgetGuards() vide le cache
+        // interne d'AuthManager, mais le conteneur a lui-meme deja mis en cache
+        // l'instance singleton 'auth.driver' (alias de Guard::class) : sans
+        // forgetInstance(), une future resolution de Guard::class renverrait encore
+        // l'ancienne instance figee. Les deux ensemble forcent une re-resolution a
+        // vide, la session etant deja invalidee et l'utilisateur deja supprime.
+        Auth::forgetGuards();
+        app()->forgetInstance('auth.driver');
 
         return response()->noContent();
     }

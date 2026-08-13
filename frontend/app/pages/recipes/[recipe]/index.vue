@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Recipe, Step, StepType } from '~/types/api'
+import { RECIPE_TABLES, formatStepTime, timeUnitFor } from '~/utils/steps'
 
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
@@ -8,14 +9,6 @@ if (error.value) {
   throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
 }
 
-const RECIPE_TABLES: { title: string; types: StepType[] }[] = [
-  { title: 'Preparation', types: ['Preparation'] },
-  { title: 'Mash', types: ['Mash'] },
-  { title: 'Boil', types: ['Boil', 'Aroma'] },
-  { title: 'Yeasts', types: ['Yeast', 'Dry Hop'] },
-  { title: 'Ferment', types: ['Primary', 'Secondary', 'Tertiary', 'Bottle'] },
-]
-
 function stepsFor(types: StepType[]): Step[] {
   return (recipe.value?.steps ?? []).filter((s) => types.includes(s.type))
 }
@@ -23,6 +16,7 @@ function stepsFor(types: StepType[]): Step[] {
 const showMore = ref(false)
 const editingDensity = ref(false)
 const densityInput = ref<string>('')
+const mutationError = ref(false)
 
 function startEditDensity() {
   densityInput.value = recipe.value?.before_boil_density?.toString() ?? ''
@@ -30,15 +24,25 @@ function startEditDensity() {
 }
 
 async function saveDensity() {
-  await apiSend(`/api/recipes/${recipeId}`, 'PATCH', { before_boil_density: Number(densityInput.value) })
-  editingDensity.value = false
-  await refresh()
+  const trimmed = densityInput.value.trim()
+  try {
+    await apiSend(`/api/recipes/${recipeId}`, 'PATCH', { before_boil_density: trimmed === '' ? null : Number(trimmed) })
+    editingDensity.value = false
+    mutationError.value = false
+    await refresh()
+  } catch {
+    mutationError.value = true
+  }
 }
 
 async function destroyRecipe() {
   if (!confirm(useNuxtApp().$i18n.t('Are you sure?'))) return
-  await apiSend(`/api/recipes/${recipeId}`, 'DELETE')
-  await navigateTo('/recipes')
+  try {
+    await apiSend(`/api/recipes/${recipeId}`, 'DELETE')
+    await navigateTo('/recipes')
+  } catch {
+    mutationError.value = true
+  }
 }
 </script>
 
@@ -48,6 +52,10 @@ async function destroyRecipe() {
       <NuxtLink to="/recipes" class="text-sm underline">&larr; {{ $t('Recipes') }}</NuxtLink>
       <button type="button" class="text-sm text-red-600 underline" @click="destroyRecipe">{{ $t('Delete') }}</button>
     </div>
+
+    <p v-if="mutationError" class="rounded bg-red-50 p-2 text-sm text-red-600">
+      {{ $t('Whoops! Something went wrong.') }}
+    </p>
     <div class="rounded bg-white p-4 shadow">
       <div class="flex items-center gap-3">
         <svg class="size-10 shrink-0" viewBox="0 0 24 24" :style="{ color: ebcToHex(recipe.color) }" fill="currentColor">
@@ -101,14 +109,19 @@ async function destroyRecipe() {
               <tr>
                 <th class="px-3 py-2">{{ $t('Name') }}</th>
                 <th class="px-3 py-2">{{ $t('Quantity') }}</th>
-                <th class="px-3 py-2">{{ $t('Minutes') }}</th>
+                <th class="px-3 py-2">{{ $t(table.unit === 'days' ? 'Days' : 'Minutes') }}</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="step in stepsFor(table.types)" :key="step.id" class="border-t">
                 <td class="px-3 py-2">{{ step.field }}</td>
                 <td class="px-3 py-2">{{ formatQuantity(step.quantity, step.unit) }}</td>
-                <td class="px-3 py-2">{{ step.time ?? '' }}</td>
+                <td class="px-3 py-2">
+                  {{ formatStepTime(step.time, timeUnitFor(table, step.type)) }}
+                  <span v-if="step.time != null && timeUnitFor(table, step.type) !== (table.unit ?? 'minutes')" class="text-xs text-gray-400">
+                    {{ $t(timeUnitFor(table, step.type) === 'days' ? 'Days' : 'Minutes') }}
+                  </span>
+                </td>
               </tr>
             </tbody>
           </table>

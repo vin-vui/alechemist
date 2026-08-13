@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { Dashboard } from '~/types/api'
 
-const { data: dashboard, refresh } = await useAsyncData('dashboard', () => apiGet<Dashboard>('/api/dashboard'))
+const { data: dashboard, error } = await useAsyncData('dashboard', () => apiGet<Dashboard>('/api/dashboard'))
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+}
 const now = new Date()
 </script>
 

@@ -18,6 +18,10 @@ export default defineNuxtConfig({
     // via NUXT_PUBLIC_SANCTUM_BASE_URL (utilise par la doc de deploiement, Tache 20).
     baseUrl: 'http://localhost:8000',
     mode: 'cookie',
+    // F5 : le defaut du module est false, donc un 401 (session expiree) laissait
+    // l'utilisateur sur une page morte sans redirection. true renvoie vers
+    // redirect.onAuthOnly (deja /login ci-dessous).
+    redirectIfUnauthenticated: true,
     endpoints: {
       csrf: '/sanctum/csrf-cookie',
       login: '/login',
