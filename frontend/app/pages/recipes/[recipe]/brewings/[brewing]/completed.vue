@@ -65,7 +65,7 @@ async function destroyBrewing() {
                 <td class="px-3 py-2">{{ step.field }}</td>
                 <td class="px-3 py-2">{{ formatQuantity(step.quantity, step.unit) }}</td>
                 <td class="px-3 py-2" :class="{ 'font-bold text-tawny': step.time !== recipeTimeAt(table.types, index) }">
-                  {{ step.time ?? '' }}
+                  {{ table.title === 'Ferment' ? minutesToDays(step.time) : (step.time ?? '') }}
                 </td>
               </tr>
             </tbody>

@@ -88,7 +88,7 @@ const now = ref(new Date())
         <div class="flex-1">
           <p>{{ view.step.field }}</p>
           <p class="text-sm text-gray-500">
-            {{ $t('n_days', view.step.time ?? 0) }} -
+            {{ $t('n_days', view.durationDays) }} -
             {{ view.late ? $t('late') : `${$t('n_days', view.daysLeft)} ${$t('left')}` }} -
             {{ formatDate(view.endsAt.toISOString()) }}
           </p>
