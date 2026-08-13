@@ -100,6 +100,22 @@ class FortifyHeadlessTest extends TestCase
             ->assertOk();
     }
 
+    public function test_l_email_de_reset_pointe_vers_le_front(): void
+    {
+        config(['app.frontend_url' => 'https://front.example']);
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->postJson('/forgot-password', ['email' => $user->email])->assertOk();
+
+        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user) {
+            $url = call_user_func($notification::$createUrlCallback, $user, $notification->token);
+
+            return $url === 'https://front.example/reset-password/'.$notification->token.'?email='.urlencode($user->email);
+        });
+    }
+
     public function test_profile_information_updates_headlessly(): void
     {
         $user = User::factory()->create();
