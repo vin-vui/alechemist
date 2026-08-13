@@ -27,17 +27,84 @@ async function submit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-md">
-    <h1 class="mb-4 font-shangrila text-2xl">{{ $t('Import File') }}</h1>
-    <form class="space-y-4 rounded bg-white p-6 shadow" @submit.prevent="submit">
-      <p class="text-sm text-gray-500">{{ $t('File BeerXML Format Only') }}</p>
-      <label class="block cursor-pointer rounded border-2 border-dashed border-gray-300 p-6 text-center hover:border-xanthous">
+  <div class="import-page">
+    <h1 class="import-page__title">{{ $t('Import File') }}</h1>
+    <form class="panel import-page__form" @submit.prevent="submit">
+      <p class="import-page__hint">{{ $t('File BeerXML Format Only') }}</p>
+      <label class="import-page__dropzone">
         <span v-if="!file">{{ $t('Upload a file') }} ({{ $t('XML up to 2MB') }})</span>
-        <span v-else class="font-semibold">{{ file.name }}</span>
-        <input type="file" accept=".xml,text/xml" class="hidden" @change="onFileChange" />
+        <span v-else class="import-page__filename">{{ file.name }}</span>
+        <input type="file" accept=".xml,text/xml" class="import-page__file-input" @change="onFileChange" />
       </label>
-      <p v-if="errors.file" class="text-sm text-red-600">{{ errors.file[0] }}</p>
-      <button type="submit" class="btn-yellow w-full rounded" :disabled="pending || !file">{{ $t('Import') }}</button>
+      <p v-if="errors.file" class="import-page__error">{{ errors.file[0] }}</p>
+      <button type="submit" class="btn btn-primary import-page__submit" :disabled="pending || !file">{{ $t('Import') }}</button>
     </form>
   </div>
 </template>
+
+<style scoped>
+.import-page {
+  max-width: 28rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.import-page__title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.import-page__form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.import-page__hint {
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.import-page__dropzone {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  border: 2px dashed var(--color-rule);
+  border-radius: var(--radius);
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--color-text-dim);
+  min-height: 96px;
+}
+
+.import-page__dropzone:hover {
+  border-color: var(--color-signal);
+}
+
+.import-page__filename {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.import-page__file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.import-page__error {
+  font-size: var(--text-label);
+  color: var(--color-ember);
+}
+
+.import-page__submit {
+  width: 100%;
+}
+</style>
