@@ -278,5 +278,9 @@
     "n_days": "n_days",
     "n_recipes": "n_recipes",
     "n_brewings": "n_brewings",
-    "n_fermentations": "n_fermentations"
+    "n_fermentations": "n_fermentations",
+    "Date": "Date",
+    "Note": "Note",
+    "End": "End",
+    "Back": "Back"
 }
