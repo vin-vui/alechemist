@@ -14,6 +14,7 @@ const note = ref(brewing.value?.note ?? '')
 
 async function save() {
   await apiSend(`/api/brewings/${brewingId}`, 'PATCH', { note: note.value })
+  brewing.value!.note = note.value
   await navigateTo(brewingPath(brewing.value!))
 }
 
