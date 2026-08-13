@@ -273,5 +273,7 @@
     "n_days": "{n} jour | {n} jours",
     "n_recipes": "{n} recette | {n} recettes",
     "n_brewings": "{n} brassin | {n} brassins",
-    "n_fermentations": "{n} fermentation en cours | {n} fermentations en cours"
+    "n_fermentations": "{n} fermentation en cours | {n} fermentations en cours",
+    "ferment": "fermentation",
+    "completed": "terminé"
 }
