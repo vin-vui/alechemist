@@ -65,10 +65,7 @@ async function destroyRecipe() {
   <div v-if="recipe" class="recipe-detail">
     <div class="recipe-detail__topbar">
       <NuxtLink to="/recipes" class="recipe-detail__back">&larr; {{ $t('Recipes') }}</NuxtLink>
-      <button type="button" class="btn btn-danger" @click="destroyRecipe">{{ $t('Delete recipe') }}</button>
     </div>
-
-    <p v-if="deleteError" class="banner-error">{{ $t('Recipe not deleted') }}</p>
 
     <div class="panel recipe-detail__card" :style="{ '--recipe-color': ebcToHex(recipe.color) }">
       <h1 class="recipe-detail__name">{{ recipe.name }}</h1>
@@ -133,6 +130,12 @@ async function destroyRecipe() {
     <NuxtLink :to="`/recipes/${recipe.id}/brewings`" class="btn btn-primary recipe-detail__brewings">
       {{ $t('Brewing list') }}
     </NuxtLink>
+
+    <!-- Action destructive discrete, en bas de page (P2) : une fiche recette est un
+         ecran de consultation, la suppression ne doit pas etre la premiere chose que
+         l'oeil attrape. La confirmation (destroyRecipe) est inchangee. -->
+    <button type="button" class="recipe-detail__delete" @click="destroyRecipe">{{ $t('Delete recipe') }}</button>
+    <p v-if="deleteError" class="banner-error">{{ $t('Recipe not deleted') }}</p>
   </div>
 </template>
 
@@ -146,7 +149,6 @@ async function destroyRecipe() {
 .recipe-detail__topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
 }
 
@@ -193,6 +195,7 @@ async function destroyRecipe() {
 .recipe-detail__density {
   margin-top: 0.75rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   font-size: var(--text-label);
@@ -275,6 +278,11 @@ async function destroyRecipe() {
   letter-spacing: -0.02em;
   font-weight: 700;
   font-size: 1.125rem;
+  /* P3 : un seul signal par ecran (contrat). Cette page est une consultation :
+     aucun titre de section n'a de raison d'etre en --color-signal/--color-ember.
+     Explicite plutot qu'implicite (heritage du texte body), pour ne plus jamais
+     laisser une section (ex. Ebullition) diverger visuellement des autres. */
+  color: var(--color-text);
 }
 
 .recipe-detail__rows {
@@ -285,5 +293,17 @@ async function destroyRecipe() {
 
 .recipe-detail__brewings {
   align-self: flex-start;
+}
+
+.recipe-detail__delete {
+  align-self: flex-start;
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+  transition: color 0.15s ease;
+}
+
+.recipe-detail__delete:hover,
+.recipe-detail__delete:focus-visible {
+  color: var(--color-ember);
 }
 </style>
