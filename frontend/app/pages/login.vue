@@ -28,28 +28,117 @@ async function submit() {
 </script>
 
 <template>
-  <div class="mx-auto mt-10 w-full max-w-md rounded bg-white p-6 shadow">
-    <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="mx-auto mb-4 size-16 rounded" />
-    <h1 class="mb-6 text-center font-shangrila text-2xl">{{ $t('Log in') }}</h1>
-    <form class="space-y-4" @submit.prevent="submit">
-      <div>
-        <label class="block text-sm" for="email">{{ $t('Email') }}</label>
-        <input id="email" v-model="form.email" type="email" required autocomplete="username" class="mt-1 w-full rounded border-gray-300" />
-        <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email[0] }}</p>
+  <div class="panel auth-card">
+    <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="auth-card__logo" />
+    <h1 class="auth-card__title">{{ $t('Log in') }}</h1>
+    <form class="auth-card__form" @submit.prevent="submit">
+      <div class="field">
+        <label class="field__label" for="email">{{ $t('Email') }}</label>
+        <input id="email" v-model="form.email" type="email" required autocomplete="username" class="field__input" />
+        <p v-if="errors.email" class="field__error">{{ errors.email[0] }}</p>
       </div>
-      <div>
-        <label class="block text-sm" for="password">{{ $t('Password') }}</label>
-        <input id="password" v-model="form.password" type="password" required autocomplete="current-password" class="mt-1 w-full rounded border-gray-300" />
-        <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password[0] }}</p>
+      <div class="field">
+        <label class="field__label" for="password">{{ $t('Password') }}</label>
+        <input id="password" v-model="form.password" type="password" required autocomplete="current-password" class="field__input" />
+        <p v-if="errors.password" class="field__error">{{ errors.password[0] }}</p>
       </div>
-      <label class="flex items-center gap-2 text-sm">
-        <input v-model="form.remember" type="checkbox" class="rounded" /> {{ $t('Remember me') }}
+      <label class="auth-card__remember">
+        <input v-model="form.remember" type="checkbox" class="auth-card__checkbox" /> {{ $t('Remember me') }}
       </label>
-      <button type="submit" class="btn-yellow w-full rounded" :disabled="pending">{{ $t('Log in') }}</button>
+      <button type="submit" class="btn btn-primary auth-card__submit" :disabled="pending">{{ $t('Log in') }}</button>
     </form>
-    <div class="mt-4 flex justify-between text-sm">
-      <NuxtLink to="/forgot-password" class="underline">{{ $t('Forgot your password?') }}</NuxtLink>
-      <NuxtLink to="/register" class="underline">{{ $t('Register') }}</NuxtLink>
+    <div class="auth-card__links">
+      <NuxtLink to="/forgot-password" class="auth-card__link">{{ $t('Forgot your password?') }}</NuxtLink>
+      <NuxtLink to="/register" class="auth-card__link">{{ $t('Register') }}</NuxtLink>
     </div>
   </div>
 </template>
+
+<style scoped>
+.auth-card {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.auth-card__logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-inline: auto;
+  border-radius: var(--radius);
+}
+
+.auth-card__title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.auth-card__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.field__label {
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.field__input {
+  height: 48px;
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding-inline: 0.875rem;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.field__error {
+  font-size: var(--text-label);
+  color: var(--color-ember);
+}
+
+.auth-card__remember {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.auth-card__checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-signal);
+}
+
+.auth-card__submit {
+  width: 100%;
+}
+
+.auth-card__links {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-label);
+}
+
+.auth-card__link {
+  color: var(--color-text-dim);
+}
+
+.auth-card__link:hover {
+  color: var(--color-text);
+}
+</style>
