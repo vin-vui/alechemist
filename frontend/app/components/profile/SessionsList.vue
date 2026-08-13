@@ -10,8 +10,10 @@ const { data: sessions, refresh } = await useAsyncData('sessions', () => apiGet<
 const password = ref('')
 const errors = ref<Record<string, string[]>>({})
 const askPassword = ref(false)
+const pending = ref(false)
 
 async function logoutOthers() {
+  pending.value = true
   errors.value = {}
   try {
     await apiSend('/api/user/sessions/logout-others', 'POST', { password: password.value })
@@ -20,6 +22,8 @@ async function logoutOthers() {
     await refresh()
   } catch (e) {
     errors.value = extractErrors(e)
+  } finally {
+    pending.value = false
   }
 }
 </script>
@@ -43,7 +47,7 @@ async function logoutOthers() {
         <input id="sessions-password" v-model="password" type="password" class="mt-1 w-full rounded border-gray-300" />
         <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password[0] }}</p>
       </div>
-      <button type="submit" class="btn-yellow rounded">{{ $t('Confirm') }}</button>
+      <button type="submit" class="btn-yellow rounded" :disabled="pending">{{ $t('Confirm') }}</button>
     </form>
   </div>
 </template>

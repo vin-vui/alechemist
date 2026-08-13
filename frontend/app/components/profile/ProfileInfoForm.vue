@@ -6,8 +6,10 @@ const user = useCurrentUser()
 const form = reactive({ name: user.value?.name ?? '', email: user.value?.email ?? '' })
 const errors = ref<Record<string, string[]>>({})
 const saved = ref(false)
+const pending = ref(false)
 
 async function submit() {
+  pending.value = true
   errors.value = {}
   saved.value = false
   try {
@@ -16,6 +18,8 @@ async function submit() {
     saved.value = true
   } catch (e) {
     errors.value = extractErrors(e)
+  } finally {
+    pending.value = false
   }
 }
 </script>
@@ -34,7 +38,7 @@ async function submit() {
       <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email[0] }}</p>
     </div>
     <div class="flex items-center gap-3">
-      <button type="submit" class="btn-yellow rounded">{{ $t('Save') }}</button>
+      <button type="submit" class="btn-yellow rounded" :disabled="pending">{{ $t('Save') }}</button>
       <span v-if="saved" class="text-sm text-gray-500">{{ $t('Saved.') }}</span>
     </div>
   </form>

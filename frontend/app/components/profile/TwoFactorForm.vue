@@ -2,24 +2,34 @@
 const client = useSanctumClient()
 const { refreshIdentity } = useSanctumAuth()
 const user = useCurrentUser()
-const { modalVisible, modalError, runConfirmed, confirm } = useConfirmPassword()
+const { modalVisible, modalError, modalPending, runConfirmed, confirm } = useConfirmPassword()
 
 const qrCode = ref<string | null>(null)
 const recoveryCodes = ref<string[]>([])
 const confirmCode = ref('')
 const confirming = ref(false)
 const errors = ref<Record<string, string[]>>({})
+// Un seul pending partage entre les 5 actions du composant : elles ne sont jamais
+// declenchables simultanement (boutons visibles selon l'etat), donc pas besoin d'un
+// ref par action.
+const pending = ref(false)
 
 async function enable() {
-  await runConfirmed(async () => {
-    await client('/user/two-factor-authentication', { method: 'POST' })
-    const qr = await client<{ svg: string }>('/user/two-factor-qr-code')
-    qrCode.value = qr.svg
-    confirming.value = true
-  })
+  pending.value = true
+  try {
+    await runConfirmed(async () => {
+      await client('/user/two-factor-authentication', { method: 'POST' })
+      const qr = await client<{ svg: string }>('/user/two-factor-qr-code')
+      qrCode.value = qr.svg
+      confirming.value = true
+    })
+  } finally {
+    pending.value = false
+  }
 }
 
 async function confirmSetup() {
+  pending.value = true
   errors.value = {}
   try {
     await client('/user/confirmed-two-factor-authentication', { method: 'POST', body: { code: confirmCode.value } })
@@ -29,28 +39,45 @@ async function confirmSetup() {
     await refreshIdentity()
   } catch (e) {
     errors.value = extractErrors(e)
+  } finally {
+    pending.value = false
   }
 }
 
 async function showRecoveryCodes() {
-  await runConfirmed(async () => {
-    recoveryCodes.value = await client<string[]>('/user/two-factor-recovery-codes')
-  })
+  pending.value = true
+  try {
+    await runConfirmed(async () => {
+      recoveryCodes.value = await client<string[]>('/user/two-factor-recovery-codes')
+    })
+  } finally {
+    pending.value = false
+  }
 }
 
 async function regenerateRecoveryCodes() {
-  await runConfirmed(async () => {
-    await client('/user/two-factor-recovery-codes', { method: 'POST' })
-    recoveryCodes.value = await client<string[]>('/user/two-factor-recovery-codes')
-  })
+  pending.value = true
+  try {
+    await runConfirmed(async () => {
+      await client('/user/two-factor-recovery-codes', { method: 'POST' })
+      recoveryCodes.value = await client<string[]>('/user/two-factor-recovery-codes')
+    })
+  } finally {
+    pending.value = false
+  }
 }
 
 async function disable() {
-  await runConfirmed(async () => {
-    await client('/user/two-factor-authentication', { method: 'DELETE' })
-    recoveryCodes.value = []
-    await refreshIdentity()
-  })
+  pending.value = true
+  try {
+    await runConfirmed(async () => {
+      await client('/user/two-factor-authentication', { method: 'DELETE' })
+      recoveryCodes.value = []
+      await refreshIdentity()
+    })
+  } finally {
+    pending.value = false
+  }
 }
 </script>
 
@@ -59,7 +86,7 @@ async function disable() {
     <h2 class="font-shangrila text-lg">{{ $t('Two Factor Authentication') }}</h2>
 
     <template v-if="!user?.two_factor_enabled && !confirming">
-      <button type="button" class="btn-yellow rounded" @click="enable">{{ $t('Enable') }}</button>
+      <button type="button" class="btn-yellow rounded" :disabled="pending" @click="enable">{{ $t('Enable') }}</button>
     </template>
 
     <template v-if="confirming && qrCode">
@@ -72,7 +99,7 @@ async function disable() {
         <input id="tfa-code" v-model="confirmCode" inputmode="numeric" class="mt-1 w-48 rounded border-gray-300" />
         <p v-if="errors.code" class="mt-1 text-sm text-red-600">{{ errors.code[0] }}</p>
       </div>
-      <button type="button" class="btn-yellow rounded" @click="confirmSetup">{{ $t('Confirm') }}</button>
+      <button type="button" class="btn-yellow rounded" :disabled="pending" @click="confirmSetup">{{ $t('Confirm') }}</button>
     </template>
 
     <template v-if="user?.two_factor_enabled">
@@ -80,12 +107,12 @@ async function disable() {
         <li v-for="code in recoveryCodes" :key="code">{{ code }}</li>
       </ul>
       <div class="flex flex-wrap gap-2">
-        <button type="button" class="rounded border px-3 py-1.5" @click="showRecoveryCodes">{{ $t('Show Recovery Codes') }}</button>
-        <button type="button" class="rounded border px-3 py-1.5" @click="regenerateRecoveryCodes">{{ $t('Regenerate Recovery Codes') }}</button>
-        <button type="button" class="rounded border border-red-600 px-3 py-1.5 text-red-600" @click="disable">{{ $t('Disable') }}</button>
+        <button type="button" class="rounded border px-3 py-1.5" :disabled="pending" @click="showRecoveryCodes">{{ $t('Show Recovery Codes') }}</button>
+        <button type="button" class="rounded border px-3 py-1.5" :disabled="pending" @click="regenerateRecoveryCodes">{{ $t('Regenerate Recovery Codes') }}</button>
+        <button type="button" class="rounded border border-red-600 px-3 py-1.5 text-red-600" :disabled="pending" @click="disable">{{ $t('Disable') }}</button>
       </div>
     </template>
 
-    <ConfirmPasswordModal :visible="modalVisible" :error="modalError" @confirm="confirm" @close="modalVisible = false" />
+    <ConfirmPasswordModal :visible="modalVisible" :error="modalError" :pending="modalPending" @confirm="confirm" @close="modalVisible = false" />
   </div>
 </template>

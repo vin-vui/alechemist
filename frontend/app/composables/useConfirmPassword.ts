@@ -2,6 +2,7 @@ export function useConfirmPassword() {
   const client = useSanctumClient()
   const modalVisible = ref(false)
   const modalError = ref('')
+  const modalPending = ref(false)
   let pendingAction: (() => Promise<void>) | null = null
 
   async function runConfirmed(action: () => Promise<void>) {
@@ -15,6 +16,7 @@ export function useConfirmPassword() {
   }
 
   async function confirm(password: string) {
+    modalPending.value = true
     modalError.value = ''
     try {
       await client('/user/confirm-password', { method: 'POST', body: { password } })
@@ -27,8 +29,10 @@ export function useConfirmPassword() {
     } catch (e) {
       const errors = extractErrors(e)
       modalError.value = errors.password?.[0] ?? 'Erreur'
+    } finally {
+      modalPending.value = false
     }
   }
 
-  return { modalVisible, modalError, runConfirmed, confirm }
+  return { modalVisible, modalError, modalPending, runConfirmed, confirm }
 }

@@ -2,14 +2,18 @@
 const password = ref('')
 const errors = ref<Record<string, string[]>>({})
 const askPassword = ref(false)
+const pending = ref(false)
 
 async function destroyAccount() {
+  pending.value = true
   errors.value = {}
   try {
     await apiSend('/api/user', 'DELETE', { password: password.value })
     window.location.href = '/login'
   } catch (e) {
     errors.value = extractErrors(e)
+  } finally {
+    pending.value = false
   }
 }
 </script>
@@ -27,7 +31,7 @@ async function destroyAccount() {
         <input id="delete-password" v-model="password" type="password" class="mt-1 w-full rounded border-gray-300" />
         <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password[0] }}</p>
       </div>
-      <button type="submit" class="rounded bg-red-600 px-3 py-1.5 text-white">{{ $t('Confirm') }}</button>
+      <button type="submit" class="rounded bg-red-600 px-3 py-1.5 text-white" :disabled="pending">{{ $t('Confirm') }}</button>
     </form>
   </div>
 </template>
