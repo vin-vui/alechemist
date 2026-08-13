@@ -22,24 +22,86 @@ async function submit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-md">
-    <h1 class="mb-4 font-shangrila text-2xl">{{ $t('New Brewing') }}</h1>
-    <form class="space-y-4 rounded bg-white p-6 shadow" @submit.prevent="submit">
-      <div>
-        <label class="block text-sm" for="name">{{ $t('Name') }}</label>
-        <input id="name" v-model="form.name" required maxlength="255" class="mt-1 w-full rounded border-gray-300" />
-        <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name[0] }}</p>
+  <div class="new-brewing">
+    <h1 class="new-brewing__title">{{ $t('New Brewing') }}</h1>
+    <form class="panel new-brewing__form" @submit.prevent="submit">
+      <div class="field">
+        <label class="field__label" for="name">{{ $t('Name') }}</label>
+        <input id="name" v-model="form.name" required maxlength="255" class="field__input" />
+        <p v-if="errors.name" class="field__error">{{ errors.name[0] }}</p>
       </div>
-      <div>
-        <label class="block text-sm" for="date_start">{{ $t('Date') }}</label>
-        <input id="date_start" v-model="form.date_start" type="date" required class="mt-1 w-full rounded border-gray-300" />
-        <p v-if="errors.date_start" class="mt-1 text-sm text-red-600">{{ errors.date_start[0] }}</p>
+      <div class="field">
+        <label class="field__label" for="date_start">{{ $t('Date') }}</label>
+        <input id="date_start" v-model="form.date_start" type="date" required class="field__input data" />
+        <p v-if="errors.date_start" class="field__error">{{ errors.date_start[0] }}</p>
       </div>
-      <div>
-        <label class="block text-sm" for="note">{{ $t('Note') }}</label>
-        <textarea id="note" v-model="form.note" rows="8" class="mt-1 w-full rounded border-gray-300" />
+      <div class="field">
+        <label class="field__label" for="note">{{ $t('Note') }}</label>
+        <textarea id="note" v-model="form.note" rows="8" class="field__input field__textarea" />
       </div>
-      <button type="submit" class="btn-yellow w-full rounded">{{ $t('Save & Start') }}</button>
+      <button type="submit" class="btn btn-primary new-brewing__submit">{{ $t('Save & Start') }}</button>
     </form>
   </div>
 </template>
+
+<style scoped>
+.new-brewing {
+  max-width: 28rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.new-brewing__title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.new-brewing__form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.field__label {
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.field__input {
+  height: 48px;
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding-inline: 0.875rem;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.field__textarea {
+  height: auto;
+  padding-block: 0.625rem;
+  font-family: var(--font-sans);
+  resize: vertical;
+}
+
+.field__error {
+  font-size: var(--text-label);
+  color: var(--color-ember);
+}
+
+.new-brewing__submit {
+  width: 100%;
+}
+</style>

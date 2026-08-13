@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { Brewing, Recipe, StepType } from '~/types/api'
-import { COMPLETED_TABLES, formatStepTime, timeUnitFor } from '~/utils/steps'
+import type { Brewing, BrewingStep, Recipe, StepType } from '~/types/api'
+import { COMPLETED_TABLES, type RecipeTableDescriptor, formatStepTime, timeUnitFor } from '~/utils/steps'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
@@ -32,56 +34,143 @@ function recipeTimeAt(types: StepType[], index: number): number | null {
   return steps[index]?.time ?? null
 }
 
+// Pas d'en-tete de tableau partage avec DataRow : chaque ligne porte elle-meme
+// l'unite de temps (toujours affichee, contrairement a l'ancien <thead>). Cle
+// pluralisee (accord correct : "1 minute", pas "1 Minutes").
+function stepMeta(table: RecipeTableDescriptor, step: BrewingStep): string | null {
+  if (step.time == null) return null
+  const unit = timeUnitFor(table, step.type)
+  const amount = Number(formatStepTime(step.time, unit))
+  return t(unit === 'days' ? 'n_days' : 'n_minutes', amount)
+}
+
 async function destroyBrewing() {
-  if (!confirm(useNuxtApp().$i18n.t('Are you sure?'))) return
+  if (!confirm(t('Are you sure?'))) return
   await apiSend(`/api/brewings/${brewingId}`, 'DELETE')
   await navigateTo(`/recipes/${recipeId}/brewings`)
 }
 </script>
 
 <template>
-  <div v-if="brewing" class="space-y-4">
-    <NuxtLink :to="`/recipes/${recipeId}/brewings`" class="text-sm underline">&larr; {{ $t('Brewing list') }}</NuxtLink>
-    <div class="rounded bg-white p-4 shadow">
-      <h1 class="font-shangrila text-2xl">{{ brewing.name }} <span class="info-label text-sm">{{ $t('finished') }}</span></h1>
-      <div class="mt-2 grid grid-cols-1 gap-1 text-sm sm:grid-cols-3">
-        <p>{{ $t('Boil') }} : {{ formatDate(brewing.boil_start) }}</p>
-        <p>{{ $t('Ferment') }} : {{ formatDate(brewing.ferment_start) }}</p>
-        <p>{{ $t('End') }} : {{ formatDate(brewing.ferment_end) }}</p>
+  <div v-if="brewing" class="completed-page">
+    <NuxtLink :to="`/recipes/${recipeId}/brewings`" class="completed-page__back">&larr; {{ $t('Brewing list') }}</NuxtLink>
+
+    <div class="panel completed-page__card">
+      <h1 class="completed-page__name">{{ brewing.name }} <span class="chip chip--done">{{ $t('finished') }}</span></h1>
+      <div class="completed-page__dates">
+        <p><span class="completed-page__label">{{ $t('Boil') }} :</span> <span class="data">{{ formatDate(brewing.boil_start) }}</span></p>
+        <p><span class="completed-page__label">{{ $t('Ferment') }} :</span> <span class="data">{{ formatDate(brewing.ferment_start) }}</span></p>
+        <p><span class="completed-page__label">{{ $t('End') }} :</span> <span class="data">{{ formatDate(brewing.ferment_end) }}</span></p>
       </div>
     </div>
 
-    <section v-for="table in COMPLETED_TABLES" :key="table.title">
+    <section v-for="table in COMPLETED_TABLES" :key="table.title" class="completed-page__section">
       <template v-if="brewingSteps(table.types).length > 0">
-        <h2 class="mb-1 font-shangrila text-lg">{{ $t(table.title) }}</h2>
-        <div class="overflow-x-auto rounded bg-white shadow">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-rich-black text-anti-flash-white">
-              <tr>
-                <th class="px-3 py-2">{{ $t('Name') }}</th>
-                <th class="px-3 py-2">{{ $t('Quantity') }}</th>
-                <th class="px-3 py-2">{{ $t(table.unit === 'days' ? 'Days' : 'Minutes') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(step, index) in brewingSteps(table.types)" :key="step.id" class="border-t">
-                <td class="px-3 py-2">{{ step.field }}</td>
-                <td class="px-3 py-2">{{ formatQuantity(step.quantity, step.unit) }}</td>
-                <td class="px-3 py-2" :class="{ 'font-bold text-tawny': step.time !== recipeTimeAt(table.types, index) }">
-                  {{ formatStepTime(step.time, timeUnitFor(table, step.type)) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <h2 class="completed-page__heading">{{ $t(table.title) }}</h2>
+        <div class="completed-page__rows">
+          <DataRow
+            v-for="(step, index) in brewingSteps(table.types)"
+            :key="step.id"
+            :label="step.field"
+            :quantity="formatQuantity(step.quantity, step.unit)"
+            :meta="stepMeta(table, step)"
+            :checkable="false"
+            :state="step.time !== recipeTimeAt(table.types, index) ? 'late' : 'pending'"
+          />
         </div>
       </template>
     </section>
 
-    <div class="rounded bg-white p-4 shadow">
-      <h2 class="mb-1 font-shangrila text-lg">{{ $t('Note') }}</h2>
-      <p class="whitespace-pre-wrap text-sm">{{ brewing.note || '-' }}</p>
+    <div class="panel completed-page__note">
+      <h2 class="completed-page__heading">{{ $t('Note') }}</h2>
+      <p class="completed-page__note-text">{{ brewing.note || '-' }}</p>
     </div>
 
-    <button type="button" class="text-sm text-red-600 underline" @click="destroyBrewing">{{ $t('Delete') }}</button>
+    <button type="button" class="btn btn-danger" @click="destroyBrewing">{{ $t('delete this brewing') }}</button>
   </div>
 </template>
+
+<style scoped>
+.completed-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.completed-page__back {
+  align-self: flex-start;
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.completed-page__back:hover {
+  color: var(--color-text);
+}
+
+.completed-page__card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.completed-page__name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.completed-page__dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: var(--text-label);
+}
+
+.completed-page__label {
+  color: var(--color-text-dim);
+}
+
+.completed-page__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.completed-page__heading {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.completed-page__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.completed-page__note {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.completed-page__note-text {
+  white-space: pre-wrap;
+  color: var(--color-text-dim);
+  font-size: var(--text-body);
+}
+
+.chip--done {
+  color: var(--color-ink);
+  background-color: var(--color-malt);
+}
+</style>
