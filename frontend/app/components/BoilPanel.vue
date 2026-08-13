@@ -60,9 +60,13 @@ function rowState(step: BrewingStep): 'pending' | 'done' | 'late' {
   return 'pending'
 }
 
-// Meme composition textuelle qu'avant la refonte (comportement inchange) : les
-// Aroma affichent toujours une description statique, jamais un decompte.
-function rowMeta(step: BrewingStep): string {
+// Une ligne cochee est faite : plus d'echeance a afficher (D3), qu'il s'agisse
+// d'un decompte ("dans 0 minutes") ou de la description statique des Aroma
+// ("hors flamme pendant 0 minutes") -- les deux etaient fausses une fois la case
+// cochee. DataRow masque la meta quand elle est vide/nulle (v-if="meta"), donc
+// "rien" suffit : le filet gauche --color-malt et la coche disent deja "fait".
+function rowMeta(step: BrewingStep): string | null {
+  if (step.status) return null
   if (step.type === 'Aroma') {
     return `${t('flame-out')} ${t('for')} ${t('n_minutes', step.time ?? 0)}`
   }
