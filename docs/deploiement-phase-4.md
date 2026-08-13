@@ -12,9 +12,10 @@
    - `SANCTUM_STATEFUL_DOMAINS=<domaine>`
    - `SESSION_SECURE_COOKIE=true`
    - `SESSION_DOMAIN` : laisser vide (same-origin)
-3. `php artisan optimize:clear` puis `php artisan config:cache && php artisan route:cache`
-4. Purger `public/files/` (reliquat phase 1, si pas déjà fait)
-5. Le passage des sessions en json (phase 3) déconnecte tous les utilisateurs une fois (re-login)
+3. `php artisan migrate --force`
+4. `php artisan optimize:clear` puis `php artisan config:cache && php artisan route:cache`
+5. Purger `public/files/` (reliquat phase 1, si pas déjà fait)
+6. Le passage des sessions en json (phase 3) déconnecte tous les utilisateurs une fois (re-login)
 
 ## Frontend Nuxt
 1. `cd frontend && NUXT_PUBLIC_SANCTUM_BASE_URL=https://<domaine> npm ci && npm run generate`
@@ -31,16 +32,17 @@ vers Laravel. Sans cela, ouvrir /login dans le navigateur donnerait un 404 apres
         server_name <domaine>;
         root /var/www/alechemist/frontend-dist;   # contenu de .output/public
         index index.html;
+        client_max_body_size 4m;   # import BeerXML jusqu'a 2 Mo (defaut nginx = 1 Mo -> 413)
 
         # 100% Laravel, toutes methodes : API, cookie CSRF, endpoints /user/*, logout
+        # try_files $uri @laravel (et non /index.php?$query_string) : une redirection
+        # interne relance la recherche de location au niveau serveur, donc un location
+        # ~ \.php$ IMBRIQUE ici ne serait jamais consulte (on retomberait sur location /
+        # et l'API renverrait du HTML). Un named location (@laravel) ne repasse pas par
+        # cette recherche : c'est le seul moyen fiable de forcer php-fpm ici.
         location ~ ^/(api|sanctum|user|logout)(/|$) {
             root /var/www/alechemist/public;      # public/ du repo Laravel
-            try_files $uri /index.php?$query_string;
-            location ~ \.php$ {
-                include fastcgi_params;
-                fastcgi_pass unix:/run/php/php8.5-fpm.sock;
-                fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
-            }
+            try_files $uri @laravel;
         }
 
         # URIs partagees : GET = page Nuxt (shell SPA), autres methodes = Fortify (Laravel).
@@ -68,6 +70,13 @@ vers Laravel. Sans cela, ouvrir /login dans le navigateur donnerait un 404 apres
 
 ## Vérifications post-bascule
 - Login (avec et sans 2FA), refresh de page authentifiée (cookie stateful OK)
+- `curl -i https://<domaine>/api/user` doit renvoyer un 401 JSON, PAS du HTML (sinon la SPA
+  intercepte l'API : voir la note sur les named locations ci-dessus)
 - Email de reset : le lien pointe vers https://<domaine>/reset-password/...
 - Import BeerXML, création de brassin, chrono boil sans requêtes répétées
 - PWA installable (manifest + SW servis)
+- Si l'affichage reste figé après bascule (assets obsolètes), vider le cache du navigateur et
+  désenregistrer l'ancien service worker (DevTools > Application > Service Workers)
+- Effet de bord assumé dès la bascule du reverse proxy : l'ancien front Livewire devient
+  inatteignable (les routes web ne sont plus servies par ce gabarit), même en cas de rollback
+  applicatif côté Laravel
