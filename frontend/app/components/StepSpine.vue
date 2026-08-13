@@ -13,6 +13,10 @@ const slugs = STEP_ORDER.slice(0, 5)
 // complets ("preparation".."fermentation") ne rentrent pas sous 5 points sur un
 // ecran de 360px. Cles i18n dediees, distinctes de $t(slug) (deja utilise ailleurs
 // pour le libelle complet, ex. le bandeau "Etape en cours").
+// P6 : a partir de sm: (>=640px), la place ne manque plus -- les deux libelles
+// (abbrege + complet, via $t(slug)) sont rendus en meme temps, la mise en page
+// (@media ci-dessous) choisit lequel afficher. Pas de nouvelle cle i18n : $t(slug)
+// couvre deja les 5 mots complets.
 const ABBR_KEYS: Record<string, string> = {
   preparation: 'step_abbr_preparation',
   mash: 'step_abbr_mash',
@@ -55,7 +59,10 @@ function stateOf(index: number): 'done' | 'current' | 'upcoming' {
         >
           <span class="step-spine__dot" />
         </span>
-        <span class="step-spine__label" :class="`step-spine__label--${stateOf(index)}`">{{ $t(ABBR_KEYS[slug] ?? slug) }}</span>
+        <span class="step-spine__label" :class="`step-spine__label--${stateOf(index)}`">
+          <span class="step-spine__label-full">{{ $t(slug) }}</span>
+          <span class="step-spine__label-abbr">{{ $t(ABBR_KEYS[slug] ?? slug) }}</span>
+        </span>
       </li>
     </ol>
     <span class="step-spine__count data">{{ Math.min(currentIndex + 1, slugs.length) }}/{{ slugs.length }}</span>
@@ -148,6 +155,26 @@ function stateOf(index: number): 'done' | 'current' | 'upcoming' {
   /* Plus petit que --text-label : 5 libelles doivent tenir sous 5 points sur 360px. */
   font-size: 0.6875rem;
   white-space: nowrap;
+}
+
+/* P6 : abrege sur mobile (5 mots complets ne rentrent pas sous 5 points a 360px),
+   complet a partir de sm: -- desktop a largement la place. */
+.step-spine__label-full {
+  display: none;
+}
+
+.step-spine__label-abbr {
+  display: inline;
+}
+
+@media (min-width: 640px) {
+  .step-spine__label-full {
+    display: inline;
+  }
+
+  .step-spine__label-abbr {
+    display: none;
+  }
 }
 
 .step-spine__label--done {
