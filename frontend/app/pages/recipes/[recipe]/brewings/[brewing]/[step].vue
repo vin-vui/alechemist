@@ -12,7 +12,7 @@ const brewingId = Number(route.params.brewing)
 const stepKey = route.params.step as StepSlug
 const config = STEP_CONFIG[stepKey]
 
-const { data: brewing } = await useAsyncData(
+const { data: brewing, refresh } = await useAsyncData(
   `brewing-${brewingId}`,
   () => apiGet<Brewing>(`/api/brewings/${brewingId}`),
 )
@@ -24,10 +24,12 @@ const isCurrent = computed(() => brewing.value?.current_step === stepKey)
 const pageSteps = computed(() => stepsForPage(stepKey, brewing.value?.steps ?? []))
 const allChecked = computed(() => pageSteps.value.length > 0 && pageSteps.value.every((s) => s.status))
 const endOfBrewing = computed(() => brewing.value?.ferment_start != null)
+const boilDone = ref(false)
 
-// Gating par etape. Le cas boil est complete en Tache 17 (chrono demarre et ecoule).
+// Gating par etape.
 const canGoNext = computed(() => {
   if (!isCurrent.value || !allChecked.value) return false
+  if (stepKey === 'boil') return boilDone.value
   if (stepKey === 'ferment') return brewing.value?.ferment_start != null
   return true
 })
@@ -93,7 +95,18 @@ const now = ref(new Date())
       </div>
     </div>
 
-    <!-- Autres etapes (boil enrichi en Tache 17) : liste simple -->
+    <!-- Etape boil : chrono client (Tache 17) -->
+    <BoilPanel
+      v-else-if="stepKey === 'boil'"
+      :brewing="brewing"
+      :steps="pageSteps"
+      :readonly="!isCurrent"
+      @refresh="refresh"
+      @toggle="toggle"
+      @done="boilDone = $event"
+    />
+
+    <!-- Autres etapes : liste simple -->
     <div v-else class="space-y-2">
       <div
         v-for="step in pageSteps"
