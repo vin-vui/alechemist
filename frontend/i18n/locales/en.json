@@ -294,5 +294,11 @@
     "step_abbr_mash": "mash",
     "step_abbr_boil": "boil",
     "step_abbr_yeast": "yeast",
-    "step_abbr_ferment": "ferm"
+    "step_abbr_ferment": "ferm",
+    "No brewings in progress": "No brewings in progress. Choose a recipe to get started.",
+    "No recipes yet": "No recipes yet. Import a BeerXML file to get started.",
+    "No brewings for this recipe": "No brewings for this recipe yet. Create the first one.",
+    "Density not saved": "The density wasn't saved. Check the value and try again.",
+    "Recipe not deleted": "The recipe couldn't be deleted. Try again.",
+    "Note not saved": "The note wasn't saved. Try again."
 }

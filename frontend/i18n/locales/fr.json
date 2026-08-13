@@ -295,5 +295,11 @@
     "step_abbr_mash": "emp",
     "step_abbr_boil": "ébu",
     "step_abbr_yeast": "lev",
-    "step_abbr_ferment": "ferm"
+    "step_abbr_ferment": "ferm",
+    "No brewings in progress": "Aucun brassin en cours. Choisissez une recette pour commencer.",
+    "No recipes yet": "Aucune recette. Importez un fichier BeerXML pour commencer.",
+    "No brewings for this recipe": "Aucun brassin pour cette recette. Créez le premier.",
+    "Density not saved": "La densité n'a pas été enregistrée. Vérifiez la valeur et réessayez.",
+    "Recipe not deleted": "La recette n'a pas pu être supprimée. Réessayez.",
+    "Note not saved": "La note n'a pas été enregistrée. Réessayez."
 }
