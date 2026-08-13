@@ -5,9 +5,17 @@ const route = useRoute()
 const recipeId = Number(route.params.recipe)
 const brewingId = Number(route.params.brewing)
 
-const { data: brewing } = await useAsyncData(`brewing-${brewingId}`, () => apiGet<Brewing>(`/api/brewings/${brewingId}`))
-const { data: recipe } = await useAsyncData(`recipe-${recipeId}`, () => apiGet<Recipe>(`/api/recipes/${recipeId}`))
+const { data: brewing, error: brewingError } = await useAsyncData(
+  `brewing-${brewingId}`,
+  () => apiGet<Brewing>(`/api/brewings/${brewingId}`),
+  { deep: true },
+)
+const { data: recipe, error: recipeError } = await useAsyncData(`recipe-${recipeId}`, () => apiGet<Recipe>(`/api/recipes/${recipeId}`))
 
+const fetchError = brewingError.value ?? recipeError.value
+if (fetchError) {
+  throw createError({ statusCode: fetchError.statusCode ?? 500, statusMessage: fetchError.statusMessage ?? fetchError.message })
+}
 if (brewing.value && brewing.value.recipe_id !== recipeId) {
   throw createError({ statusCode: 404 })
 }

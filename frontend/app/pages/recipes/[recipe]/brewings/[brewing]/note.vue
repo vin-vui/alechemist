@@ -4,8 +4,14 @@ import type { Brewing } from '~/types/api'
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
 const brewingId = Number(route.params.brewing)
-const { data: brewing } = await useAsyncData(`brewing-${brewingId}`, () => apiGet<Brewing>(`/api/brewings/${brewingId}`))
-
+const { data: brewing, error } = await useAsyncData(
+  `brewing-${brewingId}`,
+  () => apiGet<Brewing>(`/api/brewings/${brewingId}`),
+  { deep: true },
+)
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+}
 if (brewing.value && brewing.value.recipe_id !== recipeId) {
   throw createError({ statusCode: 404 })
 }

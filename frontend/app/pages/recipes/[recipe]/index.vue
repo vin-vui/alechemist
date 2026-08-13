@@ -3,7 +3,10 @@ import type { Recipe, Step, StepType } from '~/types/api'
 
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
-const { data: recipe, refresh } = await useAsyncData(`recipe-${recipeId}`, () => apiGet<Recipe>(`/api/recipes/${recipeId}`))
+const { data: recipe, error, refresh } = await useAsyncData(`recipe-${recipeId}`, () => apiGet<Recipe>(`/api/recipes/${recipeId}`))
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+}
 
 const RECIPE_TABLES: { title: string; types: StepType[] }[] = [
   { title: 'Preparation', types: ['Preparation'] },

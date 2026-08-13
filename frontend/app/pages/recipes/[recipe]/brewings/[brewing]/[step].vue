@@ -13,10 +13,14 @@ const brewingId = Number(route.params.brewing)
 const stepKey = route.params.step as StepSlug
 const config = STEP_CONFIG[stepKey]
 
-const { data: brewing, refresh } = await useAsyncData(
+const { data: brewing, error, refresh } = await useAsyncData(
   `brewing-${brewingId}`,
   () => apiGet<Brewing>(`/api/brewings/${brewingId}`),
+  { deep: true },
 )
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+}
 if (brewing.value && brewing.value.recipe_id !== recipeId) {
   throw createError({ statusCode: 404 })
 }

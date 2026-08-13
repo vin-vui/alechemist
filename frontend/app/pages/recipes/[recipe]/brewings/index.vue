@@ -3,8 +3,11 @@ import type { Brewing } from '~/types/api'
 
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
-const { data: brewings } = await useAsyncData(`brewings-${recipeId}`, () =>
+const { data: brewings, error } = await useAsyncData(`brewings-${recipeId}`, () =>
   apiGet<Brewing[]>(`/api/recipes/${recipeId}/brewings`))
+if (error.value) {
+  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+}
 </script>
 
 <template>
