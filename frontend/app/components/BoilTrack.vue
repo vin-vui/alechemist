@@ -27,6 +27,19 @@ function markerState(step: BrewingStep): MarkerState {
 function markerPosition(step: BrewingStep): number {
   return boilStepPositionPercent(props.boilTimeMin, step)
 }
+
+// Les libelles sont centres sur leur repere (translateX(-50%)) : aux extremites
+// (0% / 100%), la moitie du libelle deborde hors de la piste et provoque un
+// scroll horizontal de page sur mobile (D2). On ancre a gauche pres de T-debut,
+// a droite pres du flame-out, et on garde le centrage ailleurs.
+const EDGE_THRESHOLD = 10
+
+function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
+  const pct = markerPosition(step)
+  if (pct <= EDGE_THRESHOLD) return 'start'
+  if (pct >= 100 - EDGE_THRESHOLD) return 'end'
+  return 'center'
+}
 </script>
 
 <template>
@@ -47,13 +60,23 @@ function markerPosition(step: BrewingStep): number {
         :style="{ left: `${markerPosition(step)}%` }"
       >
         <span class="boil-track__dot" />
-        <span class="boil-track__label">{{ step.field }}</span>
+        <span class="boil-track__label" :class="`boil-track__label--${markerLabelAnchor(step)}`">{{ step.field }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+/*
+ * Filet de securite (D2) : composant purement decoratif (aria-hidden), l'info
+ * horaire accessible vit dans les DataRow juste dessous. Le rognage horizontal
+ * ne masque donc aucun contenu reel ; il protege contre un depassement residuel
+ * si un repere tombe tres pres d'un bord malgre l'ancrage des libelles ci-dessous.
+ */
+.boil-track {
+  overflow-x: hidden;
+}
+
 .boil-track__ends {
   display: flex;
   justify-content: space-between;
@@ -111,11 +134,27 @@ function markerPosition(step: BrewingStep): number {
 .boil-track__label {
   position: absolute;
   top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
   margin-top: 0.5rem;
   font-family: var(--font-mono);
   font-size: var(--text-label);
   color: var(--color-text-dim);
   white-space: nowrap;
+}
+
+/* Ancrage aux extremites (D2) : le premier repere colle au bord gauche de la
+   piste (comme "T-60" au-dessus), le dernier au bord droit (comme "FLAME-OUT"),
+   au lieu de deborder de moitie hors ecran quand ils sont centres a 0%/100%. */
+.boil-track__label--start {
+  left: 0;
+  transform: translateX(0);
+}
+
+.boil-track__label--end {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
 }
 
 .boil-track__marker--upcoming .boil-track__dot {
