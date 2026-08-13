@@ -12,12 +12,12 @@ defineProps<{ brewing: Brewing; title: string }>()
     <div class="step-header__row">
       <div>
         <h1 class="step-header__name">{{ brewing.name }}</h1>
+        <!-- P5 : le nom d'etape n'est plus repete ici -- la StepSpine juste en
+             dessous l'indique deja, en --color-signal (un seul signal par ecran). -->
         <p class="step-header__meta">
           <span class="data">{{ formatDate(brewing.date_start) }}</span>
           <span class="step-header__sep">-</span>
           <span class="data">{{ brewing.volume }} l</span>
-          <span class="step-header__sep">-</span>
-          <span>{{ $t(title) }}</span>
         </p>
       </div>
       <NuxtLink
