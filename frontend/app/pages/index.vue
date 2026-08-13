@@ -47,7 +47,7 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
 
     <!-- Autres brassins en cours (au-dela du heros), s'il y en a. -->
     <section v-if="otherBrewings.length > 0" class="dashboard__section">
-      <h2 class="dashboard__heading">{{ $t('Current step') }}</h2>
+      <h2 class="dashboard__heading">{{ $t('Other brewings in progress') }}</h2>
       <div class="dashboard__grid">
         <NuxtLink
           v-for="brewing in otherBrewings"
