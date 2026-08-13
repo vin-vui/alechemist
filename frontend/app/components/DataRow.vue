@@ -93,16 +93,24 @@ div.data-row {
 }
 
 /*
- * label et meta peuvent tous les deux se comprimer (min-width: 0) et tronquent
- * plutot que de deborder les uns sur les autres si le texte est trop long pour
- * la largeur disponible (ligne entiere fixe a 56px, jamais sur deux lignes).
+ * Le nom est l'information principale (contrat design-system.md #4) : il est
+ * prioritaire sur la largeur disponible (flex-shrink: 0), la meta se comprime
+ * et tronque en premier (D4). Avant ce correctif, les deux avaient le meme
+ * flex-shrink : a largeur egale de retrecissement, le nom (souvent plus court,
+ * ex. "Simcoe") retrecissait proportionnellement plus que la meta (plus longue,
+ * ex. "hors flamme pendant 15 minutes"), donnant un nom illisible ("Si...") et
+ * une meta presque intacte -- l'inverse de la priorite voulue.
+ * Filet de securite pour un nom pathologiquement long (rare : noms d'ingredient
+ * courts en pratique) : max-width + overflow-wrap permet un retour a la ligne
+ * plutot qu'un depassement horizontal de la ligne (D2-like), conformement au
+ * contrat ("une ligne peut faire deux lignes de texte, c'est mieux qu'un nom
+ * illisible").
  */
 .data-row__label {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-wrap: break-word;
   color: var(--color-text);
 }
 
