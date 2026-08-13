@@ -8,6 +8,11 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   vite: { plugins: [tailwindcss()] },
 
+  // pathPrefix: false : les composants dans des sous-dossiers (ex. components/profile/)
+  // gardent leur nom de fichier tel quel (ProfileInfoForm) au lieu du prefixe par
+  // dossier par defaut de Nuxt (ProfileProfileInfoForm).
+  components: [{ path: '~/components', pathPrefix: false }],
+
   sanctum: {
     // Le module expose ses options en runtimeConfig public : surchargeable au build
     // via NUXT_PUBLIC_SANCTUM_BASE_URL (utilise par la doc de deploiement, Tache 20).
