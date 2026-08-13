@@ -46,4 +46,31 @@ export default defineNuxtConfig({
     ],
     detectBrowserLanguage: false,
   },
+
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'AleChemist',
+      short_name: 'AleChemist',
+      description: 'Suivi de brassage',
+      lang: 'fr',
+      dir: 'ltr',
+      display: 'standalone',
+      orientation: 'portrait',
+      start_url: '/',
+      scope: '/',
+      background_color: '#12121A',
+      theme_color: '#12121A',
+      icons: [
+        { src: '/assets/logo/alechemist-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: '/assets/logo/alechemist@512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+        { src: '/assets/logo/alechemist@512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      ],
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,ttf,woff2}'],
+      navigateFallback: '/',
+      navigateFallbackDenylist: [/^\/api\//, /^\/sanctum\//, /^\/login$/, /^\/logout$/, /^\/register$/, /^\/user\//, /^\/forgot-password$/, /^\/reset-password/, /^\/two-factor-challenge$/],
+    },
+  },
 })
