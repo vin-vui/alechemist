@@ -8,12 +8,58 @@ const password = ref('')
 </script>
 
 <template>
-  <div v-if="visible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" @click.self="emit('close')">
-    <form class="w-full max-w-xs rounded bg-white p-4 shadow" @submit.prevent="emit('confirm', password); password = ''">
-      <label class="block text-sm" for="confirm-password">{{ $t('Confirm Password') }}</label>
-      <input id="confirm-password" v-model="password" type="password" autocomplete="current-password" class="mt-1 w-full rounded border-gray-300" />
-      <p v-if="error" class="mt-1 text-sm text-red-600">{{ error }}</p>
-      <button type="submit" class="btn-yellow mt-3 w-full rounded" :disabled="pending">{{ $t('Confirm') }}</button>
+  <div v-if="visible" class="modal" @click.self="emit('close')">
+    <form class="panel modal__form" @submit.prevent="emit('confirm', password); password = ''">
+      <label class="modal__label" for="confirm-password">{{ $t('Confirm Password') }}</label>
+      <input id="confirm-password" v-model="password" type="password" autocomplete="current-password" class="modal__input" />
+      <p v-if="error" class="modal__error">{{ error }}</p>
+      <button type="submit" class="btn btn-primary modal__submit" :disabled="pending">{{ $t('Confirm') }}</button>
     </form>
   </div>
 </template>
+
+<style scoped>
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+}
+
+.modal__form {
+  width: 100%;
+  max-width: 20rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modal__label {
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.modal__input {
+  height: 48px;
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding-inline: 0.875rem;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+.modal__error {
+  font-size: var(--text-label);
+  color: var(--color-ember);
+}
+
+.modal__submit {
+  width: 100%;
+}
+</style>

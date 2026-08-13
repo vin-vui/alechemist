@@ -5,9 +5,9 @@ const { logout } = useSanctumAuth()
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl space-y-4">
-    <div class="flex items-center justify-between">
-      <h1 class="font-shangrila text-2xl">{{ $t('Profile') }}</h1>
+  <div class="profile-page">
+    <div class="profile-page__header">
+      <h1 class="profile-page__title">{{ $t('Profile') }}</h1>
       <button type="button" class="btn btn-secondary" @click="logout()">{{ $t('Log Out') }}</button>
     </div>
     <ProfileInfoForm />
@@ -17,3 +17,26 @@ const { logout } = useSanctumAuth()
     <DeleteAccountForm />
   </div>
 </template>
+
+<style scoped>
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-page__title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+</style>
