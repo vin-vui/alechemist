@@ -70,7 +70,7 @@ export default defineNuxtConfig({
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico,ttf,woff2}'],
       navigateFallback: '/',
-      navigateFallbackDenylist: [/^\/api\//, /^\/sanctum\//, /^\/login$/, /^\/logout$/, /^\/register$/, /^\/user\//, /^\/forgot-password$/, /^\/reset-password/, /^\/two-factor-challenge$/],
+      navigateFallbackDenylist: [/^\/api\//, /^\/sanctum\//, /^\/user\//, /^\/logout$/],
     },
   },
 })
