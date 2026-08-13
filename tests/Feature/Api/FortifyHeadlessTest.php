@@ -144,4 +144,105 @@ class FortifyHeadlessTest extends TestCase
 
         $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
     }
+
+    public function test_password_update_is_rejected_when_the_current_password_is_wrong(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->putJson('/user/password', [
+                'current_password' => 'wrong-password',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('current_password');
+
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
+    }
+
+    public function test_password_update_is_rejected_when_the_confirmation_does_not_match(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->putJson('/user/password', [
+                'current_password' => 'password',
+                'password' => 'new-password',
+                'password_confirmation' => 'wrong-confirmation',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('password');
+
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
+    }
+
+    public function test_password_confirmation_succeeds_with_the_correct_password(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson('/user/confirm-password', ['password' => 'password'])
+            ->assertCreated();
+    }
+
+    public function test_password_confirmation_fails_with_an_incorrect_password(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson('/user/confirm-password', ['password' => 'wrong-password'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('password');
+    }
+
+    public function test_two_factor_authentication_can_be_enabled_headlessly(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->postJson('/user/two-factor-authentication')
+            ->assertOk();
+
+        $user = $user->fresh();
+        $this->assertNotNull($user->two_factor_secret);
+        $this->assertCount(8, $user->recoveryCodes());
+    }
+
+    public function test_two_factor_recovery_codes_can_be_regenerated_headlessly(): void
+    {
+        $user = User::factory()->create();
+        $session = ['auth.password_confirmed_at' => time()];
+
+        $this->actingAs($user)->withSession($session)
+            ->postJson('/user/two-factor-authentication')
+            ->assertOk();
+
+        $originalCodes = $user->fresh()->recoveryCodes();
+
+        $this->actingAs($user)->withSession($session)
+            ->postJson('/user/two-factor-recovery-codes')
+            ->assertOk();
+
+        $this->assertCount(8, array_diff($originalCodes, $user->fresh()->recoveryCodes()));
+    }
+
+    public function test_two_factor_authentication_can_be_disabled_headlessly(): void
+    {
+        $user = User::factory()->create();
+        $session = ['auth.password_confirmed_at' => time()];
+
+        $this->actingAs($user)->withSession($session)
+            ->postJson('/user/two-factor-authentication')
+            ->assertOk();
+
+        $this->assertNotNull($user->fresh()->two_factor_secret);
+
+        $this->actingAs($user)->withSession($session)
+            ->deleteJson('/user/two-factor-authentication')
+            ->assertOk();
+
+        $this->assertNull($user->fresh()->two_factor_secret);
+    }
 }

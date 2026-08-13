@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->redirectUsersTo('/dashboard');
+        $middleware->redirectUsersTo('/');
 
         // Parité avec l'ancien Kernel : throttle:api n'est pas dans le groupe
         // api par défaut de la nouvelle structure.
