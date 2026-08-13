@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import type { Brewing, BrewingStep } from '~/types/api'
+import type { FermentStepView } from '~/utils/ferment'
 import { STEP_CONFIG, isStepSlug, stepsForPage, type StepSlug } from '~/utils/steps'
 
 definePageMeta({
   key: (route) => route.fullPath,
   validate: (route) => isStepSlug(route.params.step),
 })
+
+const { t } = useI18n()
 
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
@@ -37,6 +40,16 @@ const canGoNext = computed(() => {
   if (stepKey === 'boil') return boilDone.value
   if (stepKey === 'ferment') return brewing.value?.ferment_start != null
   return true
+})
+
+// Raison affichee quand le bouton est desactive (contrat #6) : jamais de cul-de-sac
+// muet. Pas de raison hors etape courante, deja expliquee par le bandeau au-dessus.
+const nextDisabledReason = computed(() => {
+  if (canGoNext.value || !isCurrent.value) return null
+  if (!allChecked.value) return t('Check all rows')
+  if (stepKey === 'boil') return t('Timer not finished')
+  if (stepKey === 'ferment') return t('Fermentation not started')
+  return null
 })
 
 const mutationError = ref(false)
@@ -74,48 +87,63 @@ async function next() {
 }
 
 const now = ref(new Date())
+
+// --- Habillage DataRow des etapes hors boil/ferment (comportement inchange). ---
+function rowState(step: BrewingStep): 'pending' | 'done' {
+  return step.status ? 'done' : 'pending'
+}
+
+function otherRowLabel(step: BrewingStep): string {
+  if (stepKey === 'preparation' && step.unit === 'l') return `${t('Heat')} ${t('at')} ${step.field}`
+  return step.field
+}
+
+function otherRowQuantity(step: BrewingStep): string {
+  if (stepKey === 'preparation' && step.unit === 'l') return `${step.quantity} l`
+  return formatQuantity(step.quantity, step.unit)
+}
+
+function otherRowMeta(step: BrewingStep): string | null {
+  if (stepKey === 'mash' && step.time) return `${t('for')} ${t('n_minutes', step.time)}`
+  return null
+}
+
+// --- Habillage DataRow de l'echeancier ferment (comportement inchange). ---
+function fermentRowMeta(view: FermentStepView): string {
+  const duration = t('n_days', view.durationDays)
+  const remaining = view.late ? t('late') : `${t('n_days', view.daysLeft)} ${t('left')}`
+  return `${duration} - ${remaining} - ${formatDate(view.endsAt.toISOString())}`
+}
 </script>
 
 <template>
-  <div v-if="brewing" class="space-y-4">
+  <div v-if="brewing" class="step-page">
     <StepHeader :brewing="brewing" :title="config.title" />
-    <StepIndicator :brewing="brewing" :active="stepKey" />
+    <StepSpine :brewing="brewing" :active="stepKey" />
 
-    <p v-if="!isCurrent" class="rounded bg-gray-100 p-2 text-sm text-gray-600">
+    <p v-if="!isCurrent" class="banner-info">
       {{ $t('Current step') }} : {{ $t(brewing.current_step ?? 'preparation') }}
     </p>
 
-    <p v-if="mutationError" class="rounded bg-red-50 p-2 text-sm text-red-600">
+    <p v-if="mutationError" class="banner-error">
       {{ $t('Whoops! Something went wrong.') }}
     </p>
 
-    <!-- Etapes ferment : echeancier -->
-    <div v-if="stepKey === 'ferment' && brewing.ferment_start" class="space-y-2">
-      <div
+    <!-- Etape ferment : echeancier -->
+    <div v-if="stepKey === 'ferment' && brewing.ferment_start" class="step-page__rows">
+      <DataRow
         v-for="view in fermentSchedule(brewing.ferment_start, brewing.steps ?? [], now)"
         :key="view.step.id"
-        class="flex items-center gap-3 rounded border-l-4 bg-white p-3 shadow"
-        :class="view.late ? 'border-red-600' : view.step.status ? 'border-old-gold' : 'border-gray-200'"
-      >
-        <input
-          type="checkbox"
-          :checked="view.step.status"
-          :disabled="!isCurrent"
-          class="size-5 rounded text-xanthous"
-          @change="toggle(view.step)"
-        />
-        <div class="flex-1">
-          <p>{{ view.step.field }}</p>
-          <p class="text-sm text-gray-500">
-            {{ $t('n_days', view.durationDays) }} -
-            {{ view.late ? $t('late') : `${$t('n_days', view.daysLeft)} ${$t('left')}` }} -
-            {{ formatDate(view.endsAt.toISOString()) }}
-          </p>
-        </div>
-      </div>
+        :label="view.step.field"
+        :meta="fermentRowMeta(view)"
+        :state="view.late ? 'late' : view.step.status ? 'done' : 'pending'"
+        :checked="view.step.status"
+        :disabled="!isCurrent"
+        @toggle="toggle(view.step)"
+      />
     </div>
 
-    <!-- Etape boil : chrono client (Tache 17) -->
+    <!-- Etape boil : chrono client + BoilTrack signature -->
     <BoilPanel
       v-else-if="stepKey === 'boil'"
       :brewing="brewing"
@@ -126,36 +154,35 @@ const now = ref(new Date())
       @done="boilDone = $event"
     />
 
-    <!-- Autres etapes : liste simple -->
-    <div v-else class="space-y-2">
-      <div
+    <!-- Autres etapes : DataRow simples -->
+    <div v-else class="step-page__rows">
+      <DataRow
         v-for="step in pageSteps"
         :key="step.id"
-        class="flex items-center gap-3 rounded border-l-4 bg-white p-3 shadow"
-        :class="step.status ? 'border-old-gold' : 'border-gray-200'"
-      >
-        <input
-          type="checkbox"
-          :checked="step.status"
-          :disabled="!isCurrent"
-          class="size-5 rounded text-xanthous"
-          @change="toggle(step)"
-        />
-        <div class="flex-1">
-          <p v-if="stepKey === 'preparation' && step.unit === 'l'">
-            {{ $t('Heat') }} {{ step.quantity }} l {{ $t('at') }} {{ step.field }}
-          </p>
-          <p v-else-if="stepKey === 'mash'">
-            {{ step.field }} {{ $t('at') }} {{ formatQuantity(step.quantity, step.unit) }}
-            <span v-if="step.time"> {{ $t('for') }} {{ $t('n_minutes', step.time) }}</span>
-          </p>
-          <p v-else>
-            {{ formatQuantity(step.quantity, step.unit) }} - {{ step.field }}
-          </p>
-        </div>
-      </div>
+        :label="otherRowLabel(step)"
+        :quantity="otherRowQuantity(step)"
+        :meta="otherRowMeta(step)"
+        :state="rowState(step)"
+        :checked="step.status"
+        :disabled="!isCurrent"
+        @toggle="toggle(step)"
+      />
     </div>
 
-    <NextButton :enabled="canGoNext" :end-of-brewing="endOfBrewing" @next="next" />
+    <NextButton :enabled="canGoNext" :end-of-brewing="endOfBrewing" :reason="nextDisabledReason" @next="next" />
   </div>
 </template>
+
+<style scoped>
+.step-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.step-page__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+</style>

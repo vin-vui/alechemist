@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { boilEndMs, boilRemainingMs, isStepLate, stepRemainingMinutes } from '../app/utils/boil'
+import {
+  boilEndMs,
+  boilProgressPercent,
+  boilRemainingMs,
+  boilStepPositionPercent,
+  isStepDueSoon,
+  isStepLate,
+  stepRemainingMinutes,
+  stepRemainingMs,
+} from '../app/utils/boil'
 import type { BrewingStep } from '../app/types/api'
 
 const START = '2026-08-12T10:00:00.000000Z'
@@ -45,5 +54,60 @@ describe('isStepLate', () => {
   })
   it('jamais late si coche', () => {
     expect(isStepLate(START, 60, step({ time: 45, status: true }), startMs + 20 * MIN)).toBe(false)
+  })
+})
+
+describe('stepRemainingMs', () => {
+  it('donne le reste en ms non arrondi', () => {
+    expect(stepRemainingMs(START, 60, step({ time: 15 }), startMs + 30 * MIN + 30_000)).toBe(15 * MIN - 30_000)
+  })
+  it('retourne null tant que le chrono n a pas demarre', () => {
+    expect(stepRemainingMs(null, 60, step({ time: 15 }), startMs)).toBeNull()
+  })
+})
+
+describe('isStepDueSoon', () => {
+  it('du si l echeance est dans la fenetre de 60 s et non coche', () => {
+    // Echeance a 45 min (time=15 sur un chrono de 60 min), on est a 44 min 30 : reste 30 s.
+    expect(isStepDueSoon(START, 60, step({ time: 15 }), startMs + 44 * MIN + 30_000)).toBe(true)
+  })
+  it('pas encore du si l echeance est a plus de 60 s', () => {
+    expect(isStepDueSoon(START, 60, step({ time: 15 }), startMs + 43 * MIN)).toBe(false)
+  })
+  it('plus du une fois l echeance depassee (late, pas due)', () => {
+    expect(isStepDueSoon(START, 60, step({ time: 15 }), startMs + 46 * MIN)).toBe(false)
+  })
+  it('jamais du si deja coche', () => {
+    expect(isStepDueSoon(START, 60, step({ time: 15, status: true }), startMs + 44 * MIN + 30_000)).toBe(false)
+  })
+  it('jamais du tant que le chrono n a pas demarre', () => {
+    expect(isStepDueSoon(null, 60, step({ time: 15 }), startMs)).toBe(false)
+  })
+})
+
+describe('boilStepPositionPercent', () => {
+  it('positionne un houblon a (boil_time - time) / boil_time * 100', () => {
+    expect(boilStepPositionPercent(60, step({ time: 15 }))).toBe(75)
+    expect(boilStepPositionPercent(60, step({ time: 60 }))).toBe(0)
+  })
+  it('les Aroma sont toujours au flame-out (100)', () => {
+    expect(boilStepPositionPercent(60, step({ type: 'Aroma', time: 5 }))).toBe(100)
+  })
+  it('reste dans [0, 100] meme avec un time hors bornes', () => {
+    expect(boilStepPositionPercent(60, step({ time: 90 }))).toBe(0)
+    expect(boilStepPositionPercent(60, step({ time: -10 }))).toBe(100)
+  })
+})
+
+describe('boilProgressPercent', () => {
+  it('0 tant que le chrono n a pas demarre', () => {
+    expect(boilProgressPercent(null, 60, startMs)).toBe(0)
+  })
+  it('avance proportionnellement au temps ecoule', () => {
+    expect(boilProgressPercent(START, 60, startMs + 15 * MIN)).toBe(25)
+    expect(boilProgressPercent(START, 60, startMs + 30 * MIN)).toBe(50)
+  })
+  it('plafonne a 100 une fois le chrono ecoule', () => {
+    expect(boilProgressPercent(START, 60, startMs + 90 * MIN)).toBe(100)
   })
 })

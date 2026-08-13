@@ -284,5 +284,15 @@
     "Date": "Date",
     "Note": "Note",
     "End": "End",
-    "Back": "Back"
+    "Back": "Back",
+    "Brewing steps": "Brewing steps",
+    "Main navigation": "Main navigation",
+    "Check all rows": "Check all rows.",
+    "Timer not finished": "The timer hasn't finished.",
+    "Fermentation not started": "Fermentation hasn't started yet.",
+    "step_abbr_preparation": "prep",
+    "step_abbr_mash": "mash",
+    "step_abbr_boil": "boil",
+    "step_abbr_yeast": "yeast",
+    "step_abbr_ferment": "ferm"
 }

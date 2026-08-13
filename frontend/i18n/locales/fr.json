@@ -285,5 +285,15 @@
     "Date": "Date",
     "Note": "Note",
     "End": "Fin",
-    "Back": "Retour"
+    "Back": "Retour",
+    "Brewing steps": "Étapes du brassin",
+    "Main navigation": "Navigation principale",
+    "Check all rows": "Cochez toutes les lignes.",
+    "Timer not finished": "Le chrono n'est pas terminé.",
+    "Fermentation not started": "La fermentation n'a pas encore démarré.",
+    "step_abbr_preparation": "prép",
+    "step_abbr_mash": "emp",
+    "step_abbr_boil": "ébu",
+    "step_abbr_yeast": "lev",
+    "step_abbr_ferment": "ferm"
 }

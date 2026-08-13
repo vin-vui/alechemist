@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 
+/* Marque : jamais ailleurs que le bloc-marque de la barre laterale (cf. docs/design-system.md). */
 @font-face {
   font-family: 'shangrila';
   src: url('../fonts/SHANLN__.TTF') format('truetype');
@@ -10,23 +11,202 @@
   src: url('../fonts/SHANLNC_.TTF') format('truetype');
 }
 
+/*
+ * Systeme "L'instrument" -- docs/design-system.md fait autorite sur toute valeur.
+ * Toute deviation doit etre signalee dans le rapport de socle, pas decidee ici.
+ */
 @theme {
-  --color-rich-black: #12121A;
-  --color-xanthous: #F3AE1A;
-  --color-tawny: #CA6018;
-  --color-old-gold: #E2C05D;
-  --color-licorice: #2A1515;
-  --color-anti-flash-white: #EFEFEF;
+  --color-ink: #0E0E14;
+  --color-panel: #17171F;
+  --color-panel-hi: #1F1F29;
+  --color-rule: #2A2A36;
+  --color-signal: #F3AE1A;
+  --color-ember: #CA6018;
+  --color-malt: #E2C05D;
+  --color-text: #ECECF0;
+  --color-text-dim: #9A9AA8;
+  --color-text-faint: #6A6A78;
+
+  /*
+   * Alias temporaires : anciens noms de couleur de marque, pour que les pages pas
+   * encore refaites (login, register, recipes, profile...) restent lisibles pendant
+   * la transition. A nettoyer par la vague suivante en meme temps que les pages.
+   */
+  --color-rich-black: var(--color-ink);
+  --color-xanthous: var(--color-signal);
+  --color-tawny: var(--color-ember);
+  --color-old-gold: var(--color-malt);
+  --color-licorice: var(--color-panel-hi);
+  --color-anti-flash-white: var(--color-text);
+
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
-  --font-shangrila: 'shangrila', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --font-brand: 'shangrila', serif;
+  /* Alias temporaires (anciennes classes font-shangrila / font-shangrila-caps). */
+  --font-shangrila: var(--font-brand);
   --font-shangrila-caps: 'shangrila-caps', serif;
+
+  --text-chrono: clamp(3.5rem, 18vw, 5.5rem);
+  --text-metric: clamp(1.75rem, 7vw, 2.5rem);
+  --text-step: 1.125rem;
+  --text-body: 1rem;
+  --text-label: 0.8125rem;
+
+  --radius: 0.5rem;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/*
+ * Compatibilite transitoire : les pages pas encore refaites posent des surfaces
+ * claires (bg-white, bg-gray-100...) sans jamais fixer elles-memes de couleur de
+ * texte, comptant sur l'ancien texte body (noir par defaut). Le nouveau body est
+ * clair-sur-sombre : sans ce correctif ces surfaces deviendraient illisibles
+ * (texte clair sur fond clair). A supprimer avec les pages qui les utilisent
+ * encore (vague suivante).
+ */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-gray-200 {
+  color: #1f2937;
+}
+
+/* Anneau de focus visible, unique et coherent : jamais de outline: none sans remplacement. */
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 2px;
 }
 
 @layer components {
+  /*
+   * --- Boutons (contrat design-system.md #6) ---
+   * .btn-yellow est l'alias temporaire de .btn + .btn-primary, fusionne dans les
+   * memes regles (Tailwind v4 n'autorise pas @apply sur une classe de composant
+   * custom, seulement sur une utilite). A supprimer avec les pages qui l'utilisent
+   * encore (vague suivante).
+   */
+  .btn,
   .btn-yellow {
-    @apply bg-xanthous hover:bg-tawny hover:text-white shadow-lg transition-all duration-300 py-1.5 px-3 flex items-center justify-center gap-2 whitespace-nowrap;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    height: 48px;
+    border-radius: var(--radius);
+    padding-inline: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
-  .btn-yellow svg { @apply size-6; }
-  .info-label { @apply bg-gray-200 px-1 py-0.5 rounded; }
-  .info-label-yellow { @apply bg-old-gold px-1 py-0.5 rounded; }
+  .btn:disabled {
+    background-color: var(--color-panel);
+    color: var(--color-text-faint);
+    cursor: not-allowed;
+  }
+  .btn-primary,
+  .btn-yellow {
+    background-color: var(--color-signal);
+    color: var(--color-ink);
+  }
+  .btn-primary:hover:not(:disabled),
+  .btn-yellow:hover {
+    background-color: var(--color-malt);
+  }
+  .btn-yellow svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-rule);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-text-dim);
+  }
+  .btn-danger {
+    background-color: transparent;
+    color: var(--color-ember);
+    border: 1px solid transparent;
+  }
+  .btn-danger:hover:not(:disabled) {
+    border-color: var(--color-ember);
+  }
+
+  /* --- Pastille d'etat (.info-label / .info-label-yellow : alias temporaires) --- */
+  .chip,
+  .info-label,
+  .info-label-yellow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    color: var(--color-text-dim);
+    background-color: var(--color-panel-hi);
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    white-space: nowrap;
+  }
+  .info-label-yellow {
+    color: var(--color-ink);
+    background-color: var(--color-signal);
+  }
+
+  /* --- Surface + filet --- */
+  .panel {
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+  }
+
+  /* --- Chiffres : mono tabulaire --- */
+  .data {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Filet --- */
+  .rule {
+    border-color: var(--color-rule);
+  }
+
+  /* --- Bandeau d'erreur (mutation echouee) : filet gauche ember, meme grammaire que DataRow. --- */
+  .banner-error {
+    border-radius: var(--radius);
+    border-left: 3px solid var(--color-ember);
+    background-color: var(--color-panel);
+    color: var(--color-ember);
+    padding: 0.75rem 1rem;
+    font-size: var(--text-label);
+  }
+
+  /* --- Bandeau d'information neutre (etape non courante, etc.) --- */
+  .banner-info {
+    border-radius: var(--radius);
+    background-color: var(--color-panel);
+    color: var(--color-text-dim);
+    padding: 0.75rem 1rem;
+    font-size: var(--text-label);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,31 +1,44 @@
-<script setup lang="ts">
-const sidebarOpen = ref(false)
-</script>
-
+<!--
+  Rail desktop + barre basse mobile (AppSidebar), colonne de contenu 40rem centree
+  (docs/design-system.md, Mise en page). Plus de menu off-canvas : la barre basse
+  fixe remplace le hamburger sur mobile.
+-->
 <template>
-  <div class="min-h-screen bg-anti-flash-white text-rich-black">
-    <!-- Barre mobile -->
-    <header class="flex h-12 items-center justify-between bg-rich-black px-4 lg:hidden">
-      <button type="button" class="text-anti-flash-white" @click="sidebarOpen = !sidebarOpen">
-        <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-      <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="size-8 rounded" />
-    </header>
-    <!-- Sidebar mobile off-canvas -->
-    <div v-if="sidebarOpen" class="fixed inset-0 z-40 lg:hidden" @click.self="sidebarOpen = false">
-      <div class="absolute inset-0 bg-black/50" />
-      <div class="absolute inset-y-0 left-0 w-64" @click="sidebarOpen = false">
-        <AppSidebar />
+  <div class="app-shell">
+    <AppSidebar />
+    <main class="app-shell__main">
+      <div class="app-shell__content">
+        <slot />
       </div>
-    </div>
-    <!-- Sidebar desktop -->
-    <aside class="fixed inset-y-0 left-0 hidden w-64 lg:block">
-      <AppSidebar />
-    </aside>
-    <main class="p-4 lg:pl-68">
-      <slot />
     </main>
   </div>
 </template>
+
+<style scoped>
+.app-shell {
+  min-height: 100vh;
+  background-color: var(--color-ink);
+  color: var(--color-text);
+}
+
+.app-shell__main {
+  padding-top: 1rem;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom) + 1rem);
+}
+
+@media (min-width: 1024px) {
+  .app-shell__main {
+    padding-top: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: 1.5rem;
+    padding-left: 6rem;
+  }
+}
+
+.app-shell__content {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+</style>
