@@ -161,4 +161,46 @@ class BrewingUpdateTest extends TestCase
 
         $this->assertSame('2026-07-20 09:00:00', (string) $brewing->fresh()->boil_start);
     }
+
+    public function test_le_chrono_peut_etre_annule_pendant_l_etape_d_ebullition(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'current_step' => 'boil',
+            'boil_start' => '2026-07-20 09:00:00',
+        ]);
+
+        $this->actingAs($user)
+            ->deleteJson("/api/brewings/{$brewing->id}/start-boil")
+            ->assertOk()
+            ->assertJsonPath('data.boil_start', null);
+
+        $this->assertNull($brewing->fresh()->boil_start);
+    }
+
+    public function test_le_chrono_ne_peut_plus_etre_annule_une_fois_l_etape_passee(): void
+    {
+        $user = User::factory()->create();
+        $recipe = Recipe::factory()->for($user)->create();
+        $brewing = Brewing::factory()->for($recipe)->create([
+            'current_step' => 'ferment',
+            'boil_start' => '2026-07-20 09:00:00',
+        ]);
+
+        $this->actingAs($user)
+            ->deleteJson("/api/brewings/{$brewing->id}/start-boil")
+            ->assertStatus(409);
+
+        $this->assertNotNull($brewing->fresh()->boil_start);
+    }
+
+    public function test_cancel_boil_est_refuse_a_un_tiers(): void
+    {
+        $brewing = Brewing::factory()->for(Recipe::factory())->create(['current_step' => 'boil']);
+
+        $this->actingAs(User::factory()->create())
+            ->deleteJson("/api/brewings/{$brewing->id}/start-boil")
+            ->assertNotFound();
+    }
 }

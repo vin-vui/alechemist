@@ -38,7 +38,7 @@ class BrewingReadTest extends TestCase
     {
         $user = User::factory()->create();
         $brewing = Brewing::factory()
-            ->for(Recipe::factory()->for($user))
+            ->for(Recipe::factory()->for($user)->create(['name' => 'American IPA']))
             ->create(['current_step' => 'mash']);
         BrewingStep::factory()->count(3)->create(['brewing_id' => $brewing->id]);
 
@@ -46,7 +46,9 @@ class BrewingReadTest extends TestCase
             ->getJson("/api/brewings/{$brewing->id}")
             ->assertOk()
             ->assertJsonPath('data.current_step', 'mash')
-            ->assertJsonCount(3, 'data.steps');
+            ->assertJsonCount(3, 'data.steps')
+            // L'en-tete d'un ecran de brassin nomme sa recette dans le lien de retour.
+            ->assertJsonPath('data.recipe.name', 'American IPA');
     }
 
     public function test_show_is_forbidden_on_someone_elses_brewing(): void

@@ -31,6 +31,17 @@ class DashboardController extends Controller
                         ->oldest('updated_at')
                         ->get()
                 ),
+                // L'archive, du plus récent au plus ancien. Elle vivait sur une page
+                // « Brassins » à part, qui redisait ce que le tableau de bord montrait
+                // déjà : elle est repliée en bas de cet écran.
+                'finished_brewings' => BrewingResource::collection(
+                    Brewing::whereIn('recipe_id', $recipeIds)
+                        ->where('current_step', 'completed')
+                        ->with('recipe')
+                        ->orderByDesc('date_start')
+                        ->orderByDesc('id')
+                        ->get()
+                ),
             ],
         ]);
     }

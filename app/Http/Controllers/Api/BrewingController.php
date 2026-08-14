@@ -24,7 +24,10 @@ class BrewingController extends Controller
     {
         $this->authorize('view', $brewing);
 
-        return new BrewingResource($brewing->load('brewingSteps'));
+        // La recette est chargée pour que l'écran d'un brassin puisse la nommer
+        // ("American IPA") et y renvoyer : c'est le seul rappel de ce que l'on
+        // brasse, et le seul chemin vers la fiche.
+        return new BrewingResource($brewing->load('brewingSteps', 'recipe'));
     }
 
     public function store(StoreBrewingRequest $request, Recipe $recipe)
@@ -95,6 +98,28 @@ class BrewingController extends Controller
             $brewing->boil_start = now();
             $brewing->save();
         }
+
+        return new BrewingResource($brewing);
+    }
+
+    /**
+     * Annule un chrono d'ébullition lancé par erreur.
+     *
+     * Le plan de migration pose que les timestamps d'étape ne sont jamais effacés,
+     * pour qu'un retour en arrière de consultation ne réécrive pas l'historique.
+     * La règle est conservée : l'annulation n'est possible que tant que le brassin
+     * est *sur* l'étape d'ébullition. Une fois l'étape passée, le timestamp est
+     * définitif. Sans cette sortie, un clic de trop sur « Démarrer le chrono »
+     * faussait le brassin sans aucun recours.
+     */
+    public function cancelBoil(Brewing $brewing)
+    {
+        $this->authorize('update', $brewing);
+
+        abort_unless($brewing->current_step === 'boil', 409);
+
+        $brewing->boil_start = null;
+        $brewing->save();
 
         return new BrewingResource($brewing);
     }
