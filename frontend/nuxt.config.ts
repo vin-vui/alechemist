@@ -44,6 +44,8 @@ export default defineNuxtConfig({
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'fr',
+    // Regle de pluriel francaise (zero au singulier), cf. i18n/i18n.config.ts.
+    vueI18n: 'i18n.config.ts',
     locales: [
       { code: 'fr', file: 'fr.json' },
       { code: 'en', file: 'en.json' },

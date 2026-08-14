@@ -76,4 +76,6 @@ export interface Dashboard {
   recipe_count: number
   ferment_brewings: Brewing[]
   in_progress_brewings: Brewing[]
+  /** L'archive, du plus recent au plus ancien : repliee en bas du tableau de bord. */
+  finished_brewings: Brewing[]
 }
