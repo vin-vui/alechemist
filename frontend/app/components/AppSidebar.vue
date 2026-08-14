@@ -1,7 +1,10 @@
 <script setup lang="ts">
-// Rail desktop (4.5rem, deploye au survol) + barre basse mobile (docs/design-system.md,
-// Mise en page). Memes 3 destinations sur les deux formats. La deconnexion n'y vit
-// plus : elle est accessible depuis la page Profil (cf. pages/profile.vue).
+// Rail desktop + barre basse mobile (docs/design-system.md, Mise en page). Memes 3
+// destinations sur les deux formats. La deconnexion n'y vit pas : elle est
+// accessible depuis la page Profil (cf. pages/profile.vue).
+//
+// Il y a eu une quatrieme destination, « Brassins ». Elle disait la meme chose que
+// le tableau de bord, qui liste deja les brassins ; sa page a ete versee dedans.
 type IconName = 'dashboard' | 'recipes' | 'profile'
 
 const ICONS: Record<IconName, string> = {
@@ -12,6 +15,9 @@ const ICONS: Record<IconName, string> = {
 }
 
 const route = useRoute()
+// `match` : tout ce qui vit sous une recette eclaire Recettes, brassins compris.
+// Un ecran de brassin n'allumait aucun onglet, on ne savait plus dans quelle
+// section on se trouvait.
 const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   { to: '/', label: 'Dashboard', match: /^\/$/, icon: 'dashboard' },
   { to: '/recipes', label: 'Recipes', match: /^\/recipes/, icon: 'recipes' },
@@ -20,13 +26,12 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
 </script>
 
 <template>
-  <!-- Rail desktop : icones seules au repos (D1), libelle accessible (aria-label +
-       title) et deploiement au survol/focus qui revele le texte sans jamais le
-       rogner (cf. .app-rail__label / .app-rail__wordmark ci-dessous). -->
+  <!-- Rail desktop : libelles visibles en permanence. Trois icones sans legende
+       etaient une devinette, et sur 1440px la place ne manque pas. -->
   <aside class="app-rail">
-    <NuxtLink to="/" class="app-rail__brand" aria-label="AleChemist" title="AleChemist">
+    <NuxtLink to="/" class="app-rail__brand">
       <img src="/assets/logo/alechemist@512.png" alt="" class="app-rail__logo" />
-      <span class="app-rail__wordmark" aria-hidden="true">AleChemist</span>
+      <span class="app-rail__wordmark">AleChemist</span>
     </NuxtLink>
     <nav class="app-rail__nav" :aria-label="$t('Main navigation')">
       <NuxtLink
@@ -35,11 +40,9 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
         :to="link.to"
         class="app-rail__link"
         :class="{ 'app-rail__link--active': link.match.test(route.path) }"
-        :aria-label="$t(link.label)"
-        :title="$t(link.label)"
       >
         <svg class="app-rail__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" v-html="ICONS[link.icon]" />
-        <span class="app-rail__label" aria-hidden="true">{{ $t(link.label) }}</span>
+        <span class="app-rail__label">{{ $t(link.label) }}</span>
       </NuxtLink>
     </nav>
   </aside>
@@ -72,27 +75,20 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
     top: 0;
     bottom: 0;
     left: 0;
-    width: 4.5rem;
+    /* 12.5rem : « Tableau de bord », le plus long des quatre libelles, doit tenir
+       dans sa pastille active sans la toucher. */
+    width: 12.5rem;
     background-color: var(--color-panel);
     border-right: 1px solid var(--color-rule);
     overflow: hidden;
     z-index: 40;
-    transition: width 0.15s ease;
-  }
-
-  .app-rail:hover,
-  .app-rail:focus-within {
-    width: 14rem;
   }
 }
 
 .app-rail__brand {
   display: flex;
   align-items: center;
-  /* Au repos (4.5rem) : aucun gap reserve pour le mot-marque, qui est a largeur
-     nulle (cf. .app-rail__wordmark). Le bloc-marque Shangrila ne tient pas sous
-     24px (contrat typo) : seule l'icone du logo vit dans le rail replie. */
-  gap: 0;
+  gap: 0.75rem;
   padding: 1rem;
   flex: 0 0 auto;
   white-space: nowrap;
@@ -105,16 +101,12 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   border-radius: var(--radius);
 }
 
+/* Le bloc-marque Shangrila, seul endroit de l'app ou cette police vit (contrat typo).
+   Elle est illisible sous 24px, d'ou 1.5rem. */
 .app-rail__wordmark {
   font-family: var(--font-brand);
   font-size: 1.5rem;
   color: var(--color-text);
-  /* Largeur nulle au repos : jamais de texte rogne (D1). Revele au deploiement. */
-  display: inline-block;
-  max-width: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-width 0.15s ease, opacity 0.15s ease;
 }
 
 .app-rail__nav {
@@ -127,11 +119,9 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
 .app-rail__link {
   display: flex;
   align-items: center;
-  /* Icone seule et centree au repos (D1) : le libelle est a largeur nulle, donc
-     aucun gap tant qu'il n'est pas revele, sinon l'icone parait desaxee. */
-  gap: 0;
-  justify-content: center;
+  gap: 0.75rem;
   padding: 0.625rem;
+  min-height: 44px;
   border-radius: var(--radius);
   color: var(--color-text-dim);
   white-space: nowrap;
@@ -158,41 +148,11 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   text-transform: uppercase;
   letter-spacing: -0.02em;
   font-size: var(--text-label);
-  /* Largeur nulle au repos : jamais de texte rogne (D1, le defaut le plus visible).
-     Le libelle reste accessible via aria-label/title sur le lien (cf. template). */
-  display: inline-block;
-  max-width: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: max-width 0.15s ease, opacity 0.15s ease;
 }
 
-/* Deploiement au survol/focus (souris ou clavier) : le rail s'elargit (regle
-   .app-rail:hover/:focus-within existante) et les libelles se revelent en meme
-   temps, sans jamais etre coupes en cours de route. */
-@media (min-width: 1024px) {
-  .app-rail:hover .app-rail__brand,
-  .app-rail:focus-within .app-rail__brand,
-  .app-rail:hover .app-rail__link,
-  .app-rail:focus-within .app-rail__link {
-    gap: 0.75rem;
-  }
-
-  .app-rail:hover .app-rail__link,
-  .app-rail:focus-within .app-rail__link {
-    justify-content: flex-start;
-  }
-
-  .app-rail:hover .app-rail__wordmark,
-  .app-rail:focus-within .app-rail__wordmark,
-  .app-rail:hover .app-rail__label,
-  .app-rail:focus-within .app-rail__label {
-    max-width: 10rem;
-    opacity: 1;
-  }
-}
-
-/* Barre basse mobile : 3 destinations, pouce a portee. */
+/* Barre basse mobile : 3 destinations, pouce a portee. Sa hauteur est celle que
+   declare --nav-height (main.css) : la mise en page et la barre d'action
+   principale s'en servent pour se poser exactement dessus. */
 .app-tabbar {
   display: flex;
   justify-content: space-around;
@@ -200,6 +160,7 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   left: 0;
   right: 0;
   bottom: 0;
+  min-height: var(--nav-height);
   background-color: var(--color-panel);
   border-top: 1px solid var(--color-rule);
   padding-bottom: env(safe-area-inset-bottom);
@@ -233,10 +194,16 @@ const links: { to: string; label: string; match: RegExp; icon: IconName }[] = [
   height: 1.5rem;
 }
 
+/* Le libelle passe sur deux lignes plutot que d'etre rogne : « Tableau de bord »
+   tient sur une ligne a trois destinations, mais pas sur les ecrans les plus
+   etroits. */
 .app-tabbar__label {
   font-family: var(--font-display);
   text-transform: uppercase;
   letter-spacing: -0.02em;
   font-size: 0.625rem;
+  text-align: center;
+  line-height: 1.15;
+  padding-inline: 0.125rem;
 }
 </style>

@@ -25,15 +25,16 @@
   padding-top: 1rem;
   padding-right: 1rem;
   padding-left: 1rem;
-  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom) + 1rem);
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 1rem);
 }
 
+/* Le rail affiche ses libelles en permanence : 12.5rem de large, plus 1.5rem d'air. */
 @media (min-width: 1024px) {
   .app-shell__main {
     padding-top: 1.5rem;
     padding-right: 1.5rem;
     padding-bottom: 1.5rem;
-    padding-left: 6rem;
+    padding-left: 14rem;
   }
 }
 

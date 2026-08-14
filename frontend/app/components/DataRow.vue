@@ -34,31 +34,41 @@ const emit = defineEmits<{ toggle: [] }>()
   >
     <input
       type="checkbox"
-      class="data-row__checkbox"
+      class="checkbox data-row__checkbox"
       :checked="checked"
       :disabled="disabled"
       @change="emit('toggle')"
     />
     <span v-if="quantity" class="data-row__quantity data">{{ quantity }}</span>
-    <span class="data-row__label" :title="label">{{ label }}</span>
-    <span v-if="meta" class="data-row__meta data" :title="meta">{{ meta }}</span>
+    <span class="data-row__label">{{ label }}</span>
+    <span v-if="meta" class="data-row__meta data">{{ meta }}</span>
   </label>
   <div v-else class="data-row" :class="`data-row--${state}`">
     <span v-if="quantity" class="data-row__quantity data">{{ quantity }}</span>
-    <span class="data-row__label" :title="label">{{ label }}</span>
-    <span v-if="meta" class="data-row__meta data" :title="meta">{{ meta }}</span>
+    <span class="data-row__label">{{ label }}</span>
+    <span v-if="meta" class="data-row__meta data">{{ meta }}</span>
   </div>
 </template>
 
 <style scoped>
+/*
+ * La ligne peut passer sur deux niveaux : sur mobile, la meta (l'echeance) descend
+ * sous le nom au lieu d'etre tronquee. C'etait le pire defaut de l'ecran de
+ * brassage -- « Saccharification pendant 6... », « Mise en bouteille 7 jours -
+ * 16 jo... » : l'information coupee etait justement celle dont le brasseur a
+ * besoin, et le `title` de secours est inatteignable au doigt.
+ */
 .data-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
   min-height: 56px;
   background-color: var(--color-panel);
   border-radius: var(--radius);
   border-left: 3px solid transparent;
+  padding-block: 0.625rem;
   padding-inline: 1rem;
   cursor: pointer;
 }
@@ -79,13 +89,6 @@ div.data-row {
   border-left-color: var(--color-ember);
 }
 
-.data-row__checkbox {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  accent-color: var(--color-signal);
-}
-
 .data-row__quantity {
   min-width: 3.5rem;
   flex: 0 0 auto;
@@ -93,36 +96,33 @@ div.data-row {
 }
 
 /*
- * Le nom est l'information principale (contrat design-system.md #4) : il est
- * prioritaire sur la largeur disponible (flex-shrink: 0), la meta se comprime
- * et tronque en premier (D4). Avant ce correctif, les deux avaient le meme
- * flex-shrink : a largeur egale de retrecissement, le nom (souvent plus court,
- * ex. "Simcoe") retrecissait proportionnellement plus que la meta (plus longue,
- * ex. "hors flamme pendant 15 minutes"), donnant un nom illisible ("Si...") et
- * une meta presque intacte -- l'inverse de la priorite voulue.
- * Filet de securite pour un nom pathologiquement long (rare : noms d'ingredient
- * courts en pratique) : max-width + overflow-wrap permet un retour a la ligne
- * plutot qu'un depassement horizontal de la ligne (D2-like), conformement au
- * contrat ("une ligne peut faire deux lignes de texte, c'est mieux qu'un nom
- * illisible").
+ * Le nom est l'information principale (contrat design-system.md #4) : il garde
+ * toute la largeur restante et revient a la ligne plutot que de deborder
+ * ("une ligne peut faire deux lignes de texte, c'est mieux qu'un nom illisible").
  */
 .data-row__label {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: 100%;
   overflow-wrap: break-word;
   color: var(--color-text);
 }
 
+/* Pleine largeur : la meta occupe sa propre ligne sous le nom. */
 .data-row__meta {
-  flex: 0 1 auto;
+  flex: 1 0 100%;
   min-width: 0;
-  max-width: 60%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: right;
+  overflow-wrap: break-word;
   color: var(--color-text-dim);
+}
+
+/* A partir de sm:, la place ne manque plus : la meta remonte a droite du nom. */
+@media (min-width: 640px) {
+  .data-row__meta {
+    flex: 0 1 auto;
+    margin-left: auto;
+    text-align: right;
+    white-space: nowrap;
+  }
 }
 
 .data-row--late .data-row__meta {

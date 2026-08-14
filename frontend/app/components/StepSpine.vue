@@ -1,29 +1,22 @@
 <script setup lang="ts">
-// StepSpine : la colonne vertebrale du brassin (docs/design-system.md #1).
-// Remplace StepIndicator.vue. Cliquable en arriere (consultation) uniquement,
-// jamais en avant : on ne saute pas une etape qui n'a pas encore ete atteinte.
+/*
+ * StepSpine : la colonne vertebrale du brassin (docs/design-system.md #1).
+ *
+ * La version en points relies etait illisible sur telephone : reperes de 12px,
+ * libelles de 11px et traits d'un pixel, le tout dans une bande de 20px de haut.
+ * Elle disait « voici cinq etapes » sans repondre a la seule question du brasseur,
+ * « ou j'en suis ». C'est desormais l'inverse : l'etape courante est nommee en
+ * grand, et les cinq segments donnent le reste d'un coup d'oeil.
+ *
+ * Un segment franchi reste cliquable, en arriere seulement : on ne saute pas une
+ * etape qu'on n'a pas atteinte.
+ */
 import type { Brewing } from '~/types/api'
 import { STEP_ORDER } from '~/utils/steps'
 
 const props = defineProps<{ brewing: Brewing; active: string }>()
 
 const slugs = STEP_ORDER.slice(0, 5)
-
-// Libelles abbreges (cf. anatomie du contrat : "prep emp EBU lev ferm") : 5 mots
-// complets ("preparation".."fermentation") ne rentrent pas sous 5 points sur un
-// ecran de 360px. Cles i18n dediees, distinctes de $t(slug) (deja utilise ailleurs
-// pour le libelle complet, ex. le bandeau "Etape en cours").
-// P6 : a partir de sm: (>=640px), la place ne manque plus -- les deux libelles
-// (abbrege + complet, via $t(slug)) sont rendus en meme temps, la mise en page
-// (@media ci-dessous) choisit lequel afficher. Pas de nouvelle cle i18n : $t(slug)
-// couvre deja les 5 mots complets.
-const ABBR_KEYS: Record<string, string> = {
-  preparation: 'step_abbr_preparation',
-  mash: 'step_abbr_mash',
-  boil: 'step_abbr_boil',
-  yeast: 'step_abbr_yeast',
-  ferment: 'step_abbr_ferment',
-}
 
 const currentIndex = computed(() =>
   STEP_ORDER.indexOf(props.brewing.current_step ?? 'preparation'))
@@ -33,166 +26,146 @@ function stateOf(index: number): 'done' | 'current' | 'upcoming' {
   if (index === currentIndex.value) return 'current'
   return 'upcoming'
 }
+
+// Position affichee : bornee a 5, car `completed` sort de la liste des 5 etapes.
+const position = computed(() => Math.min(currentIndex.value + 1, slugs.length))
+const currentSlug = computed(() => slugs[Math.min(currentIndex.value, slugs.length - 1)]!)
 </script>
 
 <template>
   <nav class="step-spine" :aria-label="$t('Brewing steps')">
+    <p class="step-spine__count">{{ $t('step_of', { n: position, total: slugs.length }) }}</p>
+    <p class="step-spine__current">{{ $t(currentSlug) }}</p>
+
     <ol class="step-spine__list">
       <li v-for="(slug, index) in slugs" :key="slug" class="step-spine__item">
-        <span
-          v-if="index > 0"
-          class="step-spine__connector"
-          :class="{ 'step-spine__connector--done': index <= currentIndex }"
-        />
         <NuxtLink
           v-if="index < currentIndex"
           :to="`/recipes/${brewing.recipe_id}/brewings/${brewing.id}/${slug}`"
-          class="step-spine__point step-spine__point--done"
+          class="step-spine__segment step-spine__segment--done"
         >
-          <span class="step-spine__dot" />
+          <span class="step-spine__label">{{ $t(slug) }}</span>
         </NuxtLink>
         <span
           v-else
-          class="step-spine__point"
-          :class="`step-spine__point--${stateOf(index)}`"
+          class="step-spine__segment"
+          :class="`step-spine__segment--${stateOf(index)}`"
           :aria-current="slug === active ? 'step' : undefined"
         >
-          <span class="step-spine__dot" />
-        </span>
-        <span class="step-spine__label" :class="`step-spine__label--${stateOf(index)}`">
-          <span class="step-spine__label-full">{{ $t(slug) }}</span>
-          <span class="step-spine__label-abbr">{{ $t(ABBR_KEYS[slug] ?? slug) }}</span>
+          <span class="step-spine__label">{{ $t(slug) }}</span>
         </span>
       </li>
     </ol>
-    <span class="step-spine__count data">{{ Math.min(currentIndex + 1, slugs.length) }}/{{ slugs.length }}</span>
   </nav>
 </template>
 
 <style scoped>
 .step-spine {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  /* Espace reserve pour les libellés positionnés sous les points. */
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.step-spine__count {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+/* La reponse a « ou j'en suis », en toutes lettres. */
+.step-spine__current {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--color-signal);
 }
 
 .step-spine__list {
   display: flex;
-  align-items: flex-start;
-  flex: 1;
-  min-width: 0;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
 }
 
 .step-spine__item {
-  display: flex;
-  align-items: center;
   flex: 1;
   min-width: 0;
+}
+
+/*
+ * La barre visible fait 6px, mais la cible tactile en fait 44 : c'est par elle
+ * qu'on revient consulter une etape franchie.
+ */
+.step-spine__segment {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 44px;
   position: relative;
 }
 
-.step-spine__item:last-child {
-  flex: 0 0 auto;
-}
-
-.step-spine__connector {
-  flex: 1;
-  height: 2px;
-  min-width: 0.75rem;
-  background-color: var(--color-rule);
-  margin-inline: 2px;
-}
-
-.step-spine__connector--done {
-  background-color: var(--color-malt);
-}
-
-.step-spine__point {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex: 0 0 auto;
-  border-radius: 9999px;
-}
-
-.step-spine__dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 9999px;
-  border: 2px solid var(--color-rule);
-  background-color: transparent;
+.step-spine__segment::before {
+  content: '';
   display: block;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--color-rule);
 }
 
-.step-spine__point--done .step-spine__dot {
+.step-spine__segment--done::before {
   background-color: var(--color-malt);
-  border-color: var(--color-malt);
 }
 
-.step-spine__point--current .step-spine__dot {
-  background-color: transparent;
-  border-color: var(--color-signal);
-  box-shadow: 0 0 0 2px var(--color-signal);
+.step-spine__segment--current::before {
+  background-color: var(--color-signal);
 }
 
-.step-spine__point--upcoming .step-spine__dot {
-  background-color: transparent;
-  border-color: var(--color-rule);
+a.step-spine__segment:hover::before {
+  background-color: var(--color-text);
 }
 
+/*
+ * Les libelles ne tiennent pas sous cinq segments de 67px : sur telephone, l'etape
+ * courante est deja nommee en grand au-dessus, ils ne servent qu'aux lecteurs
+ * d'ecran. Ils reapparaissent des que la place existe.
+ */
 .step-spine__label {
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 0.25rem;
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-  /* Plus petit que --text-label : 5 libelles doivent tenir sous 5 points sur 360px. */
-  font-size: 0.6875rem;
+  width: 1px;
+  height: 1px;
+  margin-top: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
-/* P6 : abrege sur mobile (5 mots complets ne rentrent pas sous 5 points a 360px),
-   complet a partir de sm: -- desktop a largement la place. */
-.step-spine__label-full {
-  display: none;
-}
-
-.step-spine__label-abbr {
-  display: inline;
-}
-
 @media (min-width: 640px) {
-  .step-spine__label-full {
-    display: inline;
+  .step-spine__label {
+    position: static;
+    width: auto;
+    height: auto;
+    margin-top: 0.5rem;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-size: var(--text-label);
+    color: var(--color-text-faint);
+    overflow-wrap: break-word;
   }
 
-  .step-spine__label-abbr {
-    display: none;
+  .step-spine__segment--done .step-spine__label {
+    color: var(--color-text-dim);
   }
-}
 
-.step-spine__label--done {
-  color: var(--color-text-dim);
-}
-
-.step-spine__label--current {
-  color: var(--color-signal);
-  text-transform: uppercase;
-}
-
-.step-spine__label--upcoming {
-  color: var(--color-text-faint);
-}
-
-.step-spine__count {
-  color: var(--color-text-dim);
-  font-size: var(--text-label);
-  flex: 0 0 auto;
+  .step-spine__segment--current .step-spine__label {
+    color: var(--color-signal);
+  }
 }
 </style>

@@ -6,11 +6,6 @@
   src: url('../fonts/SHANLN__.TTF') format('truetype');
 }
 
-@font-face {
-  font-family: 'shangrila-caps';
-  src: url('../fonts/SHANLNC_.TTF') format('truetype');
-}
-
 /*
  * Systeme "L'instrument" -- docs/design-system.md fait autorite sur toute valeur.
  * Toute deviation doit etre signalee dans le rapport de socle, pas decidee ici.
@@ -27,25 +22,10 @@
   --color-text-dim: #9A9AA8;
   --color-text-faint: #6A6A78;
 
-  /*
-   * Alias temporaires : anciens noms de couleur de marque, pour que les pages pas
-   * encore refaites (login, register, recipes, profile...) restent lisibles pendant
-   * la transition. A nettoyer par la vague suivante en meme temps que les pages.
-   */
-  --color-rich-black: var(--color-ink);
-  --color-xanthous: var(--color-signal);
-  --color-tawny: var(--color-ember);
-  --color-old-gold: var(--color-malt);
-  --color-licorice: var(--color-panel-hi);
-  --color-anti-flash-white: var(--color-text);
-
   --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
   --font-brand: 'shangrila', serif;
-  /* Alias temporaires (anciennes classes font-shangrila / font-shangrila-caps). */
-  --font-shangrila: var(--font-brand);
-  --font-shangrila-caps: 'shangrila-caps', serif;
 
   --text-chrono: clamp(3.5rem, 18vw, 5.5rem);
   --text-metric: clamp(1.75rem, 7vw, 2.5rem);
@@ -56,25 +36,51 @@
   --radius: 0.5rem;
 }
 
+/*
+ * L'interface n'existe qu'en sombre : on le declare au navigateur, sinon il rend
+ * ses propres controles en clair (ascenseurs, selecteur de date, remplissage
+ * automatique, menus natifs) au milieu d'une page sombre.
+ */
+:root {
+  color-scheme: dark;
+
+  /*
+   * Hauteur de la barre de navigation, declaree une seule fois : la barre basse la
+   * prend pour hauteur, la mise en page pour marge du bas, et la barre d'action
+   * principale pour point d'ancrage. Trois valeurs recopiees a la main se
+   * desaccordaient d'une poignee de pixels, et il fallait un rideau de peinture
+   * pour masquer la bande qui restait entre les deux barres.
+   */
+  --nav-height: 3.5rem;
+}
+
+/* Le rail vertical remplace la barre basse : plus rien a reserver en bas. */
+@media (min-width: 1024px) {
+  :root {
+    --nav-height: 0rem;
+  }
+}
+
+/*
+ * Sous la largeur du rail, la barre de defilement est masquee : un telephone la
+ * dessine en surimpression et la fait disparaitre, alors que Chrome en mode mobile
+ * en pose une permanente de 15px le long du contenu. Le defilement lui-meme n'est
+ * pas touche. Sur desktop elle reste visible, elle y sert de reperage.
+ */
+@media (max-width: 1023px) {
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 body {
   background-color: var(--color-ink);
   color: var(--color-text);
   font-family: var(--font-sans);
-}
-
-/*
- * Compatibilite transitoire : les pages pas encore refaites posent des surfaces
- * claires (bg-white, bg-gray-100...) sans jamais fixer elles-memes de couleur de
- * texte, comptant sur l'ancien texte body (noir par defaut). Le nouveau body est
- * clair-sur-sombre : sans ce correctif ces surfaces deviendraient illisibles
- * (texte clair sur fond clair). A supprimer avec les pages qui les utilisent
- * encore (vague suivante).
- */
-.bg-white,
-.bg-gray-50,
-.bg-gray-100,
-.bg-gray-200 {
-  color: #1f2937;
 }
 
 /* Anneau de focus visible, unique et coherent : jamais de outline: none sans remplacement. */
@@ -86,45 +92,75 @@ body {
 @layer components {
   /*
    * --- Boutons (contrat design-system.md #6) ---
-   * .btn-yellow est l'alias temporaire de .btn + .btn-primary, fusionne dans les
-   * memes regles (Tailwind v4 n'autorise pas @apply sur une classe de composant
-   * custom, seulement sur une utilite). A supprimer avec les pages qui l'utilisent
-   * encore (vague suivante).
+   * Hauteur MINIMALE de 48px, jamais fixe, et le libelle a le droit de passer a la
+   * ligne : un libelle long (« Deconnecter les sessions ouvertes sur d'autres
+   * navigateurs ») debordait sinon de son conteneur et poussait toute la page en
+   * defilement horizontal sur mobile.
    */
-  .btn,
-  .btn-yellow {
+  .btn {
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: -0.02em;
     font-weight: 700;
-    height: 48px;
+    min-height: 48px;
+    max-width: 100%;
     border-radius: var(--radius);
     padding-inline: 1.25rem;
+    padding-block: 0.625rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    white-space: nowrap;
+    text-align: center;
+    overflow-wrap: break-word;
     transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
+  /* Le fond desactive vaut --color-panel, la couleur des cartes : pose sur une
+     carte, le bouton disparaissait et se lisait comme un titre. Le filet le garde
+     identifiable comme bouton. */
   .btn:disabled {
     background-color: var(--color-panel);
+    border: 1px solid var(--color-rule);
     color: var(--color-text-faint);
     cursor: not-allowed;
   }
-  .btn-primary,
-  .btn-yellow {
+  .btn-primary {
     background-color: var(--color-signal);
     color: var(--color-ink);
   }
-  .btn-primary:hover:not(:disabled),
-  .btn-yellow:hover {
+  .btn-primary:hover:not(:disabled) {
     background-color: var(--color-malt);
   }
-  .btn-yellow svg {
-    width: 1.5rem;
-    height: 1.5rem;
+  /*
+   * Bouton reduit a son icone, a toutes les tailles. Reserve a une action
+   * secondaire recurrente dont le libelle n'apprend rien (la note d'un brassin) :
+   * partout ailleurs le libelle est visible. Il reste dans le DOM pour les lecteurs
+   * d'ecran, double par aria-label et title.
+   */
+  .btn--icon {
+    width: 48px;
+    padding-inline: 0;
   }
+  .btn--icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .btn--icon .btn__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Une icone au sein d'un bouton ordinaire, a cote de son libelle. */
+  .btn svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+  }
+
   .btn-secondary {
     background-color: transparent;
     color: var(--color-text);
@@ -142,10 +178,17 @@ body {
     border-color: var(--color-ember);
   }
 
-  /* --- Pastille d'etat (.info-label / .info-label-yellow : alias temporaires) --- */
-  .chip,
-  .info-label,
-  .info-label-yellow {
+  /* --- Pastille d'etat --- */
+  /* .chip--step : le nom d'etape s'ecrit partout de la meme facon. Il s'affichait
+     « ÉBULLITION » en heros et « ébullition » en pastille, sur le meme ecran. */
+  .chip--step {
+    text-transform: uppercase;
+  }
+  .chip--done {
+    color: var(--color-ink);
+    background-color: var(--color-malt);
+  }
+  .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
@@ -157,9 +200,168 @@ body {
     padding: 0.125rem 0.625rem;
     white-space: nowrap;
   }
-  .info-label-yellow {
-    color: var(--color-ink);
+
+  /*
+   * --- Champ de formulaire ---
+   * Definition unique : les memes .field / .field__input etaient recopies dans
+   * chaque page de formulaire, avec des variantes qui divergeaient.
+   */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+  .field__label {
+    font-size: var(--text-label);
+    color: var(--color-text-dim);
+  }
+  .field__input {
+    min-height: 48px;
+    width: 100%;
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+    padding-inline: 0.875rem;
+    color: var(--color-text);
+    font-family: var(--font-sans);
+  }
+  .field__input::placeholder {
+    color: var(--color-text-faint);
+  }
+  .field__textarea {
+    padding-block: 0.625rem;
+    resize: vertical;
+  }
+  .field__error {
+    font-size: var(--text-label);
+    color: var(--color-ember);
+  }
+  .field__hint {
+    font-size: var(--text-label);
+    color: var(--color-text-faint);
+  }
+  /* Visible des seuls lecteurs d'ecran : pour un champ dont le titre de la page
+     tient deja lieu d'etiquette a l'oeil. */
+  .field__label--assistive {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /*
+   * --- Case a cocher ---
+   * Dessinee, pas native : `accent-color` laissait une coche blanche sur ambre
+   * (contraste 1,9:1). La coche est en --color-ink, comme sur un bouton principal.
+   */
+  .checkbox {
+    appearance: none;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-rule);
+    border-radius: 0.25rem;
+    background-color: transparent;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .checkbox:checked {
     background-color: var(--color-signal);
+    border-color: var(--color-signal);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230E0E14' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.5 3.5L13 4.5'/%3E%3C/svg%3E");
+  }
+  .checkbox:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+  .checkbox:not(:disabled):hover {
+    border-color: var(--color-text-dim);
+  }
+
+  /*
+   * --- Titres ---
+   * Definition unique : chaque page redefinissait sa propre variante du meme titre
+   * Archivo majuscules.
+   */
+  .page-title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    font-size: 1.5rem;
+    /* Couleur explicite : un seul signal par ecran, aucun titre n'est en ambre. */
+    color: var(--color-text);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--color-text);
+  }
+  /*
+   * --- Carte d'authentification ---
+   * Definition unique pour les cinq ecrans invites (connexion, inscription, mot de
+   * passe oublie, reinitialisation, defi 2FA), qui en portaient chacun une copie.
+   */
+  .auth-card {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .auth-card__logo {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin-inline: auto;
+    border-radius: var(--radius);
+  }
+  .auth-card__title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-align: center;
+    /* Sinon « Mot de passe oublie ? » laissait le point d'interrogation seul sur
+       la deuxieme ligne. */
+    text-wrap: balance;
+  }
+  .auth-card__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .auth-card__submit {
+    width: 100%;
+  }
+  .auth-card__status {
+    font-size: var(--text-label);
+    color: var(--color-malt);
+    text-align: center;
+  }
+  .auth-card__links {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--text-label);
+  }
+  .auth-card__links--center {
+    justify-content: center;
+  }
+  .auth-card__link {
+    color: var(--color-text-dim);
+  }
+  .auth-card__link:hover {
+    color: var(--color-text);
   }
 
   /* --- Surface + filet --- */

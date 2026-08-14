@@ -28,6 +28,7 @@ const chronoLabel = computed(() => formatDuration(chronoDisplayMs.value))
 const chronoUrgent = computed(() => started.value && !elapsed.value && (remainingMs.value ?? 0) < 60_000)
 
 const modalOpen = ref(false)
+const cancelOpen = ref(false)
 const newBoilTime = ref(props.brewing.boil_time)
 const mutationError = ref(false)
 
@@ -38,6 +39,20 @@ async function start() {
     emit('refresh')
   } catch {
     mutationError.value = true
+  }
+}
+
+// Un chrono lance par erreur n'avait aucune sortie : les deux boutons
+// disparaissaient et le brassin partait sur une heure de depart fausse.
+async function cancelBoil() {
+  try {
+    await apiSend(`/api/brewings/${props.brewing.id}/start-boil`, 'DELETE')
+    mutationError.value = false
+    cancelOpen.value = false
+    emit('refresh')
+  } catch {
+    mutationError.value = true
+    cancelOpen.value = false
   }
 }
 
@@ -83,7 +98,7 @@ function rowMeta(step: BrewingStep): string | null {
 
 <template>
   <div class="boil-panel">
-    <p v-if="mutationError" class="banner-error">{{ $t('Whoops! Something went wrong.') }}</p>
+    <p v-if="mutationError" class="banner-error">{{ $t('Boil not saved') }}</p>
 
     <div class="boil-panel__chrono-block">
       <p
@@ -95,9 +110,16 @@ function rowMeta(step: BrewingStep): string | null {
       >
         {{ chronoLabel }}
       </p>
-      <p v-if="started" class="boil-panel__state">
-        {{ elapsed ? $t('Time elapsed') : $t('in progress') }}
-      </p>
+      <template v-if="started">
+        <p class="boil-panel__state">
+          {{ elapsed ? $t('Time elapsed') : $t('in progress') }}
+        </p>
+        <!-- Sortie de secours : un chrono lance par erreur n'avait aucun recours,
+             les deux boutons ayant disparu au demarrage. -->
+        <button v-if="!readonly" type="button" class="boil-panel__cancel" @click="cancelOpen = true">
+          {{ $t('Cancel timer') }}
+        </button>
+      </template>
       <div v-else-if="!readonly" class="boil-panel__actions">
         <button type="button" class="btn btn-primary" @click="start">{{ $t('Start') }}</button>
         <button
@@ -136,6 +158,15 @@ function rowMeta(step: BrewingStep): string | null {
         </div>
       </div>
     </div>
+
+    <ConfirmDialog
+      :open="cancelOpen"
+      :title="$t('Cancel this timer?')"
+      :detail="$t('The boil will start over from zero.')"
+      :confirm-label="$t('Reset')"
+      @confirm="cancelBoil"
+      @close="cancelOpen = false"
+    />
   </div>
 </template>
 
@@ -174,6 +205,17 @@ function rowMeta(step: BrewingStep): string | null {
   letter-spacing: -0.02em;
   font-size: var(--text-label);
   color: var(--color-text-dim);
+}
+
+/* Discret : le chrono qui tourne est le signal de l'ecran, pas sa sortie de secours. */
+.boil-panel__cancel {
+  min-height: 44px;
+  font-size: var(--text-label);
+  color: var(--color-text-dim);
+}
+
+.boil-panel__cancel:hover {
+  color: var(--color-ember);
 }
 
 .boil-panel__actions {

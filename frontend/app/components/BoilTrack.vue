@@ -27,19 +27,6 @@ function markerState(step: BrewingStep): MarkerState {
 function markerPosition(step: BrewingStep): number {
   return boilStepPositionPercent(props.boilTimeMin, step)
 }
-
-// Les libelles sont centres sur leur repere (translateX(-50%)) : aux extremites
-// (0% / 100%), la moitie du libelle deborde hors de la piste et provoque un
-// scroll horizontal de page sur mobile (D2). On ancre a gauche pres de T-debut,
-// a droite pres du flame-out, et on garde le centrage ailleurs.
-const EDGE_THRESHOLD = 10
-
-function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
-  const pct = markerPosition(step)
-  if (pct <= EDGE_THRESHOLD) return 'start'
-  if (pct >= 100 - EDGE_THRESHOLD) return 'end'
-  return 'center'
-}
 </script>
 
 <template>
@@ -60,7 +47,7 @@ function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
         :style="{ left: `${markerPosition(step)}%` }"
       >
         <span class="boil-track__dot" />
-        <span class="boil-track__label" :class="`boil-track__label--${markerLabelAnchor(step)}`">{{ step.field }}</span>
+        <span class="boil-track__label">{{ step.field }}</span>
       </div>
     </div>
   </div>
@@ -70,16 +57,23 @@ function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
 /*
  * Filet de securite (D2) : composant purement decoratif (aria-hidden), l'info
  * horaire accessible vit dans les DataRow juste dessous. Le rognage horizontal
- * ne masque donc aucun contenu reel ; il protege contre un depassement residuel
- * si un repere tombe tres pres d'un bord malgre l'ancrage des libelles ci-dessous.
+ * ne masque donc aucun contenu reel ; il protege contre le cas extreme d'un nom
+ * de houblon plus large que le retrait reserve aux extremites du rail.
  */
+/* `clip` et non `hidden` : `overflow-x: hidden` fait basculer l'autre axe en
+   `overflow-y: auto`, et Chrome en mode mobile reserve alors une barre de
+   defilement permanente de 15px a droite du bloc. Elle ne defilait rien et
+   rognait la piste d'autant, decalant le rail vers la gauche. */
 .boil-track {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
+/* Meme retrait que le rail : « T-60 » et « arret du feu » marquent ses deux bouts,
+   ils s'alignent donc sur eux et non sur ceux du bloc. */
 .boil-track__ends {
   display: flex;
   justify-content: space-between;
+  margin-inline: 2.5rem;
   margin-bottom: 0.75rem;
   font-size: var(--text-label);
   color: var(--color-text-dim);
@@ -89,8 +83,14 @@ function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
   position: relative;
   height: 2px;
   background-color: var(--color-rule);
-  margin-left: 6px;
-  margin-right: 6px;
+  /*
+   * 2.5rem de chaque cote : tout libelle reste centre sous son rond, y compris
+   * aux extremites. Les reperes de bout etaient auparavant ancres a gauche et a
+   * droite pour ne pas deborder, si bien que « Cascade » et « Simcoe » ne
+   * tombaient pas sous leur rond. C'est le rail qui recule, pas le libelle qui
+   * se decale : la position d'un rond dit une heure, elle ne se negocie pas.
+   */
+  margin-inline: 2.5rem;
   /* Reserve la place pour les libelles de repere positionnes sous le rail. */
   margin-bottom: 2rem;
 }
@@ -114,9 +114,11 @@ function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
   transition: left 1s linear;
 }
 
+/* `top: 50%` comme la tete de lecture : cale sur l'axe du rail, et non sur son
+   bord superieur, qui posait les ronds un pixel trop haut. */
 .boil-track__marker {
   position: absolute;
-  top: 0;
+  top: 50%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -141,20 +143,6 @@ function markerLabelAnchor(step: BrewingStep): 'start' | 'center' | 'end' {
   font-size: var(--text-label);
   color: var(--color-text-dim);
   white-space: nowrap;
-}
-
-/* Ancrage aux extremites (D2) : le premier repere colle au bord gauche de la
-   piste (comme "T-60" au-dessus), le dernier au bord droit (comme "FLAME-OUT"),
-   au lieu de deborder de moitie hors ecran quand ils sont centres a 0%/100%. */
-.boil-track__label--start {
-  left: 0;
-  transform: translateX(0);
-}
-
-.boil-track__label--end {
-  left: auto;
-  right: 0;
-  transform: translateX(0);
 }
 
 .boil-track__marker--upcoming .boil-track__dot {

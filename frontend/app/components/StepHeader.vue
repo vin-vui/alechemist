@@ -1,76 +1,77 @@
 <script setup lang="ts">
+// En-tete d'un ecran de brassin, monte sur la charpente commune (PageHeader).
+//
+// La recette est nommee ici, en lien : c'est le seul rappel de ce qu'on brasse, et
+// le seul chemin vers la fiche depuis l'ecran ou l'on brasse.
 import type { Brewing } from '~/types/api'
 
-defineProps<{ brewing: Brewing; title: string }>()
+const props = defineProps<{ brewing: Brewing; title: string }>()
+const emit = defineEmits<{ 'note-saved': [note: string] }>()
+
+const { t } = useI18n()
+
+// « Note » ne disait pas ce que fait le bouton. Le libelle suit l'etat du brassin.
+const noteLabel = computed(() => (props.brewing.note ? 'Edit the note' : 'Add a note'))
+const recipeName = computed(() => props.brewing.recipe?.name ?? t('Recipe'))
+
+const noteOpen = ref(false)
 </script>
 
 <template>
-  <div class="panel step-header">
-    <NuxtLink :to="`/recipes/${brewing.recipe_id}`" class="step-header__back">
-      &larr; {{ $t('Recipes') }}
-    </NuxtLink>
-    <div class="step-header__row">
-      <div>
-        <h1 class="step-header__name">{{ brewing.name }}</h1>
-        <!-- P5 : le nom d'etape n'est plus repete ici -- la StepSpine juste en
-             dessous l'indique deja, en --color-signal (un seul signal par ecran). -->
-        <p class="step-header__meta">
-          <span class="data">{{ formatDate(brewing.date_start) }}</span>
-          <span class="step-header__sep">-</span>
-          <span class="data">{{ brewing.volume }} l</span>
-        </p>
-      </div>
-      <NuxtLink
-        :to="`/recipes/${brewing.recipe_id}/brewings/${brewing.id}/note`"
-        class="btn btn-secondary"
-        :title="$t('Note')"
+  <PageHeader :title="brewing.name">
+    <template #meta>
+      <!-- P5 : le nom d'etape n'est pas repete ici, la StepSpine juste en dessous
+           l'indique deja en --color-signal (un seul signal par ecran). -->
+      <p class="step-header__meta">
+        <NuxtLink :to="`/recipes/${brewing.recipe_id}`" class="step-header__recipe">{{ recipeName }}</NuxtLink>
+        <span class="step-header__sep">-</span>
+        <span class="data">{{ formatDate(brewing.date_start) }}</span>
+        <span class="step-header__sep">-</span>
+        <span class="data">{{ formatQuantity(brewing.volume, 'l') }}</span>
+      </p>
+    </template>
+    <template #action>
+      <!-- Icone seule sur telephone : en bouton pleine largeur, la note mangeait
+           une rangee entiere de l'ecran ou l'on brasse. Le libelle reapparait des
+           que la place existe, et reste annonce aux lecteurs d'ecran. -->
+      <button
+        type="button"
+        class="btn btn-secondary btn--icon"
+        :aria-label="$t(noteLabel)"
+        :title="$t(noteLabel)"
+        @click="noteOpen = true"
       >
-        {{ $t('Note') }}
-      </NuxtLink>
-    </div>
-  </div>
+        <AppIcon name="note" />
+        <span class="btn__label">{{ $t(noteLabel) }}</span>
+      </button>
+    </template>
+  </PageHeader>
+
+  <NoteDialog
+    :brewing="brewing"
+    :open="noteOpen"
+    @close="noteOpen = false"
+    @saved="emit('note-saved', $event)"
+  />
 </template>
 
 <style scoped>
-.step-header {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.step-header__back {
-  align-self: flex-start;
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.step-header__back:hover {
-  color: var(--color-text);
-}
-
-.step-header__row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.step-header__name {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-size: 1.5rem;
-}
-
 .step-header__meta {
-  margin-top: 0.25rem;
   font-size: var(--text-label);
   color: var(--color-text-dim);
   display: flex;
   gap: 0.375rem;
   flex-wrap: wrap;
+}
+
+.step-header__recipe {
+  color: var(--color-text-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.step-header__recipe:hover {
+  color: var(--color-text);
 }
 
 .step-header__sep {
