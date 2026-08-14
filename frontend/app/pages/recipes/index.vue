@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import type { Recipe } from '~/types/api'
 
+const { t } = useI18n()
 const { data: recipes, error } = await useAsyncData('recipes', () => apiGet<Recipe[]>('/api/recipes'))
 if (error.value) {
-  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+  throw createError({ statusCode: statusOf(error.value) })
 }
+
+useHead({ title: () => t('Recipes') })
+
+const isEmpty = computed(() => (recipes.value ?? []).length === 0)
 </script>
 
 <template>
   <div class="recipes">
-    <h1 class="recipes__title">{{ $t('Recipes') }}</h1>
+    <PageHeader :title="$t('Recipes')" />
 
-    <p v-if="(recipes ?? []).length === 0" class="recipes__empty">
-      {{ $t('No recipes yet') }}
-      <NuxtLink to="/recipes/import" class="recipes__empty-link">{{ $t('Import') }} &rarr;</NuxtLink>
-    </p>
+    <!-- Etat vide : une seule invitation. Le lien « Importer » doublait le bouton
+         flottant, deux appels ambre pour la meme action sur le meme ecran. -->
+    <p v-if="isEmpty" class="recipes__empty">{{ $t('No recipes yet') }}</p>
 
     <div v-else class="recipes__grid">
       <NuxtLink
@@ -32,10 +36,12 @@ if (error.value) {
         </p>
       </NuxtLink>
     </div>
-
-    <NuxtLink to="/recipes/import" class="btn btn-primary recipes__import" :title="$t('Import')">
-      {{ $t('Import') }}
-    </NuxtLink>
+    <PageAction>
+      <NuxtLink to="/recipes/import" class="btn btn-primary">
+        <AppIcon name="import" />
+        <span>{{ $t('Import File') }}</span>
+      </NuxtLink>
+    </PageAction>
   </div>
 </template>
 
@@ -46,42 +52,20 @@ if (error.value) {
   gap: 1.25rem;
 }
 
-.recipes__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-size: 1.5rem;
-}
-
 .recipes__empty {
   color: var(--color-text-dim);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
 }
 
-.recipes__empty-link {
-  color: var(--color-signal);
-}
-
+/* Deux colonnes au maximum : voir la meme note sur la liste des brassins. */
 .recipes__grid {
   display: grid;
   gap: 0.75rem;
   grid-template-columns: 1fr;
-  padding-bottom: 4rem;
 }
 
 @media (min-width: 640px) {
   .recipes__grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .recipes__grid {
-    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -115,19 +99,6 @@ if (error.value) {
   color: var(--color-text-faint);
 }
 
-.recipes__import {
-  position: fixed;
-  /* Degage la barre basse fixe mobile (AppSidebar .app-tabbar), memes valeurs que
-     le padding-bottom de .app-shell__main (layouts/default.vue). */
-  bottom: calc(4.5rem + env(safe-area-inset-bottom) + 1rem);
-  right: 1.5rem;
-  border-radius: 9999px;
-  z-index: 30;
-}
 
-@media (min-width: 1024px) {
-  .recipes__import {
-    bottom: 1.5rem;
-  }
-}
+
 </style>

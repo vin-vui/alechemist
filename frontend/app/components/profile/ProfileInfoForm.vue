@@ -5,12 +5,16 @@ const user = useCurrentUser()
 
 const form = reactive({ name: user.value?.name ?? '', email: user.value?.email ?? '' })
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 const saved = ref(false)
 const pending = ref(false)
 
 async function submit() {
   pending.value = true
   errors.value = {}
+  failed.value = false
   saved.value = false
   try {
     await client('/user/profile-information', { method: 'PUT', body: form })
@@ -18,6 +22,7 @@ async function submit() {
     saved.value = true
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -26,7 +31,8 @@ async function submit() {
 
 <template>
   <form class="panel profile-section" @submit.prevent="submit">
-    <h2 class="profile-section__title">{{ $t('Profile Information') }}</h2>
+    <h2 class="section-title">{{ $t('Profile Information') }}</h2>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
     <div class="field">
       <label class="field__label" for="profile-name">{{ $t('Name') }}</label>
       <input id="profile-name" v-model="form.name" class="field__input" />
@@ -38,7 +44,9 @@ async function submit() {
       <p v-if="errors.email" class="field__error">{{ errors.email[0] }}</p>
     </div>
     <div class="profile-section__actions">
-      <button type="submit" class="btn btn-primary" :disabled="pending">{{ $t('Save') }}</button>
+      <!-- Deux boutons « Sauvegarder » identiques se suivaient sur cet ecran, pour
+           deux actions differentes : chacun dit ce qu'il enregistre. -->
+      <button type="submit" class="btn btn-primary" :disabled="pending">{{ $t('Save profile') }}</button>
       <span v-if="saved" class="profile-section__saved">{{ $t('Saved.') }}</span>
     </div>
   </form>
@@ -52,39 +60,10 @@ async function submit() {
   gap: 0.875rem;
 }
 
-.profile-section__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  font-size: 1.125rem;
-}
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
 
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
 
-.field__input {
-  height: 48px;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
 
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
-}
 
 .profile-section__actions {
   display: flex;

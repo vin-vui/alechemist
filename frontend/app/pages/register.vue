@@ -1,22 +1,30 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'guest', sanctum: { excluded: true } })
+definePageMeta({ layout: 'guest', sanctum: { guestOnly: true } })
 
+const { t } = useI18n()
 const client = useSanctumClient()
 const { refreshIdentity } = useSanctumAuth()
 
 const form = reactive({ name: '', email: '', password: '', password_confirmation: '' })
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 const pending = ref(false)
+
+useHead({ title: () => t('Register') })
 
 async function submit() {
   pending.value = true
   errors.value = {}
+  failed.value = false
   try {
     await client('/register', { method: 'POST', body: form })
     await refreshIdentity()
     await navigateTo('/')
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -27,6 +35,7 @@ async function submit() {
   <div class="panel auth-card">
     <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="auth-card__logo" />
     <h1 class="auth-card__title">{{ $t('Register') }}</h1>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
     <form class="auth-card__form" @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="name">{{ $t('Name') }}</label>
@@ -41,14 +50,16 @@ async function submit() {
       <div class="field">
         <label class="field__label" for="password">{{ $t('Password') }}</label>
         <input id="password" v-model="form.password" type="password" required autocomplete="new-password" class="field__input" />
-        <p v-if="errors.password" class="field__error">{{ errors.password[0] }}</p>
+        <!-- La regle etait decouverte en echouant a l'envoi. -->
+        <p v-if="!errors.password" class="field__hint">{{ $t('Password rule') }}</p>
+        <p v-else class="field__error">{{ errors.password[0] }}</p>
       </div>
       <div class="field">
         <label class="field__label" for="password_confirmation">{{ $t('Confirm Password') }}</label>
         <input id="password_confirmation" v-model="form.password_confirmation" type="password" required autocomplete="new-password" class="field__input" />
         <p v-if="errors.password_confirmation" class="field__error">{{ errors.password_confirmation[0] }}</p>
       </div>
-      <button type="submit" class="btn btn-primary auth-card__submit" :disabled="pending">{{ $t('Register') }}</button>
+      <button type="submit" class="btn btn-primary auth-card__submit" :disabled="pending">{{ $t('Create my account') }}</button>
     </form>
     <div class="auth-card__links auth-card__links--center">
       <NuxtLink to="/login" class="auth-card__link">{{ $t('Already registered?') }}</NuxtLink>
@@ -56,81 +67,3 @@ async function submit() {
   </div>
 </template>
 
-<style scoped>
-.auth-card {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.auth-card__logo {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin-inline: auto;
-  border-radius: var(--radius);
-}
-
-.auth-card__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.auth-card__form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.field__input {
-  height: 48px;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
-}
-
-.auth-card__submit {
-  width: 100%;
-}
-
-.auth-card__links {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--text-label);
-}
-
-.auth-card__links--center {
-  justify-content: center;
-}
-
-.auth-card__link {
-  color: var(--color-text-dim);
-}
-
-.auth-card__link:hover {
-  color: var(--color-text);
-}
-</style>

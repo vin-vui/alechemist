@@ -22,13 +22,16 @@ const { data: brewing, error, refresh } = await useAsyncData(
   { deep: true },
 )
 if (error.value) {
-  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+  throw createError({ statusCode: statusOf(error.value) })
 }
 if (brewing.value && brewing.value.recipe_id !== recipeId) {
   throw createError({ statusCode: 404 })
 }
 
 const isCurrent = computed(() => brewing.value?.current_step === stepKey)
+const currentStepPath = computed(() => (brewing.value ? brewingPath(brewing.value) : '/'))
+
+useHead({ title: () => `${brewing.value?.name ?? ''} - ${t(stepKey)}` })
 const pageSteps = computed(() => stepsForPage(stepKey, brewing.value?.steps ?? []))
 const allChecked = computed(() => pageSteps.value.length > 0 && pageSteps.value.every((s) => s.status))
 const endOfBrewing = computed(() => brewing.value?.ferment_start != null)
@@ -42,11 +45,15 @@ const canGoNext = computed(() => {
   return true
 })
 
-// Raison affichee quand le bouton est desactive (contrat #6) : jamais de cul-de-sac
-// muet. Pas de raison hors etape courante, deja expliquee par le bandeau au-dessus.
+// Raison affichee quand le bouton est desactive (contrat #6). Pas de raison hors
+// etape courante, deja expliquee par le bandeau au-dessus, ni pour des cases non
+// cochees : elles sont juste au-dessus du bouton, vides, et se voient. La regle est
+// de ne dire que ce que l'ecran ne montre pas deja.
 const nextDisabledReason = computed(() => {
   if (canGoNext.value || !isCurrent.value) return null
-  if (!allChecked.value) return t('Check all rows')
+  // Ordre : tant qu'il reste des cases, on se tait plutot que d'annoncer le chrono
+  // ou la fermentation, qui ne sont pas ce qui bloque en premier.
+  if (!allChecked.value) return null
   if (stepKey === 'boil') return t('Timer not finished')
   if (stepKey === 'ferment') return t('Fermentation not started')
   return null
@@ -118,15 +125,21 @@ function fermentRowMeta(view: FermentStepView): string {
 
 <template>
   <div v-if="brewing" class="step-page">
-    <StepHeader :brewing="brewing" :title="config.title" />
+    <StepHeader :brewing="brewing" :title="config.title" @note-saved="brewing.note = $event" />
     <StepSpine :brewing="brewing" :active="stepKey" />
 
-    <p v-if="!isCurrent" class="banner-info">
-      {{ $t('Current step') }} : {{ $t(brewing.current_step ?? 'preparation') }}
+    <!-- Consultation d'une etape passee : le bandeau annonce l'etape reelle et
+         offre le chemin du retour. Avant, il etait suivi d'un bouton « Prochaine
+         etape » grise et muet, c'est-a-dire d'un cul-de-sac. -->
+    <p v-if="!isCurrent" class="banner-info step-page__banner">
+      <span>{{ $t('Current step') }} : {{ $t(brewing.current_step ?? 'preparation') }}</span>
+      <NuxtLink :to="currentStepPath" class="step-page__banner-link">
+        {{ $t('Back to current step') }} &rarr;
+      </NuxtLink>
     </p>
 
     <p v-if="mutationError" class="banner-error">
-      {{ $t('Whoops! Something went wrong.') }}
+      {{ $t('Step not saved') }}
     </p>
 
     <!-- Etape ferment : echeancier -->
@@ -169,7 +182,13 @@ function fermentRowMeta(view: FermentStepView): string {
       />
     </div>
 
-    <NextButton :enabled="canGoNext" :end-of-brewing="endOfBrewing" :reason="nextDisabledReason" @next="next" />
+    <NextButton
+      v-if="isCurrent"
+      :enabled="canGoNext"
+      :end-of-brewing="endOfBrewing"
+      :reason="nextDisabledReason"
+      @next="next"
+    />
   </div>
 </template>
 
@@ -184,5 +203,17 @@ function fermentRowMeta(view: FermentStepView): string {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.step-page__banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.step-page__banner-link {
+  color: var(--color-signal);
 }
 </style>

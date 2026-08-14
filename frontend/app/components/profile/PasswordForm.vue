@@ -3,12 +3,16 @@ const client = useSanctumClient()
 
 const form = reactive({ current_password: '', password: '', password_confirmation: '' })
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 const saved = ref(false)
 const pending = ref(false)
 
 async function submit() {
   pending.value = true
   errors.value = {}
+  failed.value = false
   saved.value = false
   try {
     await client('/user/password', { method: 'PUT', body: form })
@@ -18,6 +22,7 @@ async function submit() {
     saved.value = true
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -26,7 +31,8 @@ async function submit() {
 
 <template>
   <form class="panel profile-section" @submit.prevent="submit">
-    <h2 class="profile-section__title">{{ $t('Update Password') }}</h2>
+    <h2 class="section-title">{{ $t('Update Password') }}</h2>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
     <div class="field">
       <label class="field__label" for="current-password">{{ $t('Current Password') }}</label>
       <input id="current-password" v-model="form.current_password" type="password" autocomplete="current-password" class="field__input" />
@@ -35,7 +41,8 @@ async function submit() {
     <div class="field">
       <label class="field__label" for="new-password">{{ $t('New Password') }}</label>
       <input id="new-password" v-model="form.password" type="password" autocomplete="new-password" class="field__input" />
-      <p v-if="errors.password" class="field__error">{{ errors.password[0] }}</p>
+      <p v-if="!errors.password" class="field__hint">{{ $t('Password rule') }}</p>
+      <p v-else class="field__error">{{ errors.password[0] }}</p>
     </div>
     <div class="field">
       <label class="field__label" for="password-confirmation">{{ $t('Confirm Password') }}</label>
@@ -43,7 +50,7 @@ async function submit() {
       <p v-if="errors.password_confirmation" class="field__error">{{ errors.password_confirmation[0] }}</p>
     </div>
     <div class="profile-section__actions">
-      <button type="submit" class="btn btn-primary" :disabled="pending">{{ $t('Save') }}</button>
+      <button type="submit" class="btn btn-primary" :disabled="pending">{{ $t('Change password') }}</button>
       <span v-if="saved" class="profile-section__saved">{{ $t('Saved.') }}</span>
     </div>
   </form>
@@ -57,39 +64,10 @@ async function submit() {
   gap: 0.875rem;
 }
 
-.profile-section__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  font-size: 1.125rem;
-}
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
 
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
 
-.field__input {
-  height: 48px;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
 
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
-}
 
 .profile-section__actions {
   display: flex;

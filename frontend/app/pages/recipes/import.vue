@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import type { Recipe } from '~/types/api'
 
+const { t } = useI18n()
+
 const file = ref<File | null>(null)
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 const pending = ref(false)
+
+useHead({ title: () => t('Import File') })
 
 function onFileChange(event: Event) {
   file.value = (event.target as HTMLInputElement).files?.[0] ?? null
@@ -13,6 +20,7 @@ async function submit() {
   if (!file.value) return
   pending.value = true
   errors.value = {}
+  failed.value = false
   const body = new FormData()
   body.append('file', file.value)
   try {
@@ -20,6 +28,7 @@ async function submit() {
     await navigateTo(`/recipes/${recipe.id}`)
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -28,35 +37,35 @@ async function submit() {
 
 <template>
   <div class="import-page">
-    <h1 class="import-page__title">{{ $t('Import File') }}</h1>
-    <form class="panel import-page__form" @submit.prevent="submit">
-      <p class="import-page__hint">{{ $t('File BeerXML Format Only') }}</p>
+    <PageHeader :title="$t('Import File')" />
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <form id="import-form" class="panel import-page__form" @submit.prevent="submit">
       <label class="import-page__dropzone">
-        <span v-if="!file">{{ $t('Upload a file') }} ({{ $t('XML up to 2MB') }})</span>
+        <span v-if="!file" class="import-page__dropzone-action">{{ $t('Upload a file') }}</span>
         <span v-else class="import-page__filename">{{ file.name }}</span>
+        <span class="import-page__hint">{{ $t('File BeerXML Format Only') }} - 2 Mo max</span>
         <input type="file" accept=".xml,text/xml" class="import-page__file-input" @change="onFileChange" />
       </label>
-      <p v-if="errors.file" class="import-page__error">{{ errors.file[0] }}</p>
-      <button type="submit" class="btn btn-primary import-page__submit" :disabled="pending || !file">{{ $t('Import') }}</button>
+      <p v-if="errors.file" class="field__error">{{ errors.file[0] }}</p>
     </form>
+
+    <!-- Un bouton grise sans raison est un cul-de-sac (contrat #6). -->
+    <PageAction :reason="file ? null : $t('Choose a file first')">
+      <template #cancel>
+        <NuxtLink to="/recipes" class="btn btn-secondary">{{ $t('Cancel') }}</NuxtLink>
+      </template>
+      <button type="submit" form="import-form" class="btn" :class="{ 'btn-primary': file }" :disabled="pending || !file">
+        {{ $t('Import the recipe') }}
+      </button>
+    </PageAction>
   </div>
 </template>
 
 <style scoped>
 .import-page {
-  max-width: 28rem;
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-}
-
-.import-page__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-size: 1.5rem;
 }
 
 .import-page__form {
@@ -67,8 +76,10 @@ async function submit() {
 }
 
 .import-page__hint {
+  display: block;
+  margin-top: 0.375rem;
   font-size: var(--text-label);
-  color: var(--color-text-dim);
+  color: var(--color-text-faint);
 }
 
 .import-page__dropzone {
@@ -82,6 +93,17 @@ async function submit() {
   color: var(--color-text-dim);
   min-height: 96px;
 }
+
+/* La zone est un choix de fichier : elle s'annonce comme une action, pas comme
+   une phrase descriptive perdue dans un rectangle. */
+.import-page__dropzone-action {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
 
 .import-page__dropzone:hover {
   border-color: var(--color-signal);
@@ -99,12 +121,4 @@ async function submit() {
   cursor: pointer;
 }
 
-.import-page__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
-}
-
-.import-page__submit {
-  width: 100%;
-}
 </style>

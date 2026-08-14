@@ -3,7 +3,7 @@ import type { Dashboard } from '~/types/api'
 
 const { data: dashboard, error } = await useAsyncData('dashboard', () => apiGet<Dashboard>('/api/dashboard'))
 if (error.value) {
-  throw createError({ statusCode: error.value.statusCode ?? 500, statusMessage: error.value.statusMessage ?? error.value.message })
+  throw createError({ statusCode: statusOf(error.value) })
 }
 const now = new Date()
 
@@ -13,12 +13,24 @@ const now = new Date()
 // plusieurs brassins en cours (rare mais possible), seul le premier devient le
 // heros ; les autres restent listes juste dessous, comportement inchange, juste
 // redistribue visuellement (aucune donnee perdue).
+const { t } = useI18n()
+
+useHead({ title: () => t('Dashboard') })
+
 const currentBrewing = computed(() => dashboard.value?.in_progress_brewings[0] ?? null)
 const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice(1) ?? [])
+
+// Compte neuf : il n'y a aucune recette, donc « choisissez une recette » menait a
+// une liste vide. La seule premiere action possible est d'importer un BeerXML.
+const hasRecipes = computed(() => (dashboard.value?.recipe_count ?? 0) > 0)
 </script>
 
 <template>
   <div v-if="dashboard" class="dashboard">
+    <!-- Meme en-tete que les autres ecrans. Le titre etait porte par le nom du
+         brassin en heros, si bien qu'un tableau de bord vide n'avait aucun titre. -->
+    <PageHeader :title="$t('Dashboard')" />
+
     <!-- Heros : LE brassin en cours. Etape courante mise en avant en --color-signal,
          toute la carte est l'acces direct a l'etape (meme convention que les autres
          cartes de cette page : carte cliquable, pas de bouton redondant). -->
@@ -28,43 +40,40 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
       class="panel dashboard__hero"
       :style="{ '--brewing-color': ebcToHex(currentBrewing.recipe?.color ?? null) }"
     >
-      <h1 class="dashboard__hero-name">{{ currentBrewing.name }}</h1>
+      <p class="dashboard__hero-name">{{ currentBrewing.name }}</p>
       <p class="dashboard__hero-recipe">{{ currentBrewing.recipe?.name }}</p>
       <p class="dashboard__hero-meta">
         <span class="data">{{ formatDate(currentBrewing.date_start) }}</span>
         <span class="dashboard__sep">-</span>
-        <span class="data">{{ currentBrewing.volume }}</span><span class="dashboard__unit">l</span>
+        <span class="data">{{ formatQuantity(currentBrewing.volume, 'l') }}</span>
       </p>
       <p class="dashboard__hero-step">
         <span class="dashboard__hero-step-name">{{ $t(currentBrewing.current_step ?? 'preparation') }}</span>
         <span class="dashboard__hero-step-arrow" aria-hidden="true">&rarr;</span>
       </p>
     </NuxtLink>
+    <!-- Etat vide : une seule invitation, et elle mene la ou il y a quelque chose a
+         faire. Il y en avait trois, vers la meme page, sous trois libelles. -->
     <div v-else class="panel dashboard__hero dashboard__hero--empty">
-      <p>{{ $t('No brewings in progress') }}</p>
-      <NuxtLink to="/recipes" class="dashboard__empty-link">{{ $t('Recipes') }} &rarr;</NuxtLink>
+      <p>{{ hasRecipes ? $t('No brewings in progress') : $t('Import your first recipe') }}</p>
+      <NuxtLink :to="hasRecipes ? '/recipes' : '/recipes/import'" class="dashboard__empty-link">
+        {{ hasRecipes ? $t('Recipes') : $t('Import File') }} &rarr;
+      </NuxtLink>
     </div>
 
     <!-- Autres brassins en cours (au-dela du heros), s'il y en a. -->
     <section v-if="otherBrewings.length > 0" class="dashboard__section">
-      <h2 class="dashboard__heading">{{ $t('Other brewings in progress') }}</h2>
+      <!-- Compte porte par le titre, comme celui des fermentations juste dessous.
+           Meme carte que les deux listes de brassins : la suppression n'y figure
+           pas, le tableau de bord est un ecran de coup d'oeil. -->
+      <h2 class="section-title">{{ $t('n_other_brewings', otherBrewings.length) }}</h2>
       <div class="dashboard__grid">
-        <NuxtLink
+        <BrewingCard
           v-for="brewing in otherBrewings"
           :key="brewing.id"
-          :to="brewingPath(brewing)"
-          class="panel dashboard__brewing"
-          :style="{ '--brewing-color': ebcToHex(brewing.recipe?.color ?? null) }"
-        >
-          <p class="dashboard__brewing-name">{{ brewing.name }}</p>
-          <p class="dashboard__brewing-recipe">{{ brewing.recipe?.name }}</p>
-          <p class="dashboard__brewing-meta">
-            <span class="data">{{ formatDate(brewing.date_start) }}</span>
-            <span class="dashboard__sep">-</span>
-            <span class="data">{{ brewing.volume }}</span><span class="dashboard__unit">l</span>
-          </p>
-          <p class="chip dashboard__brewing-step">{{ $t(brewing.current_step ?? 'preparation') }}</p>
-        </NuxtLink>
+          :brewing="brewing"
+          :deletable="false"
+        />
       </div>
     </section>
 
@@ -72,13 +81,13 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
       <!-- Le titre ne porte le compteur que s'il est non nul (P1) : "0 FERMENTATIONS
            EN COURS" au-dessus de "Aucune fermentation en cours" disait deux fois la
            meme chose. A zero, seule l'invitation actionnable reste. -->
-      <h2 v-if="dashboard.ferment_brewings.length > 0" class="dashboard__heading">
+      <h2 v-if="dashboard.ferment_brewings.length > 0" class="section-title">
         {{ $t('n_fermentations', dashboard.ferment_brewings.length) }}
       </h2>
-      <div v-if="dashboard.ferment_brewings.length === 0" class="dashboard__empty">
-        <p>{{ $t('No fermentations in progress') }}</p>
-        <NuxtLink to="/recipes" class="dashboard__empty-link">{{ $t('View recipes') }} &rarr;</NuxtLink>
-      </div>
+      <!-- Plus de lien ici : l'invitation de la page est celle du bloc principal. -->
+      <p v-if="dashboard.ferment_brewings.length === 0" class="dashboard__empty">
+        {{ $t('No fermentations in progress') }}
+      </p>
       <div
         v-for="brewing in dashboard.ferment_brewings"
         :key="brewing.id"
@@ -106,12 +115,36 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
       </div>
     </section>
 
+    <!-- L'archive des brassins termines. Elle occupait une page et un onglet a
+         elle seule, qui redisaient ce que cet ecran montre deja. Repliee par
+         defaut : le tableau de bord reste un coup d'oeil, et ne s'allonge pas
+         d'une rangee a chaque brassin fini. -->
+    <details v-if="dashboard.finished_brewings.length > 0" class="dashboard__archive">
+      <!-- Le chevron est explicite : `display: flex` sur un `summary` efface le
+           marqueur natif, et le resume se lisait alors comme un titre de section
+           de plus, sans rien qui dise qu'il s'ouvre. -->
+      <summary class="dashboard__archive-summary">
+        <AppIcon name="chevron" class="dashboard__archive-chevron" />
+        {{ $t('n_brewings_finished', dashboard.finished_brewings.length) }}
+      </summary>
+      <div class="dashboard__grid dashboard__archive-list">
+        <BrewingCard
+          v-for="brewing in dashboard.finished_brewings"
+          :key="brewing.id"
+          :brewing="brewing"
+          :deletable="false"
+        />
+      </div>
+    </details>
+
     <!-- Compteur de recettes : l'information la moins urgente de la page, en
          dernier (P1). Filet de separation plutot qu'un panel, pour ne pas rivaliser
-         visuellement avec le heros et les fermentations. -->
-    <NuxtLink to="/recipes" class="dashboard__metric">
-      <p class="dashboard__metric-value data">{{ dashboard.recipe_count }}</p>
-      <p class="dashboard__metric-label">{{ $t('n_recipes', dashboard.recipe_count) }}</p>
+         visuellement avec le heros et les fermentations.
+         Le chiffre en gros au-dessus de « 1 recette » disait deux fois la meme
+         chose : il ne reste que la phrase, et une fleche qui dit que c'est un lien. -->
+    <NuxtLink v-if="hasRecipes" to="/recipes" class="dashboard__metric">
+      <span class="dashboard__metric-label">{{ $t('n_recipes', dashboard.recipe_count) }}</span>
+      <span aria-hidden="true">&rarr;</span>
     </NuxtLink>
   </div>
 </template>
@@ -191,21 +224,9 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
   gap: 0.75rem;
 }
 
-.dashboard__heading {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  font-size: 1.125rem;
-}
-
 .dashboard__empty {
   color: var(--color-text-dim);
   font-size: var(--text-body);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
 }
 
 .dashboard__empty-link {
@@ -274,6 +295,11 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
   background-color: var(--color-malt);
 }
 
+/*
+ * Deux colonnes au maximum. En trois colonnes dans une colonne de contenu de
+ * 40rem, une carte seule occupait un tiers de la largeur et paraissait rabougrie
+ * a cote du heros pleine largeur juste au-dessus.
+ */
 .dashboard__grid {
   display: grid;
   gap: 0.75rem;
@@ -286,73 +312,62 @@ const otherBrewings = computed(() => dashboard.value?.in_progress_brewings.slice
   }
 }
 
-@media (min-width: 1024px) {
-  .dashboard__grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.dashboard__brewing {
-  display: block;
-  padding: 1rem;
-  border-left: 4px solid var(--brewing-color, var(--color-rule));
-  transition: background-color 0.15s ease;
-}
-
-.dashboard__brewing:hover {
-  background-color: var(--color-panel-hi);
-}
-
-.dashboard__brewing-name {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.dashboard__brewing-recipe {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.dashboard__brewing-meta {
-  margin-top: 0.25rem;
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
 .dashboard__sep {
   color: var(--color-text-faint);
   margin-inline: 0.25rem;
 }
 
-.dashboard__unit {
-  margin-left: 0.25rem;
+/* Le resume porte le compte et se lit comme un titre de section : deplie, il en
+   devient un. */
+.dashboard__archive-summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--color-text-dim);
 }
 
-.dashboard__brewing-step {
-  margin-top: 0.5rem;
-}
-
-.dashboard__metric {
-  display: block;
-  align-self: flex-start;
-  max-width: 14rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-rule);
-}
-
-.dashboard__metric-value {
-  font-size: var(--text-metric);
+.dashboard__archive-summary:hover {
   color: var(--color-text);
 }
 
-.dashboard__metric-label {
-  margin-top: 0.25rem;
+.dashboard__archive[open] .dashboard__archive-summary {
+  color: var(--color-text);
+}
+
+.dashboard__archive-chevron {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex: 0 0 auto;
+  transition: transform 0.15s ease;
+}
+
+.dashboard__archive[open] .dashboard__archive-chevron {
+  transform: rotate(90deg);
+}
+
+.dashboard__archive-list {
+  margin-top: 0.75rem;
+}
+
+.dashboard__metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  min-height: 44px;
   font-size: var(--text-label);
   color: var(--color-text-dim);
   transition: color 0.15s ease;
 }
 
-.dashboard__metric:hover .dashboard__metric-label {
+.dashboard__metric:hover {
   color: var(--color-text);
 }
 </style>

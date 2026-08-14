@@ -1,30 +1,56 @@
 <script setup lang="ts">
-import type { Brewing } from '~/types/api'
+import type { Brewing, Recipe } from '~/types/api'
 
+const { t } = useI18n()
 const route = useRoute()
 const recipeId = Number(route.params.recipe)
+
+// L'ecran ne disait pas de quelle recette il s'agissait : arrive par un lien
+// profond, on remplissait un formulaire sans savoir ce qu'on allait brasser.
+const { data: recipe } = await useAsyncData(`recipe-${recipeId}`, () => apiGet<Recipe>(`/api/recipes/${recipeId}`))
+
 const form = reactive({
-  name: '',
+  // Nom pre-rempli : un champ obligatoire et vide, sans exemple, laissait deviner
+  // ce qu'on attendait.
+  name: recipe.value ? `${recipe.value.name} - ${formatDate(new Date().toISOString())}` : '',
   date_start: new Date().toISOString().slice(0, 10),
   note: '',
 })
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
+const pending = ref(false)
+
+useHead({ title: () => t('New Brewing') })
 
 async function submit() {
   errors.value = {}
+  failed.value = false
+  pending.value = true
   try {
     const brewing = await apiSend<Brewing>(`/api/recipes/${recipeId}/brewings`, 'POST', { ...form })
     await navigateTo(`/recipes/${recipeId}/brewings/${brewing.id}/preparation`)
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
+  } finally {
+    pending.value = false
   }
 }
 </script>
 
 <template>
   <div class="new-brewing">
-    <h1 class="new-brewing__title">{{ $t('New Brewing') }}</h1>
-    <form class="panel new-brewing__form" @submit.prevent="submit">
+    <PageHeader :title="$t('New Brewing')">
+      <template #meta>
+        <!-- L'ecran ne disait pas de quelle recette il s'agissait : arrive par un
+             lien profond, on remplissait un formulaire sans savoir quoi brasser. -->
+        <p v-if="recipe" class="new-brewing__recipe">{{ recipe.name }}</p>
+      </template>
+    </PageHeader>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <form id="new-brewing-form" class="panel new-brewing__form" @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="name">{{ $t('Name') }}</label>
         <input id="name" v-model="form.name" required maxlength="255" class="field__input" />
@@ -37,28 +63,39 @@ async function submit() {
       </div>
       <div class="field">
         <label class="field__label" for="note">{{ $t('Note') }}</label>
-        <textarea id="note" v-model="form.note" rows="8" class="field__input field__textarea" />
+        <textarea
+          id="note"
+          v-model="form.note"
+          rows="6"
+          class="field__input field__textarea"
+          :placeholder="$t('Note placeholder')"
+        />
       </div>
-      <button type="submit" class="btn btn-primary new-brewing__submit">{{ $t('Save & Start') }}</button>
     </form>
+
+    <!-- Un formulaire se quitte par son annulation : c'est la seule sortie de cet
+         ecran, il n'y a plus de lien de retour. -->
+    <PageAction>
+      <template #cancel>
+        <NuxtLink :to="`/recipes/${recipeId}`" class="btn btn-secondary">{{ $t('Cancel') }}</NuxtLink>
+      </template>
+      <button type="submit" form="new-brewing-form" class="btn btn-primary" :disabled="pending">
+        {{ $t('Save & Start') }}
+      </button>
+    </PageAction>
   </div>
 </template>
 
 <style scoped>
 .new-brewing {
-  max-width: 28rem;
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
 
-.new-brewing__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-size: 1.5rem;
+.new-brewing__recipe {
+  margin-top: 0.25rem;
+  color: var(--color-text-dim);
 }
 
 .new-brewing__form {
@@ -68,40 +105,4 @@ async function submit() {
   gap: 1rem;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.field__input {
-  height: 48px;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-.field__textarea {
-  height: auto;
-  padding-block: 0.625rem;
-  font-family: var(--font-sans);
-  resize: vertical;
-}
-
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
-}
-
-.new-brewing__submit {
-  width: 100%;
-}
 </style>

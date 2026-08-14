@@ -9,6 +9,9 @@ const recoveryCodes = ref<string[]>([])
 const confirmCode = ref('')
 const confirming = ref(false)
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 // Un seul pending partage entre les 5 actions du composant : elles ne sont jamais
 // declenchables simultanement (boutons visibles selon l'etat), donc pas besoin d'un
 // ref par action.
@@ -31,6 +34,7 @@ async function enable() {
 async function confirmSetup() {
   pending.value = true
   errors.value = {}
+  failed.value = false
   try {
     await client('/user/confirmed-two-factor-authentication', { method: 'POST', body: { code: confirmCode.value } })
     recoveryCodes.value = await client<string[]>('/user/two-factor-recovery-codes')
@@ -39,6 +43,7 @@ async function confirmSetup() {
     await refreshIdentity()
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -83,10 +88,16 @@ async function disable() {
 
 <template>
   <div class="panel profile-section">
-    <h2 class="profile-section__title">{{ $t('Two Factor Authentication') }}</h2>
+    <h2 class="section-title">{{ $t('Two Factor Authentication') }}</h2>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
 
+    <!-- L'ecran ne disait pas si la double authentification etait active : il n'y
+         avait qu'un bouton « Activer » sans etat ni explication. -->
     <template v-if="!user?.two_factor_enabled && !confirming">
-      <button type="button" class="btn btn-primary" :disabled="pending" @click="enable">{{ $t('Enable') }}</button>
+      <p class="profile-section__hint">{{ $t('Two factor disabled') }}</p>
+      <button type="button" class="btn btn-secondary two-factor__enable" :disabled="pending" @click="enable">
+        {{ $t('Enable') }}
+      </button>
     </template>
 
     <template v-if="confirming && qrCode">
@@ -105,6 +116,7 @@ async function disable() {
     </template>
 
     <template v-if="user?.two_factor_enabled">
+      <p class="profile-section__hint">{{ $t('Two factor enabled') }}</p>
       <ul v-if="recoveryCodes.length" class="two-factor__codes data">
         <li v-for="code in recoveryCodes" :key="code">{{ code }}</li>
       </ul>
@@ -127,13 +139,6 @@ async function disable() {
   gap: 0.875rem;
 }
 
-.profile-section__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  font-size: 1.125rem;
-}
 
 .profile-section__hint {
   font-size: var(--text-body);
@@ -147,35 +152,17 @@ async function disable() {
   border-radius: var(--radius);
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
 
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
 
-.field__input {
-  height: 48px;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
 
 .two-factor__code-input {
   max-width: 12rem;
 }
 
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
+.two-factor__enable {
+  align-self: flex-start;
 }
+
 
 .two-factor__codes {
   background-color: var(--color-ink);

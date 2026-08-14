@@ -6,15 +6,50 @@ interface SessionRow {
   is_current_device: boolean
 }
 
+const { t } = useI18n()
+
 const { data: sessions, refresh } = await useAsyncData('sessions', () => apiGet<SessionRow[]>('/api/user/sessions'))
+
+/*
+ * La ligne affichait l'IP brute suivie du User-Agent complet, tronque a l'ellipse :
+ * « 172.17.0.1 - Mozilla/5.0 (X11; Lin... ». On nomme l'appareil comme l'utilisateur
+ * le reconnait : son navigateur et son systeme.
+ */
+const BROWSERS: [RegExp, string][] = [
+  [/Edg\//, 'Edge'],
+  [/OPR\/|Opera/, 'Opera'],
+  [/Chrome\//, 'Chrome'],
+  [/Safari\//, 'Safari'],
+  [/Firefox\//, 'Firefox'],
+]
+
+const PLATFORMS: [RegExp, string][] = [
+  [/Android/, 'Android'],
+  [/iPhone|iPad|iOS/, 'iOS'],
+  [/Mac OS X|Macintosh/, 'macOS'],
+  [/Windows/, 'Windows'],
+  [/Linux|X11/, 'Linux'],
+]
+
+function describe(userAgent: string | null): string {
+  if (!userAgent) return t('Unknown device')
+  const browser = BROWSERS.find(([pattern]) => pattern.test(userAgent))?.[1]
+  const platform = PLATFORMS.find(([pattern]) => pattern.test(userAgent))?.[1]
+  if (browser && platform) return `${browser} - ${platform}`
+  return browser ?? platform ?? t('Unknown device')
+}
 const password = ref('')
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 const askPassword = ref(false)
 const pending = ref(false)
 
 async function logoutOthers() {
   pending.value = true
   errors.value = {}
+  failed.value = false
   try {
     await apiSend('/api/user/sessions/logout-others', 'POST', { password: password.value })
     askPassword.value = false
@@ -22,6 +57,7 @@ async function logoutOthers() {
     await refresh()
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -30,15 +66,21 @@ async function logoutOthers() {
 
 <template>
   <div class="panel profile-section">
-    <h2 class="profile-section__title">{{ $t('Browser Sessions') }}</h2>
+    <h2 class="section-title">{{ $t('Browser Sessions') }}</h2>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
     <ul class="sessions-list">
       <li v-for="(session, index) in sessions ?? []" :key="index" class="sessions-list__row">
-        <span class="sessions-list__info">{{ session.ip_address }} - {{ session.user_agent }}</span>
+        <span class="sessions-list__info">{{ describe(session.user_agent) }}</span>
         <span v-if="session.is_current_device" class="chip sessions-list__badge">{{ $t('This device') }}</span>
         <span v-else class="sessions-list__date data">{{ formatDate(session.last_active_at) }}</span>
       </li>
     </ul>
-    <button v-if="!askPassword" type="button" class="btn btn-secondary" @click="askPassword = true">
+    <button
+      v-if="!askPassword"
+      type="button"
+      class="btn btn-secondary sessions-list__logout"
+      @click="askPassword = true"
+    >
       {{ $t('Log Out Other Browser Sessions') }}
     </button>
     <form v-else class="sessions-list__form" @submit.prevent="logoutOthers">
@@ -58,14 +100,6 @@ async function logoutOthers() {
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
-}
-
-.profile-section__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  font-size: 1.125rem;
 }
 
 .sessions-list {
@@ -99,34 +133,20 @@ async function logoutOthers() {
   color: var(--color-text-dim);
 }
 
+/* Le bouton reste dans la carte : son libelle, le plus long de l'app, poussait la
+   page a 478px de large pour 390px de viewport. */
+.sessions-list__logout {
+  align-self: flex-start;
+}
+
 .sessions-list__form {
   display: flex;
   align-items: flex-end;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 .sessions-list__field {
-  flex: 1;
-}
-
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.field__input {
-  height: 48px;
-  width: 100%;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
+  flex: 1 1 12rem;
 }
 </style>

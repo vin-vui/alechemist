@@ -1,19 +1,31 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'guest', sanctum: { excluded: true } })
+// `excluded: true` sortait la page du middleware global : un utilisateur deja
+// connecte pouvait ouvrir /login, y poster le formulaire, et rester bloque dessus.
+// Sans `excluded`, le middleware reconnait /login comme page de visiteur et le
+// renvoie au tableau de bord.
+definePageMeta({ layout: 'guest' })
 
+const { t } = useI18n()
 const client = useSanctumClient()
 const { refreshIdentity } = useSanctumAuth()
 
 const form = reactive({ email: '', password: '', remember: false })
 const errors = ref<Record<string, string[]>>({})
+const failure = ref<string | null>(null)
 const pending = ref(false)
+
+useHead({ title: () => t('Log in') })
 
 async function submit() {
   pending.value = true
   errors.value = {}
+  failure.value = null
   try {
-    const response = await client<{ two_factor: boolean }>('/login', { method: 'POST', body: form })
-    if (response.two_factor) {
+    // Fortify repond 204 sans corps dans certains cas : `response.two_factor`
+    // levait alors un TypeError, attrape plus bas, et l'utilisateur restait
+    // devant un formulaire immobile sans le moindre message.
+    const response = await client<{ two_factor?: boolean } | null>('/login', { method: 'POST', body: form })
+    if (response?.two_factor) {
       await navigateTo('/two-factor-challenge')
     } else {
       await refreshIdentity()
@@ -21,6 +33,11 @@ async function submit() {
     }
   } catch (e) {
     errors.value = extractErrors(e)
+    // Une erreur sans detail de validation (reseau, 419, 500) ne doit pas se
+    // traduire par un ecran qui ne bouge pas : on le dit.
+    if (Object.keys(errors.value).length === 0) {
+      failure.value = t('Login failed')
+    }
   } finally {
     pending.value = false
   }
@@ -31,6 +48,7 @@ async function submit() {
   <div class="panel auth-card">
     <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="auth-card__logo" />
     <h1 class="auth-card__title">{{ $t('Log in') }}</h1>
+    <p v-if="failure" class="banner-error">{{ failure }}</p>
     <form class="auth-card__form" @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="email">{{ $t('Email') }}</label>
@@ -43,7 +61,7 @@ async function submit() {
         <p v-if="errors.password" class="field__error">{{ errors.password[0] }}</p>
       </div>
       <label class="auth-card__remember">
-        <input v-model="form.remember" type="checkbox" class="auth-card__checkbox" /> {{ $t('Remember me') }}
+        <input v-model="form.remember" type="checkbox" class="checkbox" /> {{ $t('Remember me') }}
       </label>
       <button type="submit" class="btn btn-primary auth-card__submit" :disabled="pending">{{ $t('Log in') }}</button>
     </form>
@@ -54,91 +72,3 @@ async function submit() {
   </div>
 </template>
 
-<style scoped>
-.auth-card {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.auth-card__logo {
-  width: 3.5rem;
-  height: 3.5rem;
-  margin-inline: auto;
-  border-radius: var(--radius);
-}
-
-.auth-card__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.auth-card__form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.field__input {
-  height: 48px;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
-}
-
-.auth-card__remember {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.auth-card__checkbox {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--color-signal);
-}
-
-.auth-card__submit {
-  width: 100%;
-}
-
-.auth-card__links {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--text-label);
-}
-
-.auth-card__link {
-  color: var(--color-text-dim);
-}
-
-.auth-card__link:hover {
-  color: var(--color-text);
-}
-</style>

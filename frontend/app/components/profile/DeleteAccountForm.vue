@@ -1,17 +1,22 @@
 <script setup lang="ts">
 const password = ref('')
 const errors = ref<Record<string, string[]>>({})
+// Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
+// immobile et muet : on le dit.
+const failed = ref(false)
 const askPassword = ref(false)
 const pending = ref(false)
 
 async function destroyAccount() {
   pending.value = true
   errors.value = {}
+  failed.value = false
   try {
     await apiSend('/api/user', 'DELETE', { password: password.value })
     window.location.href = '/login'
   } catch (e) {
     errors.value = extractErrors(e)
+    failed.value = Object.keys(errors.value).length === 0
   } finally {
     pending.value = false
   }
@@ -20,7 +25,8 @@ async function destroyAccount() {
 
 <template>
   <div class="panel profile-section profile-section--danger">
-    <h2 class="profile-section__title profile-section__title--danger">{{ $t('Delete Account') }}</h2>
+    <h2 class="section-title profile-section__title--danger">{{ $t('Delete Account') }}</h2>
+    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
     <p class="profile-section__hint">{{ $t('Once your account is deleted, all of its resources and data will be permanently deleted.') }}</p>
     <button v-if="!askPassword" type="button" class="btn btn-danger" @click="askPassword = true">
       {{ $t('Delete Account') }}
@@ -44,17 +50,10 @@ async function destroyAccount() {
   gap: 0.875rem;
 }
 
+/* Un filet ember suffit a isoler la zone : le contour double, le titre et le bouton
+   faisaient trois signaux pour une seule action. */
 .profile-section--danger {
   border-color: var(--color-ember);
-  border-width: 2px;
-}
-
-.profile-section__title {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  font-size: 1.125rem;
 }
 
 .profile-section__title--danger {
@@ -69,31 +68,11 @@ async function destroyAccount() {
 .delete-account__form {
   display: flex;
   align-items: flex-end;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 .delete-account__field {
-  flex: 1;
-}
-
-.field__label {
-  font-size: var(--text-label);
-  color: var(--color-text-dim);
-}
-
-.field__input {
-  height: 48px;
-  width: 100%;
-  background-color: var(--color-panel);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius);
-  padding-inline: 0.875rem;
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-.field__error {
-  font-size: var(--text-label);
-  color: var(--color-ember);
+  flex: 1 1 12rem;
 }
 </style>
