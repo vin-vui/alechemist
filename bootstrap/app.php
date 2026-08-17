@@ -11,6 +11,13 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Le site est servi derrière un proxy qui termine TLS (Cloudflare pour
+        // le domaine on-forge.com de Forge). Sans cette déclaration, Laravel
+        // voit du HTTP et génère des liens http:// dans les mails de
+        // réinitialisation. `at: '*'` est le réglage usuel sur Forge : à
+        // restreindre aux IP du proxy si le serveur reste joignable en direct.
+        $middleware->trustProxies(at: '*');
+
         $middleware->redirectUsersTo('/');
 
         // Backend sans vues depuis la phase 4 : il n'y a plus de route nommée
