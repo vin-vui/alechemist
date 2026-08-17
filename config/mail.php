@@ -29,7 +29,7 @@ return [
     | mailers below. You are free to add additional mailers as required.
     |
     | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
-    |            "postmark", "log", "array", "failover"
+    |            "postmark", "brevo", "log", "array", "failover"
     |
     */
 
@@ -62,6 +62,13 @@ return [
             // 'client' => [
             //     'timeout' => 5,
             // ],
+        ],
+
+        // Transport non natif, enregistre dans AppServiceProvider via le bridge
+        // symfony/brevo-mailer. API HTTP et non SMTP : les ports 25/465/587 sont
+        // bloques par defaut sur Laravel VPS.
+        'brevo' => [
+            'transport' => 'brevo',
         ],
 
         'sendmail' => [

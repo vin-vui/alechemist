@@ -5,6 +5,8 @@ namespace Tests\Feature\Api;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
@@ -98,6 +100,23 @@ class FortifyHeadlessTest extends TestCase
 
         $this->postJson('/login', ['email' => $user->email, 'password' => 'new-password'])
             ->assertOk();
+    }
+
+    public function test_l_email_de_reset_se_rend_reellement(): void
+    {
+        // Volontairement sans Notification::fake() : le transport `array` des
+        // tests rend le message pour de vrai. C'est la seule couverture du rendu
+        // markdown, dont config/mail.php fait pointer le theme sur
+        // resource_path('views/vendor/mail'), repertoire absent depuis la phase 4.
+        $user = User::factory()->create();
+
+        Event::fake([MessageSent::class]);
+
+        $this->postJson('/forgot-password', ['email' => $user->email])->assertOk();
+
+        Event::assertDispatched(MessageSent::class, function (MessageSent $event) {
+            return str_contains($event->message->toString(), 'reset-password');
+        });
     }
 
     public function test_l_email_de_reset_pointe_vers_le_front(): void
