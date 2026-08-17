@@ -34,13 +34,15 @@ vers Laravel. Sans cela, ouvrir /login dans le navigateur donnerait un 404 apres
         index index.html;
         client_max_body_size 4m;   # import BeerXML jusqu'a 2 Mo (defaut nginx = 1 Mo -> 413)
 
-        # 100% Laravel, toutes methodes : API, cookie CSRF, endpoints /user/*, logout
+        # 100% Laravel, toutes methodes : API, cookie CSRF, endpoints /user/*, logout,
+        # sonde /up (health check de deploiement Forge : sans elle ici, la SPA
+        # repondrait a sa place et la sonde ne testerait plus PHP)
         # try_files $uri @laravel (et non /index.php?$query_string) : une redirection
         # interne relance la recherche de location au niveau serveur, donc un location
         # ~ \.php$ IMBRIQUE ici ne serait jamais consulte (on retomberait sur location /
         # et l'API renverrait du HTML). Un named location (@laravel) ne repasse pas par
         # cette recherche : c'est le seul moyen fiable de forcer php-fpm ici.
-        location ~ ^/(api|sanctum|user|logout)(/|$) {
+        location ~ ^/(api|sanctum|user|logout|up)(/|$) {
             root /var/www/alechemist/public;      # public/ du repo Laravel
             try_files $uri @laravel;
         }
@@ -70,6 +72,8 @@ vers Laravel. Sans cela, ouvrir /login dans le navigateur donnerait un 404 apres
 
 ## Vérifications post-bascule
 - Login (avec et sans 2FA), refresh de page authentifiée (cookie stateful OK)
+- `curl -s https://<domaine>/up` doit renvoyer la page de santé de Laravel (200), et non le
+  shell HTML de la SPA : c'est la sonde du health check de déploiement Forge
 - `curl -i https://<domaine>/api/user` doit renvoyer un 401 JSON, PAS du HTML (sinon la SPA
   intercepte l'API : voir la note sur les named locations ci-dessus)
 - Email de reset : le lien pointe vers https://<domaine>/reset-password/...

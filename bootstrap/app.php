@@ -9,6 +9,10 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
+        // Sonde consommée par le health check de déploiement de Forge. Le vhost
+        // doit router /up vers Laravel, sinon la SPA répond à sa place et la
+        // sonde devient un test du serveur de fichiers statiques.
+        health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Le site est servi derrière un proxy qui termine TLS (Cloudflare pour
