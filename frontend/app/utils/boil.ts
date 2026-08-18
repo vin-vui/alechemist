@@ -64,6 +64,22 @@ export function isStepDueSoon(
   return remaining !== null && remaining > 0 && remaining <= DUE_WINDOW_MS
 }
 
+/**
+ * Un aromatique entre dans la cuve a l'arret du feu, puis infuse hors flamme : son
+ * chrono ne peut partir qu'une fois l'ebullition terminee. Le serveur applique la
+ * meme regle (409), l'ecran se contente de ne pas proposer le bouton avant.
+ */
+export function canStartAromaTimer(
+  boilStart: string | null,
+  boilTimeMin: number,
+  step: BrewingStep,
+  nowMs: number,
+): boolean {
+  if (step.type !== 'Aroma' || step.status || step.time === null || step.started_at !== null) return false
+  const remaining = boilRemainingMs(boilStart, boilTimeMin, nowMs)
+  return remaining !== null && remaining <= 0
+}
+
 /** Position en % d'un repere le long de la BoilTrack, de T-boil_time (0) au flame-out (100). Les Aroma sont toujours au flame-out. */
 export function boilStepPositionPercent(boilTimeMin: number, step: BrewingStep): number {
   if (boilTimeMin <= 0 || step.type === 'Aroma') return 100

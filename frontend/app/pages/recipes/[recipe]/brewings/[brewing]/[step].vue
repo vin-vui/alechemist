@@ -110,11 +110,6 @@ function otherRowQuantity(step: BrewingStep): string {
   return formatQuantity(step.quantity, step.unit)
 }
 
-function otherRowMeta(step: BrewingStep): string | null {
-  if (stepKey === 'mash' && step.time) return `${t('for')} ${t('n_minutes', step.time)}`
-  return null
-}
-
 // --- Habillage DataRow de l'echeancier ferment (comportement inchange). ---
 function fermentRowMeta(view: FermentStepView): string {
   const duration = t('n_days', view.durationDays)
@@ -156,6 +151,16 @@ function fermentRowMeta(view: FermentStepView): string {
       />
     </div>
 
+    <!-- Etape mash : un chrono par palier + la densite mesuree dans la cuve -->
+    <MashPanel
+      v-else-if="stepKey === 'mash'"
+      :brewing="brewing"
+      :steps="pageSteps"
+      :readonly="!isCurrent"
+      @refresh="refresh"
+      @toggle="toggle"
+    />
+
     <!-- Etape boil : chrono client + BoilTrack signature -->
     <BoilPanel
       v-else-if="stepKey === 'boil'"
@@ -174,7 +179,6 @@ function fermentRowMeta(view: FermentStepView): string {
         :key="step.id"
         :label="otherRowLabel(step)"
         :quantity="otherRowQuantity(step)"
-        :meta="otherRowMeta(step)"
         :state="rowState(step)"
         :checked="step.status"
         :disabled="!isCurrent"

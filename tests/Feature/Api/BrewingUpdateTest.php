@@ -31,6 +31,34 @@ class BrewingUpdateTest extends TestCase
             ->assertJsonPath('data.boil_time', 75);
     }
 
+    /**
+     * La recette porte la densité visée, le brassin porte celle qui a été mesurée
+     * dans la cuve ce jour-là : deux brassins d'une même recette ne s'écrasent pas.
+     */
+    public function test_la_densite_avant_ebullition_du_brassin_peut_etre_saisie(): void
+    {
+        $user = User::factory()->create();
+        $brewing = $this->ownedBrewing($user, ['before_boil_density' => null]);
+
+        $this->actingAs($user)
+            ->patchJson("/api/brewings/{$brewing->id}", ['before_boil_density' => 1.048])
+            ->assertOk()
+            ->assertJsonPath('data.before_boil_density', 1.048);
+
+        $this->assertEquals(1.048, $brewing->fresh()->before_boil_density);
+    }
+
+    public function test_la_densite_avant_ebullition_doit_etre_numerique(): void
+    {
+        $user = User::factory()->create();
+        $brewing = $this->ownedBrewing($user);
+
+        $this->actingAs($user)
+            ->patchJson("/api/brewings/{$brewing->id}", ['before_boil_density' => 'epaisse'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('before_boil_density');
+    }
+
     public function test_moving_to_ferment_sets_ferment_start(): void
     {
         $user = User::factory()->create();

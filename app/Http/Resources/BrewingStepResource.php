@@ -21,6 +21,7 @@ class BrewingStepResource extends JsonResource
             'time' => $this->time,
             'type' => $this->type,
             'status' => (bool) $this->status,
+            'started_at' => $this->started_at,
         ];
     }
 }

@@ -3,7 +3,7 @@ import { fermentSchedule } from '../app/utils/ferment'
 import type { BrewingStep } from '../app/types/api'
 
 function step(over: Partial<BrewingStep>): BrewingStep {
-  return { id: 1, quantity: 0, unit: 'g', field: '', time: null, type: 'Primary', date: null, status: false, ...over }
+  return { id: 1, quantity: 0, unit: 'g', field: '', time: null, type: 'Primary', date: null, status: false, started_at: null, ...over }
 }
 
 describe('fermentSchedule', () => {

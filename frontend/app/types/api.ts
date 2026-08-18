@@ -25,6 +25,8 @@ export interface Step {
 export interface BrewingStep extends Step {
   date: string | null
   status: boolean
+  /** Depart du chrono du palier, pose par le serveur. Seuls les paliers d'empatage en ont un. */
+  started_at: string | null
 }
 
 export interface Recipe {

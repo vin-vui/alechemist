@@ -20,6 +20,7 @@ class BrewingStepFactory extends Factory
             'time' => null,
             'type' => 'Preparation',
             'status' => false,
+            'started_at' => null,
             'brewing_id' => Brewing::factory(),
         ];
     }

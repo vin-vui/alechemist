@@ -12,7 +12,7 @@ import {
 import type { BrewingStep } from '../app/types/api'
 
 function step(over: Partial<BrewingStep>): BrewingStep {
-  return { id: Math.random(), quantity: 0, unit: 'g', field: '', time: null, type: 'Mash', date: null, status: false, ...over }
+  return { id: Math.random(), quantity: 0, unit: 'g', field: '', time: null, type: 'Mash', date: null, status: false, started_at: null, ...over }
 }
 
 describe('STEP_CONFIG', () => {

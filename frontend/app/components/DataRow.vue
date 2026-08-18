@@ -3,12 +3,12 @@
 // Une ligne = une action ou une mesure. Case optionnelle (absente en lecture
 // seule sur une recette : la quantite passe alors a gauche). Toute la ligne est
 // cliquable quand une case est presente.
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label: string
     quantity?: string | null
     meta?: string | null
-    state?: 'pending' | 'done' | 'late'
+    state?: 'pending' | 'done' | 'late' | 'running'
     checkable?: boolean
     checked?: boolean
     disabled?: boolean
@@ -24,6 +24,17 @@ withDefaults(
 )
 
 const emit = defineEmits<{ toggle: [] }>()
+
+/*
+ * Le nom accessible de la case est pose explicitement, et pas laisse au contenu du
+ * label : quand une ligne porte un bouton d'action (le « Demarrer » d'un palier
+ * d'empatage), la case s'annoncait « 67 °C Saccharification pendant 60 minutes
+ * Demarrer », en avalant le libelle du bouton. Le calcul ne peut pas dependre de
+ * `useSlots()` pour ne s'appliquer qu'aux lignes avec action : les slots ne sont
+ * pas reactifs, le computed serait fige sur son premier rendu et le nom
+ * redeviendrait faux des que le bouton reapparait.
+ */
+const checkboxLabel = computed(() => [props.quantity, props.label, props.meta].filter(Boolean).join(' '))
 </script>
 
 <template>
@@ -35,6 +46,7 @@ const emit = defineEmits<{ toggle: [] }>()
     <input
       type="checkbox"
       class="checkbox data-row__checkbox"
+      :aria-label="checkboxLabel"
       :checked="checked"
       :disabled="disabled"
       @change="emit('toggle')"
@@ -42,6 +54,10 @@ const emit = defineEmits<{ toggle: [] }>()
     <span v-if="quantity" class="data-row__quantity data">{{ quantity }}</span>
     <span class="data-row__label">{{ label }}</span>
     <span v-if="meta" class="data-row__meta data">{{ meta }}</span>
+    <!-- Action propre a la ligne (le « Demarrer » d'un palier d'empatage). Elle vit
+         dans le label : au consommateur d'arreter le clic pour que le bouton ne
+         coche pas la case au passage. -->
+    <span v-if="$slots.action" class="data-row__action"><slot name="action" /></span>
   </label>
   <div v-else class="data-row" :class="`data-row--${state}`">
     <span v-if="quantity" class="data-row__quantity data">{{ quantity }}</span>
@@ -87,6 +103,16 @@ div.data-row {
 
 .data-row--late {
   border-left-color: var(--color-ember);
+}
+
+/* Etape en cours : le signal unique du contrat (design-system.md #1). */
+.data-row--running {
+  border-left-color: var(--color-signal);
+}
+
+.data-row__action {
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .data-row__quantity {

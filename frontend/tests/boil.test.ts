@@ -4,6 +4,7 @@ import {
   boilProgressPercent,
   boilRemainingMs,
   boilStepPositionPercent,
+  canStartAromaTimer,
   isStepDueSoon,
   isStepLate,
   stepRemainingMinutes,
@@ -16,7 +17,7 @@ const startMs = Date.parse('2026-08-12T10:00:00Z')
 const MIN = 60_000
 
 function step(over: Partial<BrewingStep>): BrewingStep {
-  return { id: 1, quantity: 0, unit: 'g', field: '', time: null, type: 'Boil', date: null, status: false, ...over }
+  return { id: 1, quantity: 0, unit: 'g', field: '', time: null, type: 'Boil', date: null, status: false, started_at: null, ...over }
 }
 
 describe('boilEndMs / boilRemainingMs', () => {
@@ -109,5 +110,39 @@ describe('boilProgressPercent', () => {
   })
   it('plafonne a 100 une fois le chrono ecoule', () => {
     expect(boilProgressPercent(START, 60, startMs + 90 * MIN)).toBe(100)
+  })
+})
+
+// Un aromatique entre dans la cuve a l'arret du feu, puis infuse hors flamme :
+// son chrono n'a de sens qu'une fois l'ebullition terminee.
+describe('canStartAromaTimer', () => {
+  const aroma = (over: Partial<BrewingStep> = {}) => step({ type: 'Aroma', time: 10, ...over })
+
+  it('autorise le demarrage une fois l arret du feu passe', () => {
+    expect(canStartAromaTimer(START, 60, aroma(), startMs + 61 * MIN)).toBe(true)
+  })
+
+  it('refuse tant que l ebullition tourne', () => {
+    expect(canStartAromaTimer(START, 60, aroma(), startMs + 30 * MIN)).toBe(false)
+  })
+
+  it('refuse tant que l ebullition n a pas demarre', () => {
+    expect(canStartAromaTimer(null, 60, aroma(), startMs)).toBe(false)
+  })
+
+  it('refuse un palier deja demarre ou deja coche', () => {
+    expect(canStartAromaTimer(START, 60, aroma({ started_at: START }), startMs + 61 * MIN)).toBe(false)
+    expect(canStartAromaTimer(START, 60, aroma({ status: true }), startMs + 61 * MIN)).toBe(false)
+  })
+
+  // Un houblon d'amertume s'ajoute pendant l'ebullition, il n'infuse pas apres :
+  // le seul chrono qui le concerne est celui du feu.
+  it('ne concerne pas les autres types de palier', () => {
+    expect(canStartAromaTimer(START, 60, step({ type: 'Boil', time: 10 }), startMs + 61 * MIN)).toBe(false)
+  })
+
+  // Sans duree, il n'y a rien a decompter.
+  it('refuse un aromatique sans duree', () => {
+    expect(canStartAromaTimer(START, 60, aroma({ time: null }), startMs + 61 * MIN)).toBe(false)
   })
 })

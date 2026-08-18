@@ -21,6 +21,8 @@ class UpdateBrewingRequest extends FormRequest
         return [
             'note' => 'sometimes|nullable|string',
             'boil_time' => 'sometimes|integer|min:1',
+            // Mesure faite dans la cuve, distincte de la densité visée par la recette.
+            'before_boil_density' => 'sometimes|nullable|numeric',
             'current_step' => 'sometimes|in:preparation,mash,boil,yeast,ferment,completed',
         ];
     }
