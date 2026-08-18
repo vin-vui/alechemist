@@ -12,13 +12,13 @@ const form = reactive({
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const pending = ref(false)
 
 async function submit() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   try {
     await client('/reset-password', {
       method: 'POST',
@@ -27,7 +27,7 @@ async function submit() {
     await navigateTo('/login')
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -38,7 +38,7 @@ async function submit() {
   <div class="panel auth-card">
     <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="auth-card__logo" />
     <h1 class="auth-card__title">{{ $t('Reset Password') }}</h1>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <form class="auth-card__form" @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="email">{{ $t('Email') }}</label>

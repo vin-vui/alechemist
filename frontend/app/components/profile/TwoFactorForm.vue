@@ -11,7 +11,7 @@ const confirming = ref(false)
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 // Un seul pending partage entre les 5 actions du composant : elles ne sont jamais
 // declenchables simultanement (boutons visibles selon l'etat), donc pas besoin d'un
 // ref par action.
@@ -34,7 +34,7 @@ async function enable() {
 async function confirmSetup() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   try {
     await client('/user/confirmed-two-factor-authentication', { method: 'POST', body: { code: confirmCode.value } })
     recoveryCodes.value = await client<string[]>('/user/two-factor-recovery-codes')
@@ -43,7 +43,7 @@ async function confirmSetup() {
     await refreshIdentity()
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -89,7 +89,7 @@ async function disable() {
 <template>
   <div class="panel profile-section">
     <h2 class="section-title">{{ $t('Two Factor Authentication') }}</h2>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
 
     <!-- L'ecran ne disait pas si la double authentification etait active : il n'y
          avait qu'un bouton « Activer » sans etat ni explication. -->

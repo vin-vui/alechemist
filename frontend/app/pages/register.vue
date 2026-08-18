@@ -8,8 +8,9 @@ const { refreshIdentity } = useSanctumAuth()
 const form = reactive({ name: '', email: '', password: '', password_confirmation: '' })
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
-// immobile et muet : on le dit.
-const failed = ref(false)
+// immobile et muet : on le dit, et `failureMessageKey` dit lequel des trois c'est.
+// Le message unique parlait de connexion meme quand la connexion allait bien.
+const failure = ref<string | null>(null)
 const pending = ref(false)
 
 useHead({ title: () => t('Register') })
@@ -17,14 +18,14 @@ useHead({ title: () => t('Register') })
 async function submit() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   try {
     await client('/register', { method: 'POST', body: form })
     await refreshIdentity()
     await navigateTo('/')
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -35,7 +36,7 @@ async function submit() {
   <div class="panel auth-card">
     <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="auth-card__logo" />
     <h1 class="auth-card__title">{{ $t('Register') }}</h1>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <form class="auth-card__form" @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="name">{{ $t('Name') }}</label>

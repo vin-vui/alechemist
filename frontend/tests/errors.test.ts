@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractErrors, statusOf } from '../app/utils/errors'
+import { extractErrors, failureMessageKey, statusOf } from '../app/utils/errors'
 
 function fetchError(status: number, data?: unknown) {
   return Object.assign(new Error(`HTTP ${status}`), { response: { status, _data: data } })
@@ -21,6 +21,37 @@ describe('extractErrors', () => {
     expect(extractErrors(fetchError(500))).toEqual({})
     expect(extractErrors(fetchError(419))).toEqual({})
     expect(extractErrors(new TypeError('undefined is not an object'))).toEqual({})
+  })
+})
+
+// Tous les formulaires affichaient « L'action a echoue. Verifiez votre connexion »
+// quel que soit l'echec : sur un 419, la connexion n'y est pour rien et recharger
+// la page est la seule chose a faire. Le message doit dire ce qui s'est passe et
+// quoi faire (docs/design-system.md, Ecriture).
+describe('failureMessageKey', () => {
+  it('distingue une session expiree', () => {
+    expect(failureMessageKey(fetchError(419))).toBe('Session expired')
+  })
+
+  it('distingue un serveur en erreur', () => {
+    expect(failureMessageKey(fetchError(500))).toBe('Server error')
+    expect(failureMessageKey(fetchError(503))).toBe('Server error')
+  })
+
+  it('distingue un trop-plein de tentatives', () => {
+    expect(failureMessageKey(fetchError(429))).toBe('Too many attempts')
+  })
+
+  // Une panne reseau n'a pas de reponse du tout : c'est le seul cas ou parler de
+  // connexion a un sens.
+  it('distingue un serveur injoignable', () => {
+    expect(failureMessageKey(new TypeError('Failed to fetch'))).toBe('Server unreachable')
+    expect(failureMessageKey(null)).toBe('Server unreachable')
+  })
+
+  it('retombe sur un echec generique pour les autres statuts', () => {
+    expect(failureMessageKey(fetchError(400))).toBe('Action failed')
+    expect(failureMessageKey(fetchError(403))).toBe('Action failed')
   })
 })
 

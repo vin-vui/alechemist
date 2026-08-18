@@ -5,14 +5,14 @@ const form = reactive({ current_password: '', password: '', password_confirmatio
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const saved = ref(false)
 const pending = ref(false)
 
 async function submit() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   saved.value = false
   try {
     await client('/user/password', { method: 'PUT', body: form })
@@ -22,7 +22,7 @@ async function submit() {
     saved.value = true
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -32,7 +32,7 @@ async function submit() {
 <template>
   <form class="panel profile-section" @submit.prevent="submit">
     <h2 class="section-title">{{ $t('Update Password') }}</h2>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <div class="field">
       <label class="field__label" for="current-password">{{ $t('Current Password') }}</label>
       <input id="current-password" v-model="form.current_password" type="password" autocomplete="current-password" class="field__input" />

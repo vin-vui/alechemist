@@ -22,6 +22,27 @@ export function extractErrors(e: unknown): Record<string, string[]> {
   return {}
 }
 
+/**
+ * Clé du message à afficher quand un échec n'a pas de détail de validation.
+ *
+ * Tous les formulaires affichaient « L'action a échoué. Vérifiez votre connexion,
+ * puis réessayez. » quel que soit l'échec. Sur un 419, la connexion n'y est pour
+ * rien et recharger la page est la seule chose à faire ; sur un 500, réessayer
+ * tout de suite ne sert à rien. Un message qui désigne la mauvaise cause envoie
+ * l'utilisateur chercher la panne là où elle n'est pas.
+ */
+export function failureMessageKey(e: unknown): string {
+  const err = e as MaybeFetchError
+  const status = err?.response?.status ?? err?.statusCode ?? err?.status ?? err?.data?.statusCode
+
+  // Aucune réponse du tout : le seul cas où parler de connexion a un sens.
+  if (typeof status !== 'number') return 'Server unreachable'
+  if (status === 419) return 'Session expired'
+  if (status === 429) return 'Too many attempts'
+  if (status >= 500) return 'Server error'
+  return 'Action failed'
+}
+
 /** Code HTTP d'une erreur, quelle que soit la couche qui l'a emballée. */
 export function statusOf(e: unknown): number {
   const err = e as MaybeFetchError

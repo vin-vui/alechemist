@@ -7,7 +7,7 @@ const file = ref<File | null>(null)
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const pending = ref(false)
 
 useHead({ title: () => t('Import File') })
@@ -20,7 +20,7 @@ async function submit() {
   if (!file.value) return
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   const body = new FormData()
   body.append('file', file.value)
   try {
@@ -28,7 +28,7 @@ async function submit() {
     await navigateTo(`/recipes/${recipe.id}`)
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -38,7 +38,7 @@ async function submit() {
 <template>
   <div class="import-page">
     <PageHeader :title="$t('Import File')" />
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <form id="import-form" class="panel import-page__form" @submit.prevent="submit">
       <label class="import-page__dropzone">
         <span v-if="!file" class="import-page__dropzone-action">{{ $t('Upload a file') }}</span>

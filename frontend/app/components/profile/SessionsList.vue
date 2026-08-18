@@ -42,14 +42,14 @@ const password = ref('')
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const askPassword = ref(false)
 const pending = ref(false)
 
 async function logoutOthers() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   try {
     await apiSend('/api/user/sessions/logout-others', 'POST', { password: password.value })
     askPassword.value = false
@@ -57,7 +57,7 @@ async function logoutOthers() {
     await refresh()
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -67,7 +67,7 @@ async function logoutOthers() {
 <template>
   <div class="panel profile-section">
     <h2 class="section-title">{{ $t('Browser Sessions') }}</h2>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <ul class="sessions-list">
       <li v-for="(session, index) in sessions ?? []" :key="index" class="sessions-list__row">
         <span class="sessions-list__info">{{ describe(session.user_agent) }}</span>

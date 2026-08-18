@@ -3,20 +3,20 @@ const password = ref('')
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const askPassword = ref(false)
 const pending = ref(false)
 
 async function destroyAccount() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   try {
     await apiSend('/api/user', 'DELETE', { password: password.value })
     window.location.href = '/login'
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -26,7 +26,7 @@ async function destroyAccount() {
 <template>
   <div class="panel profile-section profile-section--danger">
     <h2 class="section-title profile-section__title--danger">{{ $t('Delete Account') }}</h2>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <p class="profile-section__hint">{{ $t('Once your account is deleted, all of its resources and data will be permanently deleted.') }}</p>
     <button v-if="!askPassword" type="button" class="btn btn-danger" @click="askPassword = true">
       {{ $t('Delete Account') }}

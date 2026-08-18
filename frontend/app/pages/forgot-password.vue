@@ -10,21 +10,21 @@ const email = ref('')
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const pending = ref(false)
 const status = ref(false)
 
 async function submit() {
   pending.value = true
   errors.value = {}
-  failed.value = false
+  failure.value = null
   status.value = false
   try {
     await client('/forgot-password', { method: 'POST', body: { email: email.value } })
     status.value = true
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -35,7 +35,7 @@ async function submit() {
   <div class="panel auth-card">
     <img src="/assets/logo/alechemist@512.png" alt="AleChemist" class="auth-card__logo" />
     <h1 class="auth-card__title">{{ $t('Forgot your password?') }}</h1>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <p v-if="status" class="auth-card__status">{{ $t('We have emailed your password reset link!') }}</p>
     <form class="auth-card__form" @submit.prevent="submit">
       <div class="field">

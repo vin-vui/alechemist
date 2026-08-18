@@ -34,9 +34,11 @@ async function submit() {
   } catch (e) {
     errors.value = extractErrors(e)
     // Une erreur sans detail de validation (reseau, 419, 500) ne doit pas se
-    // traduire par un ecran qui ne bouge pas : on le dit.
+    // traduire par un ecran qui ne bouge pas : on le dit, et on dit lequel des
+    // trois c'est. « Verifiez votre connexion » sur une session expiree envoyait
+    // chercher la panne la ou elle n'est pas.
     if (Object.keys(errors.value).length === 0) {
-      failure.value = t('Login failed')
+      failure.value = t(failureMessageKey(e))
     }
   } finally {
     pending.value = false

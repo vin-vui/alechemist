@@ -19,21 +19,21 @@ const form = reactive({
 const errors = ref<Record<string, string[]>>({})
 // Un echec sans detail de validation (reseau, 419, 500) laissait le formulaire
 // immobile et muet : on le dit.
-const failed = ref(false)
+const failure = ref<string | null>(null)
 const pending = ref(false)
 
 useHead({ title: () => t('New Brewing') })
 
 async function submit() {
   errors.value = {}
-  failed.value = false
+  failure.value = null
   pending.value = true
   try {
     const brewing = await apiSend<Brewing>(`/api/recipes/${recipeId}/brewings`, 'POST', { ...form })
     await navigateTo(`/recipes/${recipeId}/brewings/${brewing.id}/preparation`)
   } catch (e) {
     errors.value = extractErrors(e)
-    failed.value = Object.keys(errors.value).length === 0
+    failure.value = Object.keys(errors.value).length === 0 ? failureMessageKey(e) : null
   } finally {
     pending.value = false
   }
@@ -49,7 +49,7 @@ async function submit() {
         <p v-if="recipe" class="new-brewing__recipe">{{ recipe.name }}</p>
       </template>
     </PageHeader>
-    <p v-if="failed" class="banner-error">{{ $t('Action failed') }}</p>
+    <p v-if="failure" class="banner-error">{{ $t(failure) }}</p>
     <form id="new-brewing-form" class="panel new-brewing__form" @submit.prevent="submit">
       <div class="field">
         <label class="field__label" for="name">{{ $t('Name') }}</label>
