@@ -27,6 +27,11 @@ watch(
     await nextTick()
     field.value?.focus()
   },
+  // immediate : la fiche recette monte le dialogue deja ouvert, une instance par
+  // brassin. Sans ca le champ n'y prendrait jamais le focus, puisque `open` ne
+  // change plus apres le montage. Les ecrans qui le montent ferme ne bougent pas :
+  // la passe immediate sort aussitot.
+  { immediate: true },
 )
 
 async function save() {

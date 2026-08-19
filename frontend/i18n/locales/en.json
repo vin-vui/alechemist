@@ -334,6 +334,8 @@
     "Start a brewing to see it here.": "No brewing in progress.",
     "Import your first recipe": "Import your first recipe to get started.",
     "Edit the note": "Edit the note",
+    "Brewing notes": "Brewing notes",
+    "Notes not loaded": "The brewing notes could not be loaded.",
     "Brewing not deleted": "The brewing was not deleted.",
     "Action failed": "The action failed. Try again, then reload the page if it happens again.",
     "Session expired": "Your session has expired. Reload the page, then start over.",

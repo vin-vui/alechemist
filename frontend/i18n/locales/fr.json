@@ -335,6 +335,8 @@
     "Start a brewing to see it here.": "Aucun brassin en cours.",
     "Import your first recipe": "Importez votre première recette pour commencer.",
     "Edit the note": "Modifier la note",
+    "Brewing notes": "Notes des brassins",
+    "Notes not loaded": "Les notes des brassins n'ont pas pu être chargées.",
     "Brewing not deleted": "Le brassin n'a pas été supprimé.",
     "Action failed": "L'action a échoué. Réessayez, puis rechargez la page si cela se reproduit.",
     "Session expired": "Votre session a expiré. Rechargez la page, puis recommencez.",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Recipe, Step, StepType } from '~/types/api'
+import type { Brewing, Recipe, Step, StepType } from '~/types/api'
 import { RECIPE_TABLES, type RecipeTableDescriptor, formatStepTime, timeUnitFor } from '~/utils/steps'
 
 const { t } = useI18n()
@@ -9,6 +9,24 @@ const recipeId = Number(route.params.recipe)
 const { data: recipe, error, refresh } = await useAsyncData(`recipe-${recipeId}`, () => apiGet<Recipe>(`/api/recipes/${recipeId}`))
 if (error.value) {
   throw createError({ statusCode: statusOf(error.value) })
+}
+
+/*
+ * Les brassins, pour leurs notes. Meme cle que la liste des brassins, et memes
+ * options : les deux ecrans partagent le meme chargement, et une note modifiee ici
+ * est deja a jour la-bas.
+ *
+ * L'erreur n'est pas fatale, contrairement a celle de la recette : une fiche recette
+ * reste lisible sans son journal, on le dit sur une ligne plutot que de remplacer la
+ * page par un ecran d'erreur.
+ */
+const { data: brewings, error: brewingsError } = await useAsyncData(`brewings-${recipeId}`, () =>
+  apiGet<Brewing[]>(`/api/recipes/${recipeId}/brewings`))
+
+// La liste est shallow (defaut de Nuxt 4) : on remplace le tableau, on ne modifie
+// pas la note dans l'objet, sinon l'ecran ne bougerait pas.
+function applyNote({ id, note }: { id: number; note: string }) {
+  brewings.value = (brewings.value ?? []).map((b) => (b.id === id ? { ...b, note } : b))
 }
 
 function stepsFor(types: StepType[]): Step[] {
@@ -167,6 +185,9 @@ async function destroyRecipe() {
         </div>
       </template>
     </section>
+
+    <p v-if="brewingsError" class="banner-error">{{ $t('Notes not loaded') }}</p>
+    <BrewingNotes :brewings="brewings" @saved="applyNote" />
 
     <!-- Action destructive en bas de page (P2) : une fiche recette est un ecran de
          consultation, la suppression ne doit pas etre la premiere chose que l'oeil
